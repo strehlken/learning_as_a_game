@@ -7,443 +7,259 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2B50;</text></svg>">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   :root {
     --bg: #f7f8fa;
     --text: #232324;
-    --muted: #6c6f76;
-    --border: #d1d4da;
+    --muted: #6f7379;
+    --border: #d4d7dd;
     --panel: #ffffff;
-    --panel-soft: #eef2f8;
-    --blue: #335ea8;
-    --blue-soft: #dbe6fb;
-    --green: #356b4f;
-    --amber: #8c6124;
-    --shadow: 0 18px 40px rgba(34, 40, 53, 0.08);
+    --soft: #eef2f8;
+    --blue: #315aa3;
+    --blueSoft: #dbe6fb;
+    --amber: #8d6226;
+    --green: #35674c;
+    --shadow: 0 16px 38px rgba(31, 35, 48, 0.08);
   }
-
   body {
     font-family: 'Brandon Grotesque', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.6;
     background:
-      radial-gradient(circle at top, rgba(70, 101, 163, 0.08), transparent 34%),
+      radial-gradient(circle at top, rgba(79, 106, 166, 0.08), transparent 35%),
       linear-gradient(180deg, #fbfcfd 0%, var(--bg) 100%);
     color: var(--text);
     min-height: 100vh;
-    padding: 2rem 1.25rem 3rem;
+    padding: 1.8rem 1.2rem 3rem;
   }
-
-  .page {
-    width: 100%;
-    max-width: 1160px;
-    margin: 0 auto;
-  }
-
-  header {
-    text-align: center;
-    margin-bottom: 1.7rem;
-  }
-
+  .page { width: 100%; max-width: 1280px; margin: 0 auto; }
+  header { margin-bottom: 1.5rem; }
   header h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    line-height: 1.05;
-    letter-spacing: 0.01em;
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 0.96;
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    letter-spacing: 0.01em;
   }
-
   header p {
-    max-width: 820px;
-    margin: 0 auto;
     font-size: 1.18rem;
     color: var(--muted);
+    max-width: 920px;
   }
-
-  .panel {
+  .section {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 22px;
+    border-radius: 24px;
     box-shadow: var(--shadow);
-  }
-
-  .stage-panel {
-    padding: 1.25rem 1.25rem 1.35rem;
+    padding: 1.2rem;
     margin-bottom: 1rem;
   }
-
-  .stage-top {
+  .section-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     gap: 1rem;
+    align-items: end;
     flex-wrap: wrap;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.9rem;
   }
-
-  .stage-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    background: var(--blue-soft);
+  .kicker {
     color: var(--blue);
-    border-radius: 999px;
-    padding: 0.5rem 0.9rem;
-    font-size: 0.98rem;
-    font-weight: 700;
-  }
-
-  .stage-progress {
-    color: var(--muted);
-    font-size: 1rem;
-  }
-
-  .stage-title {
-    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
-    line-height: 1.1;
-    margin-bottom: 0.45rem;
-  }
-
-  .stage-copy {
-    max-width: 980px;
-    color: var(--muted);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-
-  .stage-controls {
-    display: flex;
-    gap: 0.7rem;
-    flex-wrap: wrap;
-  }
-
-  .button,
-  .chip,
-  .star-btn,
-  .element-btn {
-    font-family: inherit;
-    border-radius: 14px;
-    border: 2px solid var(--border);
-    background: #fff;
-    color: var(--text);
-    cursor: pointer;
-    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
-  }
-
-  .button:hover,
-  .chip:hover,
-  .star-btn:hover,
-  .element-btn:hover {
-    transform: translateY(-1px);
-    border-color: #aeb6c6;
-  }
-
-  .button {
-    padding: 0.75rem 1.15rem;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-
-  .button.primary {
-    background: var(--blue);
-    color: #fff;
-    border-color: var(--blue);
-  }
-
-  .button:disabled {
-    opacity: 0.45;
-    cursor: default;
-    transform: none;
-  }
-
-  .choice-row {
-    margin-top: 0.95rem;
-  }
-
-  .choice-label {
-    font-size: 0.95rem;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: var(--muted);
-    margin-bottom: 0.45rem;
+    font-size: 0.94rem;
     font-weight: 700;
-  }
-
-  .chip-row,
-  .star-row,
-  .element-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.7rem;
-  }
-
-  .chip,
-  .star-btn,
-  .element-btn {
-    padding: 0.75rem 1rem;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-
-  .chip.active,
-  .star-btn.active,
-  .element-btn.active {
-    background: var(--panel-soft);
-    border-color: var(--blue);
-  }
-
-  .instrument {
-    padding: 1.25rem;
-  }
-
-  .instrument-header {
-    display: grid;
-    grid-template-columns: 1.2fr 0.9fr;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .hero-card,
-  .question-card,
-  .sidebar-card,
-  .compare-card {
-    border-radius: 18px;
-    border: 1px solid var(--border);
-    background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,249,252,1));
-  }
-
-  .hero-card {
-    padding: 1rem 1rem 0.9rem;
-  }
-
-  .hero-kicker {
-    font-size: 0.96rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 0.45rem;
-  }
-
-  .hero-title {
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
-    line-height: 1.1;
-    margin-bottom: 0.45rem;
-  }
-
-  .hero-text {
-    font-size: 1.08rem;
-    color: var(--muted);
-  }
-
-  .question-card {
-    padding: 1rem;
-    background:
-      linear-gradient(160deg, rgba(219,230,251,0.95), rgba(255,255,255,1) 55%),
-      #fff;
-  }
-
-  .question-label {
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--blue);
-    font-weight: 700;
-    margin-bottom: 0.35rem;
-  }
-
-  .question-text {
-    font-size: 1.22rem;
-    line-height: 1.28;
-    margin-bottom: 0.55rem;
-  }
-
-  .question-answer {
-    color: var(--muted);
-    font-size: 1.02rem;
-  }
-
-  .question-answer strong {
-    color: var(--text);
-  }
-
-  .spectrum-frame {
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background:
-      linear-gradient(180deg, rgba(33, 40, 57, 0.04), rgba(255,255,255,0)),
-      #fff;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-  }
-
-  .section-label {
-    font-size: 0.96rem;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--muted);
-    font-weight: 700;
-    margin-bottom: 0.4rem;
-  }
-
-  .spectrum-title {
-    font-size: 1.35rem;
-    line-height: 1.2;
     margin-bottom: 0.2rem;
   }
-
-  .spectrum-help {
-    font-size: 1.05rem;
-    color: var(--muted);
-    margin-bottom: 0.8rem;
-    max-width: 860px;
+  .section-title {
+    font-size: clamp(1.6rem, 2.4vw, 2.3rem);
+    line-height: 1.08;
   }
-
-  canvas#spectrum {
+  .section-note {
+    color: var(--muted);
+    font-size: 1.02rem;
+    max-width: 680px;
+  }
+  .status-pill {
+    background: var(--blueSoft);
+    color: var(--blue);
+    border-radius: 999px;
+    padding: 0.45rem 0.85rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1.1fr 0.95fr; gap: 1rem; }
+  .card {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #fff, #fbfcfe);
+    padding: 1rem;
+  }
+  .prompt { font-size: 1.08rem; color: var(--muted); margin-bottom: 0.8rem; }
+  .instruction { font-size: 1.08rem; margin-top: 0.75rem; }
+  .instruction strong { color: var(--text); }
+  .beam-stage {
+    position: relative;
+    height: 260px;
+    border-radius: 18px;
+    background:
+      linear-gradient(180deg, rgba(28, 32, 41, 0.05), rgba(255,255,255,0)),
+      #ffffff;
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .beam-label { position: absolute; left: 1rem; top: 1rem; color: var(--muted); font-size: 0.95rem; }
+  .beam {
+    position: absolute;
+    left: 0;
+    top: 104px;
+    width: 250px;
+    height: 14px;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.94) 18%, rgba(255,255,255,0.94) 100%);
+    box-shadow: 0 0 18px rgba(255,255,255,0.9);
+  }
+  .prism {
+    position: absolute;
+    left: 320px;
+    top: 120px;
+    width: 110px;
+    height: 96px;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background: linear-gradient(180deg, rgba(230,236,248,0.96), rgba(197,210,236,0.96));
+    border: 2px solid #aab8d6;
+    cursor: grab;
+    box-shadow: 0 14px 26px rgba(54, 77, 121, 0.16);
+  }
+  .prism.dragging { cursor: grabbing; }
+  .target-ring {
+    position: absolute;
+    left: 208px;
+    top: 72px;
+    width: 128px;
+    height: 128px;
+    border: 2px dashed rgba(49,90,163,0.24);
+    border-radius: 22px;
+    pointer-events: none;
+  }
+  .target-ring.done { border-color: rgba(53,103,76,0.55); }
+  .rainbow {
+    position: absolute;
+    left: 292px;
+    top: 118px;
+    width: 0;
+    height: 130px;
+    background: linear-gradient(180deg, #6f00ff 0%, #365bff 16%, #00b7ff 32%, #00cf72 49%, #ffd200 67%, #ff8f00 82%, #ff2f2f 100%);
+    transform-origin: top left;
+    transform: skewX(-31deg);
+    filter: saturate(1.15) brightness(1.02);
+    border-radius: 0 0 12px 12px;
+    transition: width 320ms ease;
+  }
+  .rainbow.visible { width: 120px; }
+  .mini-spectrum, .main-spectrum, .marker-strip {
     width: 100%;
-    height: 220px;
     display: block;
-    border-radius: 16px;
+    border-radius: 14px;
     border: 1px solid var(--border);
     background: #edf1f6;
   }
-
-  canvas#markers {
-    width: 100%;
-    height: 82px;
-    display: block;
-    margin-top: 0.4rem;
-  }
-
+  .main-spectrum { height: 160px; }
+  .marker-strip { height: 70px; margin-top: 0.35rem; }
   .axis {
     display: flex;
     justify-content: space-between;
     color: var(--muted);
-    font-size: 0.95rem;
-    margin-top: 0.35rem;
-    padding: 0 0.2rem;
+    font-size: 0.92rem;
+    margin-top: 0.3rem;
+    padding: 0 0.15rem;
   }
-
-  .below-grid {
+  .lab-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 1rem; }
+  .periodic-grid {
     display: grid;
-    grid-template-columns: 1.15fr 0.95fr;
-    gap: 1rem;
+    grid-template-columns: repeat(18, minmax(0, 1fr));
+    gap: 0.28rem;
   }
-
-  .sidebar-card {
-    padding: 1rem;
+  .element-cell {
+    min-height: 58px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: #fff;
+    padding: 0.22rem 0.2rem 0.16rem;
+    cursor: pointer;
+    transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
   }
-
-  .star-info {
-    margin-top: 0.7rem;
-    min-height: 1.45rem;
-    font-size: 1rem;
-    color: var(--muted);
-  }
-
-  .star-info strong {
+  .element-cell:hover { transform: translateY(-1px); border-color: #aeb9cf; }
+  .element-cell.selected { border-color: var(--blue); background: var(--soft); }
+  .element-num { font-size: 0.64rem; color: var(--muted); line-height: 1; }
+  .element-symbol { font-size: 1.04rem; font-weight: 700; line-height: 1.05; margin-top: 0.08rem; }
+  .element-lines { font-size: 0.62rem; color: var(--muted); margin-top: 0.16rem; }
+  .blank-cell { min-height: 58px; }
+  .lab-controls { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+  .mode-btn, .star-btn, .earth-btn, .overlay-chip {
+    font-family: inherit;
+    border: 2px solid var(--border);
+    border-radius: 14px;
+    background: #fff;
     color: var(--text);
-  }
-
-  .readout {
-    margin-top: 1rem;
-    padding: 1rem;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: #fff;
-  }
-
-  .readout-main {
-    font-size: 1.14rem;
-    line-height: 1.35;
-    margin-bottom: 0.45rem;
-  }
-
-  .readout-line {
-    font-size: 1rem;
-    color: var(--muted);
-    margin-top: 0.45rem;
-  }
-
-  .compare-card {
-    padding: 1rem;
-    display: none;
-  }
-
-  .compare-card.active {
-    display: block;
-  }
-
-  .compare-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
-    margin: 0.9rem 0;
-  }
-
-  .mini-panel {
-    padding: 0.85rem;
-    border-radius: 16px;
-    border: 1px solid var(--border);
-    background: #fff;
-  }
-
-  .mini-title {
+    cursor: pointer;
     font-size: 1rem;
     font-weight: 700;
-    margin-bottom: 0.15rem;
+    padding: 0.72rem 0.95rem;
+    transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease;
   }
-
-  .mini-note {
-    color: var(--muted);
-    font-size: 0.94rem;
-    margin-bottom: 0.55rem;
-  }
-
-  .mini-spectrum {
-    width: 100%;
-    height: 92px;
-    display: block;
-    border-radius: 10px;
+  .mode-btn:hover, .star-btn:hover, .earth-btn:hover, .overlay-chip:hover { transform: translateY(-1px); border-color: #aeb9cf; }
+  .mode-btn.active, .star-btn.active, .earth-btn.active, .overlay-chip.active { border-color: var(--blue); background: var(--soft); }
+  .selected-box {
+    padding: 1rem;
     border: 1px solid var(--border);
-    background: #edf1f6;
-  }
-
-  .compare-readout {
-    padding: 0.95rem 1rem;
     border-radius: 16px;
-    background: var(--panel-soft);
-    border: 1px solid #d5deec;
-    font-size: 1.03rem;
+    background: linear-gradient(180deg, #fff, #fafbfd);
+    margin-bottom: 0.8rem;
   }
-
-  footer {
-    text-align: center;
-    margin-top: 1.5rem;
+  .selected-box h3 { font-size: 1.5rem; line-height: 1.1; margin-bottom: 0.18rem; }
+  .selected-box p { color: var(--muted); font-size: 1rem; }
+  .line-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.35rem 0.8rem;
+    margin-top: 0.7rem;
+    font-size: 0.95rem;
   }
-
-  footer a {
-    color: var(--muted);
-    text-decoration: none;
+  .line-item { color: var(--muted); }
+  .line-item strong { color: var(--text); }
+  .bridge-note {
+    margin-top: 0.75rem;
+    padding: 0.85rem 0.9rem;
+    border-radius: 14px;
+    background: var(--soft);
+    border: 1px solid #dbe2ef;
     font-size: 1rem;
   }
-
-  footer a:hover {
-    color: var(--text);
+  .compare-controls { margin-bottom: 0.8rem; }
+  .compare-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+  .compare-box { border: 1px solid var(--border); border-radius: 16px; padding: 0.85rem; background: #fff; }
+  .compare-box h4 { font-size: 1.02rem; margin-bottom: 0.1rem; }
+  .compare-box p { font-size: 0.92rem; color: var(--muted); margin-bottom: 0.45rem; }
+  .mini-spectrum { height: 92px; }
+  .compare-verdict {
+    margin-top: 0.9rem;
+    padding: 0.92rem 0.95rem;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #f4f7fb, #eef3fa);
+    border: 1px solid #d5deec;
+    font-size: 1rem;
   }
-
-  .hidden { display: none !important; }
-
-  @media (max-width: 920px) {
-    .instrument-header,
-    .below-grid,
-    .compare-grid {
-      grid-template-columns: 1fr;
-    }
-
-    canvas#spectrum {
-      height: 190px;
-    }
+  .star-layout { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: 1rem; }
+  .chip-wrap { display: flex; flex-wrap: wrap; gap: 0.55rem; }
+  .subtle { color: var(--muted); font-size: 1rem; }
+  .muted-block { padding: 0.85rem 0.9rem; border: 1px dashed var(--border); border-radius: 14px; color: var(--muted); }
+  footer { text-align: center; margin-top: 1.4rem; }
+  footer a { text-decoration: none; color: var(--muted); font-size: 1rem; }
+  footer a:hover { color: var(--text); }
+  @media (max-width: 1080px) {
+    .grid-2, .lab-layout, .compare-grid, .star-layout { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 760px) {
+    body { padding: 1rem 0.7rem 2rem; }
+    .periodic-grid { grid-template-columns: repeat(9, minmax(0, 1fr)); }
+    .element-cell, .blank-cell { min-height: 60px; }
   }
 </style>
 </head>
@@ -451,270 +267,178 @@
 <div class="page">
   <header>
     <h1>Reading Starlight</h1>
-    <p>Move from mechanism to explanation. By the end, the model should not just look right. It should answer real questions about where spectral lines come from.</p>
+    <p>Build the decoder ring yourself. Make a spectrum, excite elements across the periodic table, flip emission into absorption at the same wavelengths, compare causes, then read a real star.</p>
   </header>
 
-  <section class="panel stage-panel">
-    <div class="stage-top">
-      <div class="stage-pill" id="stagePill">Stage 1</div>
-      <div class="stage-progress" id="stageProgress">1 of 5</div>
-    </div>
-    <div class="stage-title" id="stageTitle"></div>
-    <div class="stage-copy" id="stageCopy"></div>
-    <div class="stage-controls">
-      <button class="button" id="prevBtn">Previous</button>
-      <button class="button primary" id="nextBtn">Next</button>
-    </div>
-    <div class="choice-row hidden" id="demoElementWrap">
-      <div class="choice-label">Choose One Element</div>
-      <div class="chip-row" id="demoElementButtons"></div>
-    </div>
-  </section>
-
-  <section class="panel instrument">
-    <div class="instrument-header">
-      <div class="hero-card">
-        <div class="hero-kicker">Learning Goal</div>
-        <div class="hero-title" id="heroTitle">A spectrum is light spread out.</div>
-        <div class="hero-text" id="heroText">First understand the object you are looking at. Then understand what changes it.</div>
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="kicker">1. Make A Spectrum</div>
+        <div class="section-title">Drag the prism into the beam.</div>
       </div>
-      <div class="question-card">
-        <div class="question-label">Question To Carry</div>
-        <div class="question-text" id="questionText">Why do we need to spread light out before we can learn anything from it?</div>
-        <div class="question-answer" id="questionAnswer">Because when all wavelengths arrive mixed together, the missing ones are hidden. <strong>The spectrum makes the structure visible.</strong></div>
-      </div>
+      <div class="status-pill" id="prismStatus">Prism not placed</div>
     </div>
-
-    <div class="spectrum-frame">
-      <div class="section-label" id="spectrumLabel">Continuous Spectrum</div>
-      <div class="spectrum-title" id="spectrumTitle">White light spread into a visible range of colors.</div>
-      <div class="spectrum-help" id="spectrumHelp">This is the baseline. No absorption lines have been added yet.</div>
-      <canvas id="spectrum"></canvas>
-      <canvas id="markers"></canvas>
-      <div class="axis">
-        <span>380 nm</span>
-        <span>450</span>
-        <span>520</span>
-        <span>590</span>
-        <span>660</span>
-        <span>730 nm</span>
+    <div class="grid-2">
+      <div class="card">
+        <div class="prompt">Do the action first. Then read the sentence.</div>
+        <div class="beam-stage" id="beamStage">
+          <div class="beam-label">white beam</div>
+          <div class="target-ring" id="targetRing"></div>
+          <div class="beam"></div>
+          <div class="rainbow" id="rainbow"></div>
+          <div class="prism" id="prism"></div>
+        </div>
+        <div class="instruction" id="prismInstruction">Move the prism into the dashed zone so the hidden colors separate.</div>
       </div>
-    </div>
-
-    <div class="compare-card" id="compareCard">
-      <div class="section-label">Compare Causes</div>
-      <div class="spectrum-title">If Earth caused all the visible dark lines, every star would look much more alike.</div>
-      <div class="spectrum-help">The dashed markers show a few fixed telluric wavelengths from Earth's atmosphere. Notice that the stars share those, but they also have many star-specific lines that differ from each other.</div>
-      <div class="compare-grid">
-        <div class="mini-panel">
-          <div class="mini-title">Earth Atmosphere Only</div>
-          <div class="mini-note">A small fixed set of visible telluric lines.</div>
-          <canvas class="mini-spectrum" id="miniEarth"></canvas>
-        </div>
-        <div class="mini-panel">
-          <div class="mini-title">Sirius</div>
-          <div class="mini-note">Strong hydrogen pattern plus the same small telluric contribution.</div>
-          <canvas class="mini-spectrum" id="miniSirius"></canvas>
-        </div>
-        <div class="mini-panel">
-          <div class="mini-title">Betelgeuse</div>
-          <div class="mini-note">Very different star pattern, despite the same Earth atmosphere.</div>
-          <canvas class="mini-spectrum" id="miniBetelgeuse"></canvas>
-        </div>
-      </div>
-      <div class="compare-readout" id="compareReadout"></div>
-    </div>
-
-    <div class="below-grid">
-      <div class="sidebar-card">
-        <div id="starTool" class="hidden">
-          <div class="choice-label">Choose A Star</div>
-          <div class="star-row" id="starButtons"></div>
-          <div class="star-info" id="starInfo"></div>
-        </div>
-      </div>
-
-      <div class="sidebar-card">
-        <div id="elementTool" class="hidden">
-          <div class="choice-label">Test Element Overlays</div>
-          <div class="element-row" id="elementButtons"></div>
-        </div>
-        <div class="readout" id="readout">
-          <div class="readout-main">The page is introducing the model step by step.</div>
-        </div>
+      <div class="card">
+        <div class="kicker">Why This Matters</div>
+        <div class="section-note">When the wavelengths stay mixed together, you cannot tell which ones are missing. The spectrum is what makes structure visible in the first place.</div>
       </div>
     </div>
   </section>
 
-  <footer>
-    <a href="../index.html">&larr; back</a>
-  </footer>
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="kicker">2. Build The Decoder Ring</div>
+        <div class="section-title">Use the periodic table as a lab bench.</div>
+      </div>
+      <div class="status-pill" id="labStatus">Choose an element</div>
+    </div>
+    <div class="lab-layout">
+      <div class="card">
+        <div class="prompt">Pick any element. Real visible strong lines are embedded from the NIST handbook for the elements available there. The rest of the table is still selectable, but many have sparse or no visible data in this build.</div>
+        <div class="periodic-grid" id="periodicGrid"></div>
+      </div>
+      <div class="card">
+        <div class="selected-box">
+          <h3 id="selectedTitle">Hydrogen (H)</h3>
+          <p id="selectedMeta">Atomic number 1 · visible strong lines loaded</p>
+        </div>
+        <div class="lab-controls">
+          <button class="mode-btn active" id="emissionBtn">Hot glowing gas</button>
+          <button class="mode-btn" id="absorptionBtn">Cool gas in white light</button>
+        </div>
+        <canvas class="main-spectrum" id="labSpectrum"></canvas>
+        <div class="axis"><span>380 nm</span><span>450</span><span>520</span><span>590</span><span>660</span><span>730 nm</span></div>
+        <div class="bridge-note" id="bridgeNote">Excite the gas and you get bright emission lines. Flip to absorption mode and those same wavelengths appear as dark lines instead.</div>
+        <div class="line-list" id="lineList"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="kicker">3. Compare Causes</div>
+        <div class="section-title">Ask whether Earth could be causing all the lines.</div>
+      </div>
+      <div class="status-pill">Model test</div>
+    </div>
+    <div class="compare-controls">
+      <button class="earth-btn" id="earthToggle">Show Earth’s shared lines</button>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-box">
+        <h4>Earth atmosphere only</h4>
+        <p>A small fixed telluric pattern in the visible range.</p>
+        <canvas class="mini-spectrum" id="earthSpectrum"></canvas>
+      </div>
+      <div class="compare-box">
+        <h4>Sirius through Earth</h4>
+        <p>Same Earth atmosphere, but a very different star pattern.</p>
+        <canvas class="mini-spectrum" id="siriusSpectrum"></canvas>
+      </div>
+      <div class="compare-box">
+        <h4>Betelgeuse through Earth</h4>
+        <p>Again through Earth, but the stellar lines are clearly not the same.</p>
+        <canvas class="mini-spectrum" id="betelgeuseSpectrum"></canvas>
+      </div>
+    </div>
+    <div class="compare-verdict" id="compareVerdict">Toggle the shared Earth lines. If Earth caused all the visible structure, the two stars would look much more alike than they do.</div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <div class="kicker">4. Read A Real Star</div>
+        <div class="section-title">Use the patterns you explored in the lab.</div>
+      </div>
+      <div class="status-pill" id="starStatus">Pick a star and test overlays</div>
+    </div>
+    <div class="star-layout">
+      <div class="card">
+        <div class="prompt">Choose a star, then toggle elements you explored above. The tool should feel like an instrument, not an answer key.</div>
+        <div class="chip-wrap" id="starButtons"></div>
+        <div class="subtle" id="starInfo" style="margin-top:0.75rem;"></div>
+        <div style="margin-top:1rem;" class="choice-label"></div>
+        <div class="subtle" style="margin-bottom:0.45rem; font-weight:700; color:var(--text);">Elements explored in the lab</div>
+        <div class="chip-wrap" id="overlayRack"></div>
+        <div class="muted-block" id="overlayHint" style="margin-top:0.8rem;">Explore elements in the lab and they will appear here as overlays you can test against the star.</div>
+      </div>
+      <div class="card">
+        <canvas class="main-spectrum" id="starSpectrum"></canvas>
+        <canvas class="marker-strip" id="starMarkers"></canvas>
+        <div class="axis"><span>380 nm</span><span>450</span><span>520</span><span>590</span><span>660</span><span>730 nm</span></div>
+        <div class="bridge-note" id="starReadout">Choose overlays and look for alignment. Strong matches glow. Weak explanations stay faint.</div>
+      </div>
+    </div>
+  </section>
+
+  <footer><a href="../index.html">&larr; back</a></footer>
 </div>
 
 <script>
+const ELEMENTS = {"Ac":{"name":"Actinium","symbol":"Ac","atomicNumber":89,"lines":[{"intensity":700.0,"nm":386.312,"spectrum":"Ac II","medium":"air"},{"intensity":400.0,"nm":388.556,"spectrum":"Ac I","medium":"air"},{"intensity":1000.0,"nm":408.844,"spectrum":"Ac II","medium":"air"},{"intensity":700.0,"nm":416.84,"spectrum":"Ac II","medium":"air"},{"intensity":1000.0,"nm":417.998,"spectrum":"Ac I","medium":"air"},{"intensity":500.0,"nm":418.312,"spectrum":"Ac I","medium":"air"},{"intensity":400.0,"nm":419.44,"spectrum":"Ac I","medium":"air"},{"intensity":300.0,"nm":438.453,"spectrum":"Ac I","medium":"air"},{"intensity":500.0,"nm":438.641,"spectrum":"Ac II","medium":"air"},{"intensity":400.0,"nm":439.671,"spectrum":"Ac I","medium":"air"},{"intensity":400.0,"nm":446.273,"spectrum":"Ac I","medium":"air"},{"intensity":700.0,"nm":450.72,"spectrum":"Ac II","medium":"air"}],"lineCount":12,"row":7,"col":3},"Au":{"name":"Gold","symbol":"Au","atomicNumber":79,"lines":[{"intensity":40.0,"nm":389.7865,"spectrum":"Au I","medium":"air"},{"intensity":25.0,"nm":390.9383,"spectrum":"Au I","medium":"air"},{"intensity":40.0,"nm":404.0931,"spectrum":"Au I","medium":"air"},{"intensity":60.0,"nm":406.5068,"spectrum":"Au I","medium":"air"},{"intensity":20.0,"nm":431.511,"spectrum":"Au I","medium":"air"},{"intensity":11.0,"nm":443.7269,"spectrum":"Au I","medium":"air"},{"intensity":25.0,"nm":448.8253,"spectrum":"Au I","medium":"air"},{"intensity":80.0,"nm":460.7512,"spectrum":"Au I","medium":"air"},{"intensity":50.0,"nm":479.2583,"spectrum":"Au I","medium":"air"},{"intensity":25.0,"nm":523.0259,"spectrum":"Au I","medium":"air"},{"intensity":25.0,"nm":583.7374,"spectrum":"Au I","medium":"air"},{"intensity":25.0,"nm":595.6965,"spectrum":"Au I","medium":"air"}],"lineCount":12,"row":6,"col":11},"Pm":{"name":"Promethium","symbol":"Pm","atomicNumber":61,"lines":[{"intensity":800.0,"nm":387.762,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":389.215,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":391.026,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":391.91,"spectrum":"Pm II","medium":"air"},{"intensity":800.0,"nm":393.648,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":395.774,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":399.896,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":441.796,"spectrum":"Pm II","medium":"air"},{"intensity":800.0,"nm":445.395,"spectrum":"Pm II","medium":"air"},{"intensity":800.0,"nm":452.921,"spectrum":"Pm II","medium":"air"},{"intensity":1000.0,"nm":476.257,"spectrum":"Pm I","medium":"air"},{"intensity":1000.0,"nm":499.71,"spectrum":"Pm I","medium":"air"}],"lineCount":12,"row":8,"col":7},"Al":{"name":"Aluminum","symbol":"Al","atomicNumber":13,"lines":[{"intensity":400.0,"nm":390.0675,"spectrum":"Al II","medium":"air"},{"intensity":500.0,"nm":394.4006,"spectrum":"Al I","medium":"air"},{"intensity":1000.0,"nm":396.152,"spectrum":"Al I","medium":"air"},{"intensity":1000.0,"nm":466.3056,"spectrum":"Al II","medium":"air"},{"intensity":600.0,"nm":466.68,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":559.3302,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":600.641,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":607.3198,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":618.342,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":620.1463,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":624.336,"spectrum":"Al II","medium":"air"},{"intensity":400.0,"nm":633.5701,"spectrum":"Al II","medium":"air"}],"lineCount":12,"row":3,"col":13},"Hf":{"name":"Hafnium","symbol":"Hf","atomicNumber":72,"lines":[{"intensity":400.0,"nm":380.038,"spectrum":"Hf I","medium":"air"},{"intensity":150.0,"nm":381.178,"spectrum":"Hf I","medium":"air"},{"intensity":600.0,"nm":382.073,"spectrum":"Hf I","medium":"air"},{"intensity":400.0,"nm":384.918,"spectrum":"Hf I","medium":"air"},{"intensity":250.0,"nm":385.831,"spectrum":"Hf I","medium":"air"},{"intensity":300.0,"nm":389.994,"spectrum":"Hf I","medium":"air"},{"intensity":150.0,"nm":393.138,"spectrum":"Hf I","medium":"air"},{"intensity":200.0,"nm":395.183,"spectrum":"Hf I","medium":"air"},{"intensity":500.0,"nm":417.434,"spectrum":"Hf I","medium":"air"},{"intensity":150.0,"nm":429.479,"spectrum":"Hf I","medium":"air"},{"intensity":250.0,"nm":459.88,"spectrum":"Hf I","medium":"air"},{"intensity":250.0,"nm":713.181,"spectrum":"Hf I","medium":"air"}],"lineCount":12,"row":6,"col":4},"Pa":{"name":"Protactinium","symbol":"Pa","atomicNumber":91,"lines":[{"intensity":300.0,"nm":387.335,"spectrum":"Pa I","medium":"air"},{"intensity":300.0,"nm":393.183,"spectrum":"Pa I","medium":"air"},{"intensity":300.0,"nm":395.262,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":395.785,"spectrum":"Pa II","medium":"air"},{"intensity":300.0,"nm":397.007,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":398.223,"spectrum":"Pa I","medium":"air"},{"intensity":300.0,"nm":401.296,"spectrum":"Pa II","medium":"air"},{"intensity":300.0,"nm":401.821,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":405.62,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":407.04,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":421.723,"spectrum":"Pa II","medium":"air"},{"intensity":1000.0,"nm":424.8083,"spectrum":"Pa II","medium":"air"}],"lineCount":12,"row":9,"col":5},"Am":{"name":"Americium","symbol":"Am","atomicNumber":95,"lines":[{"intensity":1000.0,"nm":392.6248,"spectrum":"Am II","medium":"air"},{"intensity":200.0,"nm":395.2576,"spectrum":"Am II","medium":"air"},{"intensity":1000.0,"nm":408.9291,"spectrum":"Am II","medium":"air"},{"intensity":200.0,"nm":418.8121,"spectrum":"Am II","medium":"air"},{"intensity":500.0,"nm":428.9258,"spectrum":"Am I","medium":"air"},{"intensity":400.0,"nm":432.457,"spectrum":"Am II","medium":"air"},{"intensity":400.0,"nm":444.1357,"spectrum":"Am II","medium":"air"},{"intensity":1000.0,"nm":450.945,"spectrum":"Am II","medium":"air"},{"intensity":1000.0,"nm":457.559,"spectrum":"Am II","medium":"air"},{"intensity":200.0,"nm":459.3307,"spectrum":"Am II","medium":"air"},{"intensity":500.0,"nm":466.279,"spectrum":"Am I","medium":"air"},{"intensity":400.0,"nm":469.97,"spectrum":"Am II","medium":"air"}],"lineCount":12,"row":9,"col":9},"He":{"name":"Helium","symbol":"He","atomicNumber":2,"lines":[{"intensity":10.0,"nm":381.9607,"spectrum":"He I","medium":"air"},{"intensity":300.0,"nm":388.8649,"spectrum":"He I","medium":"air"},{"intensity":20.0,"nm":396.4729,"spectrum":"He I","medium":"air"},{"intensity":50.0,"nm":402.6191,"spectrum":"He I","medium":"air"},{"intensity":12.0,"nm":412.082,"spectrum":"He I","medium":"air"},{"intensity":200.0,"nm":447.1479,"spectrum":"He I","medium":"air"},{"intensity":12.0,"nm":468.5804,"spectrum":"He II","medium":"air"},{"intensity":30.0,"nm":471.3146,"spectrum":"He I","medium":"air"},{"intensity":20.0,"nm":492.1931,"spectrum":"He I","medium":"air"},{"intensity":100.0,"nm":501.5678,"spectrum":"He I","medium":"air"},{"intensity":500.0,"nm":587.5615,"spectrum":"He I","medium":"air"},{"intensity":200.0,"nm":667.8152,"spectrum":"He I","medium":"air"}],"lineCount":12,"row":1,"col":18},"Ra":{"name":"Radium","symbol":"Ra","atomicNumber":88,"lines":[{"intensity":1000.0,"nm":381.442,"spectrum":"Ra II","medium":"air"},{"intensity":500.0,"nm":434.064,"spectrum":"Ra II","medium":"air"},{"intensity":500.0,"nm":468.228,"spectrum":"Ra II","medium":"air"},{"intensity":1000.0,"nm":482.591,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":540.023,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":540.681,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":555.585,"spectrum":"Ra I","medium":"air"},{"intensity":500.0,"nm":566.081,"spectrum":"Ra I","medium":"air"},{"intensity":300.0,"nm":620.03,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":644.62,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":648.732,"spectrum":"Ra I","medium":"air"},{"intensity":200.0,"nm":698.022,"spectrum":"Ra I","medium":"air"}],"lineCount":12,"row":7,"col":2},"Sb":{"name":"Antimony","symbol":"Sb","atomicNumber":51,"lines":[{"intensity":200.0,"nm":471.168,"spectrum":"Sb II","medium":"air"},{"intensity":400.0,"nm":556.812,"spectrum":"Sb II","medium":"air"},{"intensity":200.0,"nm":563.977,"spectrum":"Sb II","medium":"air"},{"intensity":500.0,"nm":600.557,"spectrum":"Sb II","medium":"air"},{"intensity":200.0,"nm":607.967,"spectrum":"Sb II","medium":"air"},{"intensity":300.0,"nm":613.0,"spectrum":"Sb II","medium":"air"}],"lineCount":6,"row":5,"col":15},"Ho":{"name":"Holmium","symbol":"Ho","atomicNumber":67,"lines":[{"intensity":600.0,"nm":381.074,"spectrum":"Ho II","medium":"air"},{"intensity":150.0,"nm":386.168,"spectrum":"Ho II","medium":"air"},{"intensity":200.0,"nm":388.896,"spectrum":"Ho II","medium":"air"},{"intensity":800.0,"nm":389.094,"spectrum":"Ho II","medium":"air"},{"intensity":300.0,"nm":404.081,"spectrum":"Ho I","medium":"air"},{"intensity":300.0,"nm":404.547,"spectrum":"Ho II","medium":"air"},{"intensity":900.0,"nm":405.387,"spectrum":"Ho I","medium":"air"},{"intensity":1000.0,"nm":410.38,"spectrum":"Ho I","medium":"air"},{"intensity":300.0,"nm":410.862,"spectrum":"Ho I","medium":"air"},{"intensity":150.0,"nm":412.02,"spectrum":"Ho I","medium":"air"},{"intensity":500.0,"nm":412.716,"spectrum":"Ho I","medium":"air"},{"intensity":900.0,"nm":416.303,"spectrum":"Ho I","medium":"air"}],"lineCount":12,"row":8,"col":13},"Rn":{"name":"Radon","symbol":"Rn","atomicNumber":86,"lines":[{"intensity":250.0,"nm":430.776,"spectrum":"Rn I","medium":"air"},{"intensity":300.0,"nm":434.96,"spectrum":"Rn I","medium":"air"},{"intensity":150.0,"nm":445.925,"spectrum":"Rn I","medium":"air"},{"intensity":150.0,"nm":450.848,"spectrum":"Rn I","medium":"air"},{"intensity":150.0,"nm":457.772,"spectrum":"Rn I","medium":"air"},{"intensity":150.0,"nm":460.938,"spectrum":"Rn I","medium":"air"},{"intensity":100.0,"nm":472.176,"spectrum":"Rn I","medium":"air"},{"intensity":50.0,"nm":662.723,"spectrum":"Rn I","medium":"air"},{"intensity":70.0,"nm":675.181,"spectrum":"Rn I","medium":"air"},{"intensity":700.0,"nm":705.542,"spectrum":"Rn I","medium":"air"},{"intensity":300.0,"nm":726.811,"spectrum":"Rn I","medium":"air"},{"intensity":70.0,"nm":729.1,"spectrum":"Rn I","medium":"air"}],"lineCount":12,"row":6,"col":18},"Ar":{"name":"Argon","symbol":"Ar","atomicNumber":18,"lines":[{"intensity":200.0,"nm":427.7528,"spectrum":"Ar II","medium":"air"},{"intensity":250.0,"nm":434.8064,"spectrum":"Ar II","medium":"air"},{"intensity":130.0,"nm":442.6001,"spectrum":"Ar II","medium":"air"},{"intensity":130.0,"nm":454.5052,"spectrum":"Ar II","medium":"air"},{"intensity":130.0,"nm":457.935,"spectrum":"Ar II","medium":"air"},{"intensity":130.0,"nm":458.9898,"spectrum":"Ar II","medium":"air"},{"intensity":200.0,"nm":460.9567,"spectrum":"Ar II","medium":"air"},{"intensity":130.0,"nm":465.7901,"spectrum":"Ar II","medium":"air"},{"intensity":200.0,"nm":472.6868,"spectrum":"Ar II","medium":"air"},{"intensity":250.0,"nm":476.4865,"spectrum":"Ar II","medium":"air"},{"intensity":200.0,"nm":480.602,"spectrum":"Ar II","medium":"air"},{"intensity":250.0,"nm":487.9864,"spectrum":"Ar II","medium":"air"}],"lineCount":12,"row":3,"col":18},"H":{"name":"Hydrogen","symbol":"H","atomicNumber":1,"lines":[{"intensity":5.0,"nm":383.5384,"spectrum":"H I","medium":"air"},{"intensity":6.0,"nm":388.9049,"spectrum":"H I","medium":"air"},{"intensity":8.0,"nm":397.0072,"spectrum":"H I","medium":"air"},{"intensity":15.0,"nm":410.174,"spectrum":"H I","medium":"air"},{"intensity":30.0,"nm":434.0462,"spectrum":"H I","medium":"air"},{"intensity":60.0,"nm":486.1361,"spectrum":"H I","medium":"air"},{"intensity":180.0,"nm":656.2852,"spectrum":"H I","medium":"air"}],"lineCount":7,"row":1,"col":1},"Re":{"name":"Rhenium","symbol":"Re","atomicNumber":75,"lines":[{"intensity":10.0,"nm":392.985,"spectrum":"Re I","medium":"air"},{"intensity":30.0,"nm":413.645,"spectrum":"Re I","medium":"air"},{"intensity":13.0,"nm":414.436,"spectrum":"Re I","medium":"air"},{"intensity":12.0,"nm":422.108,"spectrum":"Re I","medium":"air"},{"intensity":70.0,"nm":422.746,"spectrum":"Re I","medium":"air"},{"intensity":7.0,"nm":435.869,"spectrum":"Re I","medium":"air"},{"intensity":50.0,"nm":451.331,"spectrum":"Re I","medium":"air"},{"intensity":9.0,"nm":452.273,"spectrum":"Re I","medium":"air"},{"intensity":40.0,"nm":488.914,"spectrum":"Re I","medium":"air"},{"intensity":25.0,"nm":527.095,"spectrum":"Re I","medium":"air"},{"intensity":30.0,"nm":527.556,"spectrum":"Re I","medium":"air"},{"intensity":10.0,"nm":583.431,"spectrum":"Re I","medium":"air"}],"lineCount":12,"row":6,"col":7},"As":{"name":"Arsenic","symbol":"As","atomicNumber":33,"lines":[{"intensity":700.0,"nm":419.0082,"spectrum":"As II","medium":"air"},{"intensity":700.0,"nm":445.8469,"spectrum":"As II","medium":"air"},{"intensity":700.0,"nm":446.6348,"spectrum":"As II","medium":"air"},{"intensity":800.0,"nm":449.423,"spectrum":"As II","medium":"air"},{"intensity":800.0,"nm":450.7659,"spectrum":"As II","medium":"air"},{"intensity":700.0,"nm":454.3483,"spectrum":"As II","medium":"air"},{"intensity":500.0,"nm":617.027,"spectrum":"As II","medium":"air"}],"lineCount":7,"row":4,"col":15},"In":{"name":"Indium","symbol":"In","atomicNumber":49,"lines":[{"intensity":25.0,"nm":405.694,"spectrum":"In II","medium":"air"},{"intensity":900.0,"nm":410.175,"spectrum":"In I","medium":"air"},{"intensity":1000.0,"nm":451.1297,"spectrum":"In I","medium":"air"},{"intensity":20.0,"nm":463.816,"spectrum":"In II","medium":"air"},{"intensity":20.0,"nm":465.562,"spectrum":"In II","medium":"air"},{"intensity":25.0,"nm":468.48,"spectrum":"In II","medium":"air"},{"intensity":15.0,"nm":512.08,"spectrum":"In II","medium":"air"},{"intensity":20.0,"nm":551.3,"spectrum":"In II","medium":"air"},{"intensity":25.0,"nm":590.34,"spectrum":"In II","medium":"air"},{"intensity":20.0,"nm":613.21,"spectrum":"In II","medium":"air"},{"intensity":15.0,"nm":622.83,"spectrum":"In II","medium":"air"},{"intensity":15.0,"nm":630.48,"spectrum":"In II","medium":"air"}],"lineCount":12,"row":5,"col":13},"Rh":{"name":"Rhodium","symbol":"Rh","atomicNumber":45,"lines":[{"intensity":140.0,"nm":380.676,"spectrum":"Rh I","medium":"air"},{"intensity":140.0,"nm":381.819,"spectrum":"Rh I","medium":"air"},{"intensity":400.0,"nm":382.226,"spectrum":"Rh I","medium":"air"},{"intensity":250.0,"nm":382.848,"spectrum":"Rh I","medium":"air"},{"intensity":200.0,"nm":383.389,"spectrum":"Rh I","medium":"air"},{"intensity":600.0,"nm":385.652,"spectrum":"Rh I","medium":"air"},{"intensity":200.0,"nm":393.423,"spectrum":"Rh I","medium":"air"},{"intensity":400.0,"nm":395.886,"spectrum":"Rh I","medium":"air"},{"intensity":120.0,"nm":412.168,"spectrum":"Rh I","medium":"air"},{"intensity":150.0,"nm":412.887,"spectrum":"Rh I","medium":"air"},{"intensity":200.0,"nm":413.527,"spectrum":"Rh I","medium":"air"},{"intensity":400.0,"nm":421.114,"spectrum":"Rh I","medium":"air"}],"lineCount":12,"row":5,"col":9},"At":{"name":"Astatine","symbol":"At","atomicNumber":85,"lines":[],"lineCount":0,"row":6,"col":17},"I":{"name":"Iodine","symbol":"I","atomicNumber":53,"lines":[{"intensity":130.0,"nm":511.929,"spectrum":"I I","medium":"air"},{"intensity":150.0,"nm":516.12,"spectrum":"I II","medium":"air"},{"intensity":150.0,"nm":524.571,"spectrum":"I II","medium":"air"},{"intensity":500.0,"nm":533.822,"spectrum":"I II","medium":"air"},{"intensity":250.0,"nm":534.515,"spectrum":"I II","medium":"air"},{"intensity":150.0,"nm":543.583,"spectrum":"I II","medium":"air"},{"intensity":100.0,"nm":546.462,"spectrum":"I II","medium":"air"},{"intensity":500.0,"nm":562.569,"spectrum":"I II","medium":"air"},{"intensity":100.0,"nm":569.091,"spectrum":"I II","medium":"air"},{"intensity":200.0,"nm":571.053,"spectrum":"I II","medium":"air"},{"intensity":250.0,"nm":595.025,"spectrum":"I II","medium":"air"},{"intensity":100.0,"nm":607.498,"spectrum":"I II","medium":"air"}],"lineCount":12,"row":5,"col":17},"Rb":{"name":"Rubidium","symbol":"Rb","atomicNumber":37,"lines":[{"intensity":30.0,"nm":380.19,"spectrum":"Rb II","medium":"air"},{"intensity":300.0,"nm":394.051,"spectrum":"Rb II","medium":"air"},{"intensity":40.0,"nm":419.308,"spectrum":"Rb II","medium":"air"},{"intensity":1000.0,"nm":424.44,"spectrum":"Rb II","medium":"air"},{"intensity":150.0,"nm":427.314,"spectrum":"Rb II","medium":"air"},{"intensity":200.0,"nm":457.177,"spectrum":"Rb II","medium":"air"},{"intensity":110.0,"nm":464.857,"spectrum":"Rb II","medium":"air"},{"intensity":300.0,"nm":477.595,"spectrum":"Rb II","medium":"air"},{"intensity":60.0,"nm":478.283,"spectrum":"Rb II","medium":"air"},{"intensity":110.0,"nm":515.208,"spectrum":"Rb II","medium":"air"},{"intensity":60.0,"nm":552.278,"spectrum":"Rb II","medium":"air"},{"intensity":60.0,"nm":563.599,"spectrum":"Rb II","medium":"air"}],"lineCount":12,"row":5,"col":1},"Ba":{"name":"Barium","symbol":"Ba","atomicNumber":56,"lines":[{"intensity":1000.0,"nm":455.4033,"spectrum":"Ba II","medium":"air"},{"intensity":300.0,"nm":493.4077,"spectrum":"Ba II","medium":"air"},{"intensity":1000.0,"nm":553.5481,"spectrum":"Ba I","medium":"air"},{"intensity":80.0,"nm":577.7619,"spectrum":"Ba I","medium":"air"},{"intensity":80.0,"nm":599.7087,"spectrum":"Ba I","medium":"air"},{"intensity":250.0,"nm":611.0783,"spectrum":"Ba I","medium":"air"},{"intensity":300.0,"nm":614.1713,"spectrum":"Ba II","medium":"air"},{"intensity":200.0,"nm":649.6898,"spectrum":"Ba II","medium":"air"},{"intensity":250.0,"nm":649.876,"spectrum":"Ba I","medium":"air"},{"intensity":110.0,"nm":652.7312,"spectrum":"Ba I","medium":"air"},{"intensity":100.0,"nm":659.5325,"spectrum":"Ba I","medium":"air"},{"intensity":50.0,"nm":667.527,"spectrum":"Ba I","medium":"air"}],"lineCount":12,"row":6,"col":2},"Ir":{"name":"Iridium","symbol":"Ir","atomicNumber":77,"lines":[{"intensity":200.0,"nm":380.012,"spectrum":"Ir I","medium":"air"},{"intensity":30.0,"nm":397.631,"spectrum":"Ir I","medium":"air"},{"intensity":15.0,"nm":426.81,"spectrum":"Ir I","medium":"air"},{"intensity":13.0,"nm":431.15,"spectrum":"Ir I","medium":"air"}],"lineCount":4,"row":6,"col":9},"Ru":{"name":"Ruthenium","symbol":"Ru","atomicNumber":44,"lines":[{"intensity":140.0,"nm":392.3486,"spectrum":"Ru I","medium":"air"},{"intensity":300.0,"nm":392.593,"spectrum":"Ru I","medium":"air"},{"intensity":140.0,"nm":402.2168,"spectrum":"Ru I","medium":"air"},{"intensity":500.0,"nm":408.0599,"spectrum":"Ru I","medium":"air"},{"intensity":150.0,"nm":411.2741,"spectrum":"Ru I","medium":"air"},{"intensity":200.0,"nm":414.416,"spectrum":"Ru I","medium":"air"},{"intensity":700.0,"nm":419.9892,"spectrum":"Ru I","medium":"air"},{"intensity":500.0,"nm":421.2062,"spectrum":"Ru I","medium":"air"},{"intensity":300.0,"nm":429.7714,"spectrum":"Ru I","medium":"air"},{"intensity":200.0,"nm":437.22,"spectrum":"Ru I","medium":"air"},{"intensity":150.0,"nm":439.044,"spectrum":"Ru I","medium":"air"},{"intensity":150.0,"nm":441.0028,"spectrum":"Ru I","medium":"air"}],"lineCount":12,"row":5,"col":8},"Bk":{"name":"Berkelium","symbol":"Bk","atomicNumber":97,"lines":[{"intensity":1000.0,"nm":380.2345,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":382.3098,"spectrum":"Bk II","medium":"air"},{"intensity":1000.0,"nm":382.519,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":383.1565,"spectrum":"Bk II","medium":"air"},{"intensity":1000.0,"nm":383.348,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":383.5967,"spectrum":"Bk II","medium":"air"},{"intensity":1000.0,"nm":384.2185,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":384.6618,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":385.503,"spectrum":"Bk I","medium":"air"},{"intensity":1000.0,"nm":385.9888,"spectrum":"Bk II","medium":"air"},{"intensity":1000.0,"nm":387.7937,"spectrum":"Bk II","medium":"air"},{"intensity":1000.0,"nm":388.0106,"spectrum":"Bk I","medium":"air"}],"lineCount":12,"row":9,"col":11},"Fe":{"name":"Iron","symbol":"Fe","atomicNumber":26,"lines":[{"intensity":150.0,"nm":381.584,"spectrum":"Fe I","medium":"air"},{"intensity":500.0,"nm":382.0425,"spectrum":"Fe I","medium":"air"},{"intensity":250.0,"nm":382.4444,"spectrum":"Fe I","medium":"air"},{"intensity":150.0,"nm":382.5881,"spectrum":"Fe I","medium":"air"},{"intensity":250.0,"nm":385.6372,"spectrum":"Fe I","medium":"air"},{"intensity":500.0,"nm":385.9911,"spectrum":"Fe I","medium":"air"},{"intensity":150.0,"nm":387.8573,"spectrum":"Fe I","medium":"air"},{"intensity":300.0,"nm":388.6282,"spectrum":"Fe I","medium":"air"},{"intensity":200.0,"nm":393.0297,"spectrum":"Fe I","medium":"air"},{"intensity":300.0,"nm":404.5813,"spectrum":"Fe I","medium":"air"},{"intensity":150.0,"nm":406.3594,"spectrum":"Fe I","medium":"air"},{"intensity":150.0,"nm":432.5762,"spectrum":"Fe I","medium":"air"}],"lineCount":12,"row":4,"col":8},"Sm":{"name":"Samarium","symbol":"Sm","atomicNumber":62,"lines":[{"intensity":600.0,"nm":385.4209,"spectrum":"Sm II","medium":"air"},{"intensity":900.0,"nm":388.5286,"spectrum":"Sm II","medium":"air"},{"intensity":600.0,"nm":392.2397,"spectrum":"Sm II","medium":"air"},{"intensity":500.0,"nm":392.8279,"spectrum":"Sm II","medium":"air"},{"intensity":500.0,"nm":411.8551,"spectrum":"Sm II","medium":"air"},{"intensity":500.0,"nm":425.6393,"spectrum":"Sm II","medium":"air"},{"intensity":500.0,"nm":428.0789,"spectrum":"Sm II","medium":"air"},{"intensity":1000.0,"nm":429.6743,"spectrum":"Sm I","medium":"air"},{"intensity":500.0,"nm":431.8936,"spectrum":"Sm II","medium":"air"},{"intensity":600.0,"nm":433.6137,"spectrum":"Sm I","medium":"air"},{"intensity":700.0,"nm":442.4339,"spectrum":"Sm II","medium":"air"},{"intensity":500.0,"nm":446.7342,"spectrum":"Sm II","medium":"air"}],"lineCount":12,"row":8,"col":8},"Be":{"name":"Beryllium","symbol":"Be","atomicNumber":4,"lines":[{"intensity":15.0,"nm":381.3454,"spectrum":"Be I","medium":"air"},{"intensity":100.0,"nm":436.0988,"spectrum":"Be II","medium":"air"},{"intensity":12.0,"nm":457.2664,"spectrum":"Be I","medium":"air"},{"intensity":200.0,"nm":467.3423,"spectrum":"Be II","medium":"air"},{"intensity":40.0,"nm":482.8159,"spectrum":"Be II","medium":"air"},{"intensity":100.0,"nm":527.081,"spectrum":"Be II","medium":"air"},{"intensity":12.0,"nm":654.789,"spectrum":"Be II","medium":"air"},{"intensity":12.0,"nm":655.836,"spectrum":"Be II","medium":"air"},{"intensity":10.0,"nm":698.2749,"spectrum":"Be I","medium":"air"},{"intensity":10.0,"nm":720.9134,"spectrum":"Be I","medium":"air"}],"lineCount":10,"row":2,"col":2},"Kr":{"name":"Krypton","symbol":"Kr","atomicNumber":36,"lines":[{"intensity":200.0,"nm":429.2923,"spectrum":"Kr II","medium":"air"},{"intensity":1000.0,"nm":435.5477,"spectrum":"Kr II","medium":"air"},{"intensity":200.0,"nm":443.6812,"spectrum":"Kr II","medium":"air"},{"intensity":250.0,"nm":447.5014,"spectrum":"Kr II","medium":"air"},{"intensity":250.0,"nm":457.7209,"spectrum":"Kr II","medium":"air"},{"intensity":300.0,"nm":461.9166,"spectrum":"Kr II","medium":"air"},{"intensity":250.0,"nm":463.3885,"spectrum":"Kr II","medium":"air"},{"intensity":700.0,"nm":465.8876,"spectrum":"Kr II","medium":"air"},{"intensity":1000.0,"nm":473.9002,"spectrum":"Kr II","medium":"air"},{"intensity":300.0,"nm":476.5744,"spectrum":"Kr II","medium":"air"},{"intensity":250.0,"nm":483.2077,"spectrum":"Kr II","medium":"air"},{"intensity":250.0,"nm":484.6612,"spectrum":"Kr II","medium":"air"}],"lineCount":12,"row":4,"col":18},"Sc":{"name":"Scandium","symbol":"Sc","atomicNumber":21,"lines":[{"intensity":900.0,"nm":390.7484,"spectrum":"Sc I","medium":"air"},{"intensity":1000.0,"nm":391.1812,"spectrum":"Sc I","medium":"air"},{"intensity":200.0,"nm":393.3375,"spectrum":"Sc I","medium":"air"},{"intensity":250.0,"nm":399.6601,"spectrum":"Sc I","medium":"air"},{"intensity":900.0,"nm":402.0387,"spectrum":"Sc I","medium":"air"},{"intensity":900.0,"nm":402.3678,"spectrum":"Sc I","medium":"air"},{"intensity":120.0,"nm":404.7797,"spectrum":"Sc I","medium":"air"},{"intensity":250.0,"nm":405.4544,"spectrum":"Sc I","medium":"air"},{"intensity":250.0,"nm":408.2387,"spectrum":"Sc I","medium":"air"},{"intensity":500.0,"nm":424.682,"spectrum":"Sc II","medium":"air"},{"intensity":150.0,"nm":431.4082,"spectrum":"Sc II","medium":"air"},{"intensity":120.0,"nm":432.0745,"spectrum":"Sc II","medium":"air"}],"lineCount":12,"row":4,"col":3},"Bi":{"name":"Bismuth","symbol":"Bi","atomicNumber":83,"lines":[{"intensity":300.0,"nm":386.4025,"spectrum":"Bi II","medium":"air"},{"intensity":400.0,"nm":407.9072,"spectrum":"Bi II","medium":"air"},{"intensity":800.0,"nm":425.9413,"spectrum":"Bi II","medium":"air"},{"intensity":700.0,"nm":430.1697,"spectrum":"Bi II","medium":"air"},{"intensity":600.0,"nm":470.5285,"spectrum":"Bi II","medium":"air"},{"intensity":70.0,"nm":472.2527,"spectrum":"Bi I","medium":"air"},{"intensity":300.0,"nm":473.0267,"spectrum":"Bi II","medium":"air"},{"intensity":500.0,"nm":512.4356,"spectrum":"Bi II","medium":"air"},{"intensity":600.0,"nm":514.4492,"spectrum":"Bi II","medium":"air"},{"intensity":800.0,"nm":520.9325,"spectrum":"Bi II","medium":"air"},{"intensity":400.0,"nm":527.0512,"spectrum":"Bi II","medium":"air"},{"intensity":400.0,"nm":571.9138,"spectrum":"Bi II","medium":"air"}],"lineCount":12,"row":6,"col":15},"La":{"name":"Lanthanum","symbol":"La","atomicNumber":57,"lines":[{"intensity":1000.0,"nm":394.91,"spectrum":"La II","medium":"air"},{"intensity":500.0,"nm":398.852,"spectrum":"La II","medium":"air"},{"intensity":600.0,"nm":408.672,"spectrum":"La II","medium":"air"},{"intensity":500.0,"nm":412.323,"spectrum":"La II","medium":"air"},{"intensity":500.0,"nm":433.374,"spectrum":"La II","medium":"air"},{"intensity":600.0,"nm":514.542,"spectrum":"La I","medium":"air"},{"intensity":800.0,"nm":517.731,"spectrum":"La I","medium":"air"},{"intensity":1000.0,"nm":521.186,"spectrum":"La I","medium":"air"},{"intensity":700.0,"nm":523.427,"spectrum":"La I","medium":"air"},{"intensity":700.0,"nm":545.515,"spectrum":"La I","medium":"air"},{"intensity":700.0,"nm":550.134,"spectrum":"La I","medium":"air"},{"intensity":600.0,"nm":579.134,"spectrum":"La I","medium":"air"}],"lineCount":12,"row":6,"col":3},"Se":{"name":"Selenium","symbol":"Se","atomicNumber":34,"lines":[{"intensity":800.0,"nm":417.528,"spectrum":"Se II","medium":"air"},{"intensity":1000.0,"nm":418.09,"spectrum":"Se II","medium":"air"},{"intensity":600.0,"nm":473.078,"spectrum":"Se I","medium":"air"},{"intensity":400.0,"nm":473.903,"spectrum":"Se I","medium":"air"},{"intensity":300.0,"nm":474.225,"spectrum":"Se I","medium":"air"},{"intensity":800.0,"nm":484.4941,"spectrum":"Se II","medium":"air"},{"intensity":1000.0,"nm":522.7533,"spectrum":"Se II","medium":"air"},{"intensity":800.0,"nm":530.5347,"spectrum":"Se II","medium":"air"},{"intensity":1000.0,"nm":605.584,"spectrum":"Se II","medium":"air"},{"intensity":800.0,"nm":644.429,"spectrum":"Se II","medium":"air"},{"intensity":300.0,"nm":706.2065,"spectrum":"Se I","medium":"air"}],"lineCount":11,"row":4,"col":16},"B":{"name":"Boron","symbol":"B","atomicNumber":5,"lines":[{"intensity":300.0,"nm":412.1933,"spectrum":"B II","medium":"air"},{"intensity":110.0,"nm":419.4792,"spectrum":"B II","medium":"air"},{"intensity":110.0,"nm":447.2101,"spectrum":"B II","medium":"air"},{"intensity":110.0,"nm":494.0376,"spectrum":"B II","medium":"air"},{"intensity":110.0,"nm":608.044,"spectrum":"B II","medium":"air"}],"lineCount":5,"row":2,"col":13},"Pb":{"name":"Lead","symbol":"Pb","atomicNumber":82,"lines":[{"intensity":1000.0,"nm":405.7807,"spectrum":"Pb I","medium":"air"},{"intensity":50.0,"nm":415.282,"spectrum":"Pb II","medium":"air"},{"intensity":100.0,"nm":424.492,"spectrum":"Pb II","medium":"air"},{"intensity":50.0,"nm":435.274,"spectrum":"Pb II","medium":"air"},{"intensity":100.0,"nm":438.646,"spectrum":"Pb II","medium":"air"},{"intensity":50.0,"nm":457.9051,"spectrum":"Pb II","medium":"air"},{"intensity":50.0,"nm":458.227,"spectrum":"Pb II","medium":"air"},{"intensity":250.0,"nm":504.258,"spectrum":"Pb II","medium":"air"},{"intensity":50.0,"nm":507.058,"spectrum":"Pb II","medium":"air"},{"intensity":100.0,"nm":560.885,"spectrum":"Pb II","medium":"air"},{"intensity":200.0,"nm":607.574,"spectrum":"Pb II","medium":"air"},{"intensity":200.0,"nm":608.1409,"spectrum":"Pb II","medium":"air"}],"lineCount":12,"row":6,"col":14},"Si":{"name":"Silicon","symbol":"Si","atomicNumber":14,"lines":[{"intensity":100.0,"nm":385.6017,"spectrum":"Si II","medium":"air"},{"intensity":200.0,"nm":390.5523,"spectrum":"Si I","medium":"air"},{"intensity":70.0,"nm":413.0893,"spectrum":"Si II","medium":"air"},{"intensity":130.0,"nm":504.1026,"spectrum":"Si II","medium":"air"},{"intensity":130.0,"nm":505.5981,"spectrum":"Si II","medium":"air"},{"intensity":70.0,"nm":520.241,"spectrum":"Si II","medium":"air"},{"intensity":70.0,"nm":546.6432,"spectrum":"Si II","medium":"air"},{"intensity":130.0,"nm":566.9562,"spectrum":"Si II","medium":"air"},{"intensity":80.0,"nm":570.8397,"spectrum":"Si I","medium":"air"},{"intensity":80.0,"nm":595.7561,"spectrum":"Si II","medium":"air"},{"intensity":80.0,"nm":597.8929,"spectrum":"Si II","medium":"air"},{"intensity":130.0,"nm":634.7103,"spectrum":"Si II","medium":"air"}],"lineCount":12,"row":3,"col":14},"Br":{"name":"Bromine","symbol":"Br","atomicNumber":35,"lines":[{"intensity":500.0,"nm":391.438,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":398.038,"spectrum":"Br II","medium":"air"},{"intensity":1000.0,"nm":422.389,"spectrum":"Br II","medium":"air"},{"intensity":1000.0,"nm":436.563,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":454.289,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":467.87,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":470.492,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":478.548,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":481.668,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":518.236,"spectrum":"Br II","medium":"air"},{"intensity":500.0,"nm":523.826,"spectrum":"Br II","medium":"air"},{"intensity":800.0,"nm":635.073,"spectrum":"Br I","medium":"air"}],"lineCount":12,"row":4,"col":17},"Li":{"name":"Lithium","symbol":"Li","atomicNumber":3,"lines":[{"intensity":10.0,"nm":415.5946,"spectrum":"Li II","medium":"air"},{"intensity":15.0,"nm":432.5419,"spectrum":"Li II","medium":"air"},{"intensity":15.0,"nm":460.2831,"spectrum":"Li I","medium":"air"},{"intensity":30.0,"nm":467.1651,"spectrum":"Li II","medium":"air"},{"intensity":80.0,"nm":467.8056,"spectrum":"Li II","medium":"air"},{"intensity":80.0,"nm":478.8363,"spectrum":"Li II","medium":"air"},{"intensity":15.0,"nm":488.132,"spectrum":"Li II","medium":"air"},{"intensity":10.0,"nm":497.1748,"spectrum":"Li I","medium":"air"},{"intensity":15.0,"nm":503.7915,"spectrum":"Li II","medium":"air"},{"intensity":500.0,"nm":548.45,"spectrum":"Li II","medium":"air"},{"intensity":300.0,"nm":610.3542,"spectrum":"Li I","medium":"air"},{"intensity":1000.0,"nm":670.7926,"spectrum":"Li I","medium":"air"}],"lineCount":12,"row":2,"col":1},"Ag":{"name":"Silver","symbol":"Ag","atomicNumber":47,"lines":[{"intensity":20.0,"nm":381.0941,"spectrum":"Ag I","medium":"air"},{"intensity":9.0,"nm":384.075,"spectrum":"Ag I","medium":"air"},{"intensity":9.0,"nm":398.158,"spectrum":"Ag I","medium":"air"},{"intensity":9.0,"nm":405.5476,"spectrum":"Ag I","medium":"air"},{"intensity":8.0,"nm":421.096,"spectrum":"Ag I","medium":"air"},{"intensity":9.0,"nm":421.2814,"spectrum":"Ag I","medium":"air"},{"intensity":50.0,"nm":462.0036,"spectrum":"Ag II","medium":"air"},{"intensity":100.0,"nm":478.8397,"spectrum":"Ag II","medium":"air"},{"intensity":9.0,"nm":487.41,"spectrum":"Ag I","medium":"air"},{"intensity":50.0,"nm":502.7343,"spectrum":"Ag II","medium":"air"},{"intensity":90.0,"nm":520.9078,"spectrum":"Ag I","medium":"air"},{"intensity":90.0,"nm":546.5497,"spectrum":"Ag I","medium":"air"}],"lineCount":12,"row":5,"col":11},"Cd":{"name":"Cadmium","symbol":"Cd","atomicNumber":48,"lines":[{"intensity":200.0,"nm":413.4768,"spectrum":"Cd II","medium":"air"},{"intensity":1000.0,"nm":441.563,"spectrum":"Cd II","medium":"air"},{"intensity":100.0,"nm":467.8149,"spectrum":"Cd I","medium":"air"},{"intensity":150.0,"nm":479.9912,"spectrum":"Cd I","medium":"air"},{"intensity":500.0,"nm":508.5822,"spectrum":"Cd I","medium":"air"},{"intensity":1000.0,"nm":533.748,"spectrum":"Cd II","medium":"air"},{"intensity":1000.0,"nm":537.813,"spectrum":"Cd II","medium":"air"},{"intensity":200.0,"nm":538.189,"spectrum":"Cd II","medium":"air"},{"intensity":150.0,"nm":609.9142,"spectrum":"Cd I","medium":"air"},{"intensity":400.0,"nm":635.472,"spectrum":"Cd II","medium":"air"},{"intensity":500.0,"nm":635.998,"spectrum":"Cd II","medium":"air"},{"intensity":1000.0,"nm":643.847,"spectrum":"Cd I","medium":"air"}],"lineCount":12,"row":5,"col":12},"Lu":{"name":"Lutetium","symbol":"Lu","atomicNumber":71,"lines":[{"intensity":400.0,"nm":384.118,"spectrum":"Lu I","medium":"air"},{"intensity":60.0,"nm":396.846,"spectrum":"Lu I","medium":"air"},{"intensity":90.0,"nm":405.445,"spectrum":"Lu I","medium":"air"},{"intensity":400.0,"nm":412.473,"spectrum":"Lu I","medium":"air"},{"intensity":90.0,"nm":418.425,"spectrum":"Lu II","medium":"air"},{"intensity":400.0,"nm":451.857,"spectrum":"Lu I","medium":"air"},{"intensity":130.0,"nm":465.802,"spectrum":"Lu I","medium":"air"},{"intensity":110.0,"nm":500.114,"spectrum":"Lu I","medium":"air"},{"intensity":400.0,"nm":513.509,"spectrum":"Lu I","medium":"air"},{"intensity":70.0,"nm":540.257,"spectrum":"Lu I","medium":"air"},{"intensity":120.0,"nm":547.669,"spectrum":"Lu II","medium":"air"},{"intensity":70.0,"nm":573.655,"spectrum":"Lu I","medium":"air"}],"lineCount":12,"row":8,"col":17},"Na":{"name":"Sodium","symbol":"Na","atomicNumber":11,"lines":[{"intensity":150.0,"nm":411.37,"spectrum":"Na II","medium":"air"},{"intensity":600.0,"nm":439.281,"spectrum":"Na II","medium":"air"},{"intensity":400.0,"nm":440.512,"spectrum":"Na II","medium":"air"},{"intensity":500.0,"nm":445.523,"spectrum":"Na II","medium":"air"},{"intensity":400.0,"nm":449.087,"spectrum":"Na II","medium":"air"},{"intensity":5.0,"nm":498.2813,"spectrum":"Na I","medium":"air"},{"intensity":50.0,"nm":541.455,"spectrum":"Na II","medium":"air"},{"intensity":7.0,"nm":568.8205,"spectrum":"Na I","medium":"air"},{"intensity":1000.0,"nm":588.995,"spectrum":"Na I","medium":"air"},{"intensity":500.0,"nm":589.5924,"spectrum":"Na I","medium":"air"},{"intensity":50.0,"nm":651.421,"spectrum":"Na II","medium":"air"},{"intensity":70.0,"nm":653.07,"spectrum":"Na II","medium":"air"}],"lineCount":12,"row":3,"col":1},"Ca":{"name":"Calcium","symbol":"Ca","atomicNumber":20,"lines":[{"intensity":1000.0,"nm":393.3661,"spectrum":"Ca II","medium":"air"},{"intensity":1000.0,"nm":396.8467,"spectrum":"Ca II","medium":"air"},{"intensity":1000.0,"nm":422.6727,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":445.4781,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":585.7452,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":612.2219,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":616.2172,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":616.9559,"spectrum":"Ca I","medium":"air"},{"intensity":700.0,"nm":643.9073,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":644.981,"spectrum":"Ca I","medium":"air"},{"intensity":700.0,"nm":646.2566,"spectrum":"Ca I","medium":"air"},{"intensity":600.0,"nm":647.166,"spectrum":"Ca I","medium":"air"}],"lineCount":12,"row":4,"col":2},"Mg":{"name":"Magnesium","symbol":"Mg","atomicNumber":12,"lines":[{"intensity":25.0,"nm":382.9355,"spectrum":"Mg I","medium":"air"},{"intensity":50.0,"nm":383.23,"spectrum":"Mg I","medium":"air"},{"intensity":80.0,"nm":383.8292,"spectrum":"Mg I","medium":"air"},{"intensity":2.0,"nm":416.7271,"spectrum":"Mg I","medium":"air"},{"intensity":3.0,"nm":435.1906,"spectrum":"Mg I","medium":"air"},{"intensity":10.0,"nm":439.0572,"spectrum":"Mg II","medium":"air"},{"intensity":14.0,"nm":448.1126,"spectrum":"Mg II","medium":"air"},{"intensity":5.0,"nm":457.1096,"spectrum":"Mg I","medium":"air"},{"intensity":12.0,"nm":516.7322,"spectrum":"Mg I","medium":"air"},{"intensity":40.0,"nm":517.2684,"spectrum":"Mg I","medium":"air"},{"intensity":70.0,"nm":518.3604,"spectrum":"Mg I","medium":"air"},{"intensity":5.0,"nm":571.1088,"spectrum":"Mg I","medium":"air"}],"lineCount":12,"row":3,"col":2},"Sr":{"name":"Strontium","symbol":"Sr","atomicNumber":38,"lines":[{"intensity":1000.0,"nm":407.771,"spectrum":"Sr II","medium":"air"},{"intensity":700.0,"nm":421.552,"spectrum":"Sr II","medium":"air"},{"intensity":1000.0,"nm":460.733,"spectrum":"Sr I","medium":"air"},{"intensity":50.0,"nm":472.228,"spectrum":"Sr I","medium":"air"},{"intensity":70.0,"nm":481.188,"spectrum":"Sr I","medium":"air"},{"intensity":60.0,"nm":483.208,"spectrum":"Sr I","medium":"air"},{"intensity":50.0,"nm":487.249,"spectrum":"Sr I","medium":"air"},{"intensity":120.0,"nm":496.226,"spectrum":"Sr I","medium":"air"},{"intensity":70.0,"nm":525.69,"spectrum":"Sr I","medium":"air"},{"intensity":110.0,"nm":548.084,"spectrum":"Sr I","medium":"air"},{"intensity":140.0,"nm":640.847,"spectrum":"Sr I","medium":"air"},{"intensity":80.0,"nm":650.4,"spectrum":"Sr I","medium":"air"}],"lineCount":12,"row":5,"col":2},"Cf":{"name":"Californium","symbol":"Cf","atomicNumber":98,"lines":[{"intensity":1000.0,"nm":389.323,"spectrum":"Cf II","medium":"air"},{"intensity":1000.0,"nm":399.357,"spectrum":"Cf II","medium":"air"},{"intensity":1000.0,"nm":403.545,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":409.912,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":424.238,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":432.903,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":433.522,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":517.396,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":517.908,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":521.924,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":527.901,"spectrum":"Cf I","medium":"air"},{"intensity":1000.0,"nm":532.009,"spectrum":"Cf I","medium":"air"}],"lineCount":12,"row":9,"col":12},"Mn":{"name":"Manganese","symbol":"Mn","atomicNumber":25,"lines":[{"intensity":120.0,"nm":380.6715,"spectrum":"Mn I","medium":"air"},{"intensity":80.0,"nm":382.3508,"spectrum":"Mn I","medium":"air"},{"intensity":50.0,"nm":383.4368,"spectrum":"Mn I","medium":"air"},{"intensity":60.0,"nm":401.8106,"spectrum":"Mn I","medium":"air"},{"intensity":1000.0,"nm":403.0755,"spectrum":"Mn I","medium":"air"},{"intensity":700.0,"nm":403.3068,"spectrum":"Mn I","medium":"air"},{"intensity":400.0,"nm":403.4485,"spectrum":"Mn I","medium":"air"},{"intensity":60.0,"nm":403.5729,"spectrum":"Mn I","medium":"air"},{"intensity":200.0,"nm":404.1357,"spectrum":"Mn I","medium":"air"},{"intensity":40.0,"nm":404.8747,"spectrum":"Mn I","medium":"air"},{"intensity":70.0,"nm":405.5548,"spectrum":"Mn I","medium":"air"},{"intensity":40.0,"nm":405.8936,"spectrum":"Mn I","medium":"air"}],"lineCount":12,"row":4,"col":7},"S":{"name":"Sulfur","symbol":"S","atomicNumber":16,"lines":[{"intensity":200.0,"nm":415.3064,"spectrum":"S II","medium":"air"},{"intensity":250.0,"nm":416.2665,"spectrum":"S II","medium":"air"},{"intensity":40.0,"nm":469.413,"spectrum":"S I","medium":"air"},{"intensity":140.0,"nm":542.8667,"spectrum":"S II","medium":"air"},{"intensity":250.0,"nm":543.2815,"spectrum":"S II","medium":"air"},{"intensity":400.0,"nm":545.3828,"spectrum":"S II","medium":"air"},{"intensity":150.0,"nm":547.362,"spectrum":"S II","medium":"air"},{"intensity":150.0,"nm":550.9718,"spectrum":"S II","medium":"air"},{"intensity":150.0,"nm":560.6151,"spectrum":"S II","medium":"air"},{"intensity":150.0,"nm":563.9972,"spectrum":"S II","medium":"air"},{"intensity":120.0,"nm":565.9985,"spectrum":"S II","medium":"air"},{"intensity":40.0,"nm":675.716,"spectrum":"S I","medium":"air"}],"lineCount":12,"row":3,"col":16},"C":{"name":"Carbon","symbol":"C","atomicNumber":6,"lines":[{"intensity":300.0,"nm":391.8978,"spectrum":"C II","medium":"air"},{"intensity":400.0,"nm":392.0693,"spectrum":"C II","medium":"air"},{"intensity":500.0,"nm":426.7258,"spectrum":"C II","medium":"air"},{"intensity":300.0,"nm":514.516,"spectrum":"C II","medium":"air"},{"intensity":200.0,"nm":515.109,"spectrum":"C II","medium":"air"},{"intensity":150.0,"nm":538.034,"spectrum":"C I","medium":"air"},{"intensity":300.0,"nm":588.977,"spectrum":"C II","medium":"air"},{"intensity":150.0,"nm":601.322,"spectrum":"C I","medium":"air"},{"intensity":400.0,"nm":657.805,"spectrum":"C II","medium":"air"},{"intensity":300.0,"nm":658.288,"spectrum":"C II","medium":"air"},{"intensity":400.0,"nm":723.132,"spectrum":"C II","medium":"air"},{"intensity":500.0,"nm":723.642,"spectrum":"C II","medium":"air"}],"lineCount":12,"row":2,"col":14},"Hg":{"name":"Mercury","symbol":"Hg","atomicNumber":80,"lines":[{"intensity":1000.0,"nm":398.3931,"spectrum":"Hg II","medium":"air"},{"intensity":400.0,"nm":404.6563,"spectrum":"Hg I","medium":"air"},{"intensity":60.0,"nm":433.9223,"spectrum":"Hg I","medium":"air"},{"intensity":100.0,"nm":434.7494,"spectrum":"Hg I","medium":"air"},{"intensity":1000.0,"nm":435.8328,"spectrum":"Hg I","medium":"air"},{"intensity":15.0,"nm":520.4768,"spectrum":"Hg II","medium":"air"},{"intensity":80.0,"nm":542.5253,"spectrum":"Hg II","medium":"air"},{"intensity":500.0,"nm":546.0735,"spectrum":"Hg I","medium":"air"},{"intensity":200.0,"nm":567.7105,"spectrum":"Hg II","medium":"air"},{"intensity":50.0,"nm":576.9598,"spectrum":"Hg I","medium":"air"},{"intensity":60.0,"nm":579.0663,"spectrum":"Hg I","medium":"air"},{"intensity":20.0,"nm":588.8939,"spectrum":"Hg II","medium":"air"}],"lineCount":12,"row":6,"col":12},"Ta":{"name":"Tantalum","symbol":"Ta","atomicNumber":73,"lines":[{"intensity":90.0,"nm":383.374,"spectrum":"Ta II","medium":"air"},{"intensity":150.0,"nm":406.14,"spectrum":"Ta I","medium":"air"},{"intensity":120.0,"nm":406.791,"spectrum":"Ta I","medium":"air"},{"intensity":120.0,"nm":420.588,"spectrum":"Ta I","medium":"air"},{"intensity":140.0,"nm":451.098,"spectrum":"Ta I","medium":"air"},{"intensity":130.0,"nm":457.431,"spectrum":"Ta I","medium":"air"},{"intensity":100.0,"nm":461.951,"spectrum":"Ta I","medium":"air"},{"intensity":150.0,"nm":468.188,"spectrum":"Ta I","medium":"air"},{"intensity":130.0,"nm":515.656,"spectrum":"Ta I","medium":"air"},{"intensity":90.0,"nm":587.736,"spectrum":"Ta I","medium":"air"},{"intensity":90.0,"nm":594.402,"spectrum":"Ta I","medium":"air"},{"intensity":100.0,"nm":604.539,"spectrum":"Ta I","medium":"air"}],"lineCount":12,"row":6,"col":5},"Ce":{"name":"Cerium","symbol":"Ce","atomicNumber":58,"lines":[{"intensity":700.0,"nm":380.152,"spectrum":"Ce II","medium":"air"},{"intensity":800.0,"nm":394.2746,"spectrum":"Ce II","medium":"air"},{"intensity":900.0,"nm":395.2545,"spectrum":"Ce II","medium":"air"},{"intensity":800.0,"nm":399.9237,"spectrum":"Ce II","medium":"air"},{"intensity":800.0,"nm":401.2387,"spectrum":"Ce II","medium":"air"},{"intensity":800.0,"nm":413.3802,"spectrum":"Ce II","medium":"air"},{"intensity":1000.0,"nm":418.6596,"spectrum":"Ce II","medium":"air"},{"intensity":700.0,"nm":446.0204,"spectrum":"Ce II","medium":"air"},{"intensity":800.0,"nm":515.9686,"spectrum":"Ce I","medium":"air"},{"intensity":800.0,"nm":516.1484,"spectrum":"Ce I","medium":"air"},{"intensity":700.0,"nm":522.3461,"spectrum":"Ce I","medium":"air"},{"intensity":700.0,"nm":524.5916,"spectrum":"Ce I","medium":"air"}],"lineCount":12,"row":8,"col":4},"Mo":{"name":"Molybdenum","symbol":"Mo","atomicNumber":42,"lines":[{"intensity":60.0,"nm":383.3747,"spectrum":"Mo I","medium":"air"},{"intensity":1000.0,"nm":386.4104,"spectrum":"Mo I","medium":"air"},{"intensity":700.0,"nm":390.2953,"spectrum":"Mo I","medium":"air"},{"intensity":50.0,"nm":406.2077,"spectrum":"Mo I","medium":"air"},{"intensity":80.0,"nm":406.9882,"spectrum":"Mo I","medium":"air"},{"intensity":100.0,"nm":414.355,"spectrum":"Mo I","medium":"air"},{"intensity":90.0,"nm":418.8324,"spectrum":"Mo I","medium":"air"},{"intensity":50.0,"nm":423.2589,"spectrum":"Mo I","medium":"air"},{"intensity":50.0,"nm":428.8631,"spectrum":"Mo I","medium":"air"},{"intensity":70.0,"nm":438.163,"spectrum":"Mo I","medium":"air"},{"intensity":90.0,"nm":441.1695,"spectrum":"Mo I","medium":"air"},{"intensity":250.0,"nm":550.6494,"spectrum":"Mo I","medium":"air"}],"lineCount":12,"row":5,"col":6},"Tc":{"name":"Technetium","symbol":"Tc","atomicNumber":43,"lines":[{"intensity":400.0,"nm":394.657,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":398.497,"spectrum":"Tc I","medium":"air"},{"intensity":1000.0,"nm":403.163,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":404.911,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":408.871,"spectrum":"Tc I","medium":"air"},{"intensity":700.0,"nm":409.567,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":411.508,"spectrum":"Tc I","medium":"air"},{"intensity":400.0,"nm":412.422,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":416.561,"spectrum":"Tc I","medium":"air"},{"intensity":500.0,"nm":423.819,"spectrum":"Tc I","medium":"air"},{"intensity":800.0,"nm":426.227,"spectrum":"Tc I","medium":"air"},{"intensity":1000.0,"nm":429.706,"spectrum":"Tc I","medium":"air"}],"lineCount":12,"row":5,"col":7},"Cs":{"name":"Cesium","symbol":"Cs","atomicNumber":55,"lines":[{"intensity":200.0,"nm":427.713,"spectrum":"Cs II","medium":"air"},{"intensity":200.0,"nm":452.674,"spectrum":"Cs II","medium":"air"},{"intensity":1000.0,"nm":460.379,"spectrum":"Cs II","medium":"air"},{"intensity":250.0,"nm":483.019,"spectrum":"Cs II","medium":"air"},{"intensity":200.0,"nm":487.004,"spectrum":"Cs II","medium":"air"},{"intensity":400.0,"nm":495.285,"spectrum":"Cs II","medium":"air"},{"intensity":250.0,"nm":504.38,"spectrum":"Cs II","medium":"air"},{"intensity":800.0,"nm":522.704,"spectrum":"Cs II","medium":"air"},{"intensity":300.0,"nm":524.938,"spectrum":"Cs II","medium":"air"},{"intensity":200.0,"nm":537.099,"spectrum":"Cs II","medium":"air"},{"intensity":400.0,"nm":556.302,"spectrum":"Cs II","medium":"air"},{"intensity":250.0,"nm":583.114,"spectrum":"Cs II","medium":"air"}],"lineCount":12,"row":6,"col":1},"Nd":{"name":"Neodymium","symbol":"Nd","atomicNumber":60,"lines":[{"intensity":500.0,"nm":380.536,"spectrum":"Nd II","medium":"air"},{"intensity":700.0,"nm":401.225,"spectrum":"Nd II","medium":"air"},{"intensity":600.0,"nm":404.08,"spectrum":"Nd II","medium":"air"},{"intensity":900.0,"nm":406.109,"spectrum":"Nd II","medium":"air"},{"intensity":600.0,"nm":415.608,"spectrum":"Nd II","medium":"air"},{"intensity":1000.0,"nm":430.358,"spectrum":"Nd II","medium":"air"},{"intensity":600.0,"nm":462.194,"spectrum":"Nd I","medium":"air"},{"intensity":1000.0,"nm":463.424,"spectrum":"Nd I","medium":"air"},{"intensity":700.0,"nm":464.11,"spectrum":"Nd I","medium":"air"},{"intensity":600.0,"nm":464.967,"spectrum":"Nd I","medium":"air"},{"intensity":600.0,"nm":468.345,"spectrum":"Nd I","medium":"air"},{"intensity":700.0,"nm":488.381,"spectrum":"Nd I","medium":"air"}],"lineCount":12,"row":8,"col":6},"Te":{"name":"Tellurium","symbol":"Te","atomicNumber":52,"lines":[{"intensity":500.0,"nm":416.977,"spectrum":"Te II","medium":"air"},{"intensity":500.0,"nm":426.111,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":436.4,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":447.863,"spectrum":"Te II","medium":"air"},{"intensity":500.0,"nm":455.778,"spectrum":"Te II","medium":"air"},{"intensity":900.0,"nm":465.437,"spectrum":"Te II","medium":"air"},{"intensity":1000.0,"nm":468.691,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":483.128,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":484.29,"spectrum":"Te II","medium":"air"},{"intensity":1000.0,"nm":486.624,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":557.635,"spectrum":"Te II","medium":"air"},{"intensity":800.0,"nm":564.926,"spectrum":"Te II","medium":"air"}],"lineCount":12,"row":5,"col":16},"Cl":{"name":"Chlorine","symbol":"Cl","atomicNumber":17,"lines":[{"intensity":140.0,"nm":386.083,"spectrum":"Cl II","medium":"air"},{"intensity":70.0,"nm":478.1318,"spectrum":"Cl II","medium":"air"},{"intensity":600.0,"nm":479.455,"spectrum":"Cl II","medium":"air"},{"intensity":150.0,"nm":481.006,"spectrum":"Cl II","medium":"air"},{"intensity":90.0,"nm":481.9471,"spectrum":"Cl II","medium":"air"},{"intensity":400.0,"nm":489.677,"spectrum":"Cl II","medium":"air"},{"intensity":250.0,"nm":490.4776,"spectrum":"Cl II","medium":"air"},{"intensity":140.0,"nm":491.7731,"spectrum":"Cl II","medium":"air"},{"intensity":140.0,"nm":507.8264,"spectrum":"Cl II","medium":"air"},{"intensity":300.0,"nm":521.794,"spectrum":"Cl II","medium":"air"},{"intensity":130.0,"nm":522.1355,"spectrum":"Cl II","medium":"air"},{"intensity":80.0,"nm":539.2119,"spectrum":"Cl II","medium":"air"}],"lineCount":12,"row":3,"col":17},"Ne":{"name":"Neon","symbol":"Ne","atomicNumber":10,"lines":[{"intensity":150.0,"nm":421.9745,"spectrum":"Ne II","medium":"air"},{"intensity":150.0,"nm":437.955,"spectrum":"Ne II","medium":"air"},{"intensity":200.0,"nm":439.1991,"spectrum":"Ne II","medium":"air"},{"intensity":150.0,"nm":439.799,"spectrum":"Ne II","medium":"air"},{"intensity":150.0,"nm":440.9299,"spectrum":"Ne II","medium":"air"},{"intensity":150.0,"nm":443.0904,"spectrum":"Ne II","medium":"air"},{"intensity":200.0,"nm":540.0562,"spectrum":"Ne I","medium":"air"},{"intensity":200.0,"nm":585.2488,"spectrum":"Ne I","medium":"air"},{"intensity":200.0,"nm":640.2248,"spectrum":"Ne I","medium":"air"},{"intensity":1000.0,"nm":692.9467,"spectrum":"Ne I","medium":"air"},{"intensity":300.0,"nm":702.405,"spectrum":"Ne I","medium":"air"},{"intensity":800.0,"nm":703.2413,"spectrum":"Ne I","medium":"air"}],"lineCount":12,"row":2,"col":18},"Tb":{"name":"Terbium","symbol":"Tb","atomicNumber":65,"lines":[{"intensity":500.0,"nm":383.0261,"spectrum":"Tb I","medium":"air"},{"intensity":600.0,"nm":384.874,"spectrum":"Tb II","medium":"air"},{"intensity":600.0,"nm":387.4172,"spectrum":"Tb II","medium":"air"},{"intensity":400.0,"nm":389.9197,"spectrum":"Tb II","medium":"air"},{"intensity":500.0,"nm":390.1325,"spectrum":"Tb I","medium":"air"},{"intensity":400.0,"nm":397.6845,"spectrum":"Tb II","medium":"air"},{"intensity":300.0,"nm":398.1875,"spectrum":"Tb II","medium":"air"},{"intensity":300.0,"nm":400.5474,"spectrum":"Tb II","medium":"air"},{"intensity":400.0,"nm":403.3027,"spectrum":"Tb II","medium":"air"},{"intensity":400.0,"nm":406.1558,"spectrum":"Tb I","medium":"air"},{"intensity":700.0,"nm":431.8847,"spectrum":"Tb I","medium":"air"},{"intensity":1000.0,"nm":432.6472,"spectrum":"Tb I","medium":"air"}],"lineCount":12,"row":8,"col":11},"Cr":{"name":"Chromium","symbol":"Cr","atomicNumber":24,"lines":[{"intensity":90.0,"nm":391.9165,"spectrum":"Cr I","medium":"air"},{"intensity":90.0,"nm":396.3694,"spectrum":"Cr I","medium":"air"},{"intensity":80.0,"nm":396.9748,"spectrum":"Cr I","medium":"air"},{"intensity":80.0,"nm":397.6674,"spectrum":"Cr I","medium":"air"},{"intensity":1000.0,"nm":425.4331,"spectrum":"Cr I","medium":"air"},{"intensity":800.0,"nm":427.4806,"spectrum":"Cr I","medium":"air"},{"intensity":500.0,"nm":428.9733,"spectrum":"Cr I","medium":"air"},{"intensity":90.0,"nm":434.451,"spectrum":"Cr I","medium":"air"},{"intensity":120.0,"nm":435.177,"spectrum":"Cr I","medium":"air"},{"intensity":80.0,"nm":464.6151,"spectrum":"Cr I","medium":"air"},{"intensity":250.0,"nm":520.4505,"spectrum":"Cr I","medium":"air"},{"intensity":400.0,"nm":520.6021,"spectrum":"Cr I","medium":"air"}],"lineCount":12,"row":4,"col":6},"Np":{"name":"Neptunium","symbol":"Np","atomicNumber":93,"lines":[{"intensity":300.0,"nm":398.689,"spectrum":"Np I","medium":"air"},{"intensity":300.0,"nm":504.466,"spectrum":"Np I","medium":"air"},{"intensity":1000.0,"nm":538.098,"spectrum":"Np II","medium":"air"},{"intensity":300.0,"nm":587.804,"spectrum":"Np I","medium":"air"},{"intensity":300.0,"nm":693.031,"spectrum":"Np I","medium":"air"},{"intensity":1000.0,"nm":697.209,"spectrum":"Np I","medium":"air"}],"lineCount":6,"row":9,"col":7},"Tl":{"name":"Thallium","symbol":"Tl","atomicNumber":81,"lines":[{"intensity":700.0,"nm":427.498,"spectrum":"Tl II","medium":"air"},{"intensity":1000.0,"nm":430.68,"spectrum":"Tl II","medium":"air"},{"intensity":700.0,"nm":473.705,"spectrum":"Tl II","medium":"air"},{"intensity":500.0,"nm":498.135,"spectrum":"Tl II","medium":"air"},{"intensity":800.0,"nm":507.854,"spectrum":"Tl II","medium":"air"},{"intensity":800.0,"nm":515.214,"spectrum":"Tl II","medium":"air"},{"intensity":900.0,"nm":535.046,"spectrum":"Tl I","medium":"air"},{"intensity":500.0,"nm":538.485,"spectrum":"Tl II","medium":"air"},{"intensity":800.0,"nm":594.948,"spectrum":"Tl II","medium":"air"}],"lineCount":9,"row":6,"col":13},"Co":{"name":"Cobalt","symbol":"Co","atomicNumber":27,"lines":[{"intensity":300.0,"nm":384.5469,"spectrum":"Co I","medium":"air"},{"intensity":250.0,"nm":387.3114,"spectrum":"Co I","medium":"air"},{"intensity":400.0,"nm":389.4078,"spectrum":"Co I","medium":"air"},{"intensity":300.0,"nm":399.5308,"spectrum":"Co I","medium":"air"},{"intensity":130.0,"nm":411.8774,"spectrum":"Co I","medium":"air"},{"intensity":200.0,"nm":412.1318,"spectrum":"Co I","medium":"air"}],"lineCount":6,"row":4,"col":9},"Ni":{"name":"Nickel","symbol":"Ni","atomicNumber":28,"lines":[{"intensity":90.0,"nm":380.7144,"spectrum":"Ni I","medium":"air"},{"intensity":150.0,"nm":385.8297,"spectrum":"Ni I","medium":"air"},{"intensity":80.0,"nm":499.2024,"spectrum":"Ni II","medium":"air"}],"lineCount":3,"row":4,"col":10},"Th":{"name":"Thorium","symbol":"Th","atomicNumber":90,"lines":[{"intensity":1000.0,"nm":380.3075,"spectrum":"Th I","medium":"air"},{"intensity":800.0,"nm":382.8385,"spectrum":"Th I","medium":"air"},{"intensity":400.0,"nm":387.5373,"spectrum":"Th I","medium":"air"},{"intensity":600.0,"nm":389.5419,"spectrum":"Th I","medium":"air"},{"intensity":300.0,"nm":393.2911,"spectrum":"Th I","medium":"air"},{"intensity":700.0,"nm":396.7392,"spectrum":"Th I","medium":"air"},{"intensity":400.0,"nm":400.821,"spectrum":"Th I","medium":"air"},{"intensity":500.0,"nm":401.2495,"spectrum":"Th I","medium":"air"},{"intensity":1000.0,"nm":401.9129,"spectrum":"Th II","medium":"air"},{"intensity":400.0,"nm":403.0842,"spectrum":"Th I","medium":"air"},{"intensity":400.0,"nm":403.6048,"spectrum":"Th I","medium":"air"},{"intensity":400.0,"nm":406.3407,"spectrum":"Th I","medium":"air"}],"lineCount":12,"row":9,"col":4},"Cu":{"name":"Copper","symbol":"Cu","atomicNumber":29,"lines":[{"intensity":700.0,"nm":490.9734,"spectrum":"Cu II","medium":"air"},{"intensity":600.0,"nm":493.1698,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":495.3724,"spectrum":"Cu II","medium":"air"},{"intensity":600.0,"nm":505.1793,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":615.4222,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":621.6939,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":621.9844,"spectrum":"Cu II","medium":"air"},{"intensity":700.0,"nm":627.3349,"spectrum":"Cu II","medium":"air"},{"intensity":600.0,"nm":630.1009,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":637.784,"spectrum":"Cu II","medium":"air"},{"intensity":600.0,"nm":642.3884,"spectrum":"Cu II","medium":"air"},{"intensity":500.0,"nm":644.8559,"spectrum":"Cu II","medium":"air"}],"lineCount":12,"row":4,"col":11},"Nb":{"name":"Niobium","symbol":"Nb","atomicNumber":41,"lines":[{"intensity":150.0,"nm":380.292,"spectrum":"Nb I","medium":"air"},{"intensity":70.0,"nm":388.544,"spectrum":"Nb I","medium":"air"},{"intensity":1000.0,"nm":405.894,"spectrum":"Nb I","medium":"air"},{"intensity":800.0,"nm":407.973,"spectrum":"Nb I","medium":"air"},{"intensity":400.0,"nm":410.092,"spectrum":"Nb I","medium":"air"},{"intensity":300.0,"nm":412.381,"spectrum":"Nb I","medium":"air"},{"intensity":140.0,"nm":413.71,"spectrum":"Nb I","medium":"air"},{"intensity":150.0,"nm":413.971,"spectrum":"Nb I","medium":"air"},{"intensity":300.0,"nm":415.258,"spectrum":"Nb I","medium":"air"},{"intensity":300.0,"nm":416.366,"spectrum":"Nb I","medium":"air"},{"intensity":200.0,"nm":416.813,"spectrum":"Nb I","medium":"air"},{"intensity":80.0,"nm":419.088,"spectrum":"Nb I","medium":"air"}],"lineCount":12,"row":5,"col":5},"Tm":{"name":"Thulium","symbol":"Tm","atomicNumber":69,"lines":[{"intensity":150.0,"nm":383.82,"spectrum":"Tm II","medium":"air"},{"intensity":1000.0,"nm":384.802,"spectrum":"Tm II","medium":"air"},{"intensity":700.0,"nm":388.3132,"spectrum":"Tm I","medium":"air"},{"intensity":500.0,"nm":388.7348,"spectrum":"Tm I","medium":"air"},{"intensity":400.0,"nm":391.6477,"spectrum":"Tm I","medium":"air"},{"intensity":150.0,"nm":394.927,"spectrum":"Tm I","medium":"air"},{"intensity":150.0,"nm":395.81,"spectrum":"Tm II","medium":"air"},{"intensity":200.0,"nm":399.652,"spectrum":"Tm II","medium":"air"},{"intensity":1000.0,"nm":409.4187,"spectrum":"Tm I","medium":"air"},{"intensity":1000.0,"nm":410.5841,"spectrum":"Tm I","medium":"air"},{"intensity":900.0,"nm":418.7615,"spectrum":"Tm I","medium":"air"},{"intensity":600.0,"nm":420.3727,"spectrum":"Tm I","medium":"air"}],"lineCount":12,"row":8,"col":15},"Cm":{"name":"Curium","symbol":"Cm","atomicNumber":96,"lines":[{"intensity":1000.0,"nm":381.6304,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":382.5138,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":383.3315,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":383.7593,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":384.2,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":384.9924,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":385.4106,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":390.0253,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":390.4064,"spectrum":"Cm II","medium":"air"},{"intensity":1000.0,"nm":390.8238,"spectrum":"Cm II","medium":"air"},{"intensity":1000.0,"nm":393.6666,"spectrum":"Cm I","medium":"air"},{"intensity":1000.0,"nm":394.2025,"spectrum":"Cm I","medium":"air"}],"lineCount":12,"row":9,"col":10},"N":{"name":"Nitrogen","symbol":"N","atomicNumber":7,"lines":[{"intensity":50.0,"nm":399.5,"spectrum":"N II","medium":"air"},{"intensity":30.0,"nm":404.131,"spectrum":"N II","medium":"air"},{"intensity":30.0,"nm":444.703,"spectrum":"N II","medium":"air"},{"intensity":30.0,"nm":460.148,"spectrum":"N II","medium":"air"},{"intensity":40.0,"nm":463.054,"spectrum":"N II","medium":"air"},{"intensity":30.0,"nm":464.308,"spectrum":"N II","medium":"air"},{"intensity":80.0,"nm":496.398,"spectrum":"N I","medium":"air"},{"intensity":30.0,"nm":500.148,"spectrum":"N II","medium":"air"},{"intensity":40.0,"nm":500.515,"spectrum":"N II","medium":"air"},{"intensity":30.0,"nm":500.732,"spectrum":"N II","medium":"air"},{"intensity":40.0,"nm":567.956,"spectrum":"N II","medium":"air"},{"intensity":150.0,"nm":575.25,"spectrum":"N I","medium":"air"}],"lineCount":12,"row":2,"col":15},"Sn":{"name":"Tin","symbol":"Sn","atomicNumber":50,"lines":[{"intensity":200.0,"nm":380.1011,"spectrum":"Sn I","medium":"air"},{"intensity":110.0,"nm":452.4734,"spectrum":"Sn I","medium":"air"},{"intensity":30.0,"nm":533.2339,"spectrum":"Sn II","medium":"air"},{"intensity":30.0,"nm":556.191,"spectrum":"Sn II","medium":"air"},{"intensity":30.0,"nm":558.8815,"spectrum":"Sn II","medium":"air"},{"intensity":60.0,"nm":563.1676,"spectrum":"Sn I","medium":"air"},{"intensity":30.0,"nm":579.886,"spectrum":"Sn II","medium":"air"},{"intensity":30.0,"nm":605.4674,"spectrum":"Sn I","medium":"air"},{"intensity":40.0,"nm":606.9117,"spectrum":"Sn I","medium":"air"},{"intensity":40.0,"nm":614.9604,"spectrum":"Sn I","medium":"air"},{"intensity":20.0,"nm":615.4446,"spectrum":"Sn I","medium":"air"},{"intensity":50.0,"nm":645.3542,"spectrum":"Sn II","medium":"air"}],"lineCount":12,"row":5,"col":14},"Dy":{"name":"Dysprosium","symbol":"Dy","atomicNumber":66,"lines":[{"intensity":300.0,"nm":387.2103,"spectrum":"Dy II","medium":"air"},{"intensity":250.0,"nm":389.8528,"spectrum":"Dy II","medium":"air"},{"intensity":500.0,"nm":394.4679,"spectrum":"Dy II","medium":"air"},{"intensity":600.0,"nm":396.8384,"spectrum":"Dy II","medium":"air"},{"intensity":400.0,"nm":400.0449,"spectrum":"Dy II","medium":"air"},{"intensity":800.0,"nm":404.597,"spectrum":"Dy I","medium":"air"},{"intensity":300.0,"nm":407.7965,"spectrum":"Dy II","medium":"air"},{"intensity":400.0,"nm":416.7974,"spectrum":"Dy I","medium":"air"},{"intensity":800.0,"nm":418.6821,"spectrum":"Dy I","medium":"air"},{"intensity":400.0,"nm":419.4846,"spectrum":"Dy I","medium":"air"},{"intensity":1000.0,"nm":421.1714,"spectrum":"Dy I","medium":"air"},{"intensity":250.0,"nm":421.5159,"spectrum":"Dy I","medium":"air"}],"lineCount":12,"row":8,"col":12},"Os":{"name":"Osmium","symbol":"Os","atomicNumber":76,"lines":[{"intensity":25.0,"nm":387.677,"spectrum":"Os I","medium":"air"},{"intensity":30.0,"nm":396.363,"spectrum":"Os I","medium":"air"},{"intensity":25.0,"nm":397.723,"spectrum":"Os I","medium":"air"},{"intensity":30.0,"nm":406.669,"spectrum":"Os I","medium":"air"},{"intensity":40.0,"nm":411.202,"spectrum":"Os I","medium":"air"},{"intensity":90.0,"nm":413.578,"spectrum":"Os I","medium":"air"},{"intensity":40.0,"nm":417.323,"spectrum":"Os I","medium":"air"},{"intensity":20.0,"nm":417.563,"spectrum":"Os I","medium":"air"},{"intensity":40.0,"nm":421.186,"spectrum":"Os I","medium":"air"},{"intensity":150.0,"nm":426.085,"spectrum":"Os I","medium":"air"},{"intensity":20.0,"nm":429.395,"spectrum":"Os I","medium":"air"},{"intensity":20.0,"nm":431.14,"spectrum":"Os I","medium":"air"}],"lineCount":12,"row":6,"col":8},"Ti":{"name":"Titanium","symbol":"Ti","atomicNumber":22,"lines":[{"intensity":600.0,"nm":394.867,"spectrum":"Ti I","medium":"air"},{"intensity":600.0,"nm":395.6334,"spectrum":"Ti I","medium":"air"},{"intensity":700.0,"nm":395.8201,"spectrum":"Ti I","medium":"air"},{"intensity":600.0,"nm":398.1761,"spectrum":"Ti I","medium":"air"},{"intensity":700.0,"nm":398.9758,"spectrum":"Ti I","medium":"air"},{"intensity":1000.0,"nm":399.8636,"spectrum":"Ti I","medium":"air"},{"intensity":500.0,"nm":430.1079,"spectrum":"Ti I","medium":"air"},{"intensity":800.0,"nm":430.5907,"spectrum":"Ti I","medium":"air"},{"intensity":800.0,"nm":453.3239,"spectrum":"Ti I","medium":"air"},{"intensity":500.0,"nm":453.4775,"spectrum":"Ti I","medium":"air"},{"intensity":700.0,"nm":498.173,"spectrum":"Ti I","medium":"air"},{"intensity":600.0,"nm":499.1066,"spectrum":"Ti I","medium":"air"}],"lineCount":12,"row":4,"col":4},"Es":{"name":"Einsteinium","symbol":"Es","atomicNumber":99,"lines":[{"intensity":1000.0,"nm":380.149,"spectrum":"Es I","medium":"air"},{"intensity":300.0,"nm":393.077,"spectrum":"Es I","medium":"air"},{"intensity":100.0,"nm":417.694,"spectrum":"Es I","medium":"air"},{"intensity":1000.0,"nm":516.174,"spectrum":"Es I","medium":"air"},{"intensity":1000.0,"nm":520.44,"spectrum":"Es I","medium":"air"},{"intensity":300.0,"nm":561.551,"spectrum":"Es I","medium":"air"}],"lineCount":6,"row":9,"col":13},"O":{"name":"Oxygen","symbol":"O","atomicNumber":8,"lines":[{"intensity":400.0,"nm":391.1957,"spectrum":"O II","medium":"air"},{"intensity":400.0,"nm":397.3256,"spectrum":"O II","medium":"air"},{"intensity":250.0,"nm":407.2157,"spectrum":"O II","medium":"air"},{"intensity":400.0,"nm":407.5862,"spectrum":"O II","medium":"air"},{"intensity":250.0,"nm":411.9215,"spectrum":"O II","medium":"air"},{"intensity":250.0,"nm":418.5449,"spectrum":"O II","medium":"air"},{"intensity":400.0,"nm":418.9789,"spectrum":"O II","medium":"air"},{"intensity":250.0,"nm":431.7138,"spectrum":"O II","medium":"air"},{"intensity":250.0,"nm":434.9426,"spectrum":"O II","medium":"air"},{"intensity":400.0,"nm":441.4905,"spectrum":"O II","medium":"air"},{"intensity":300.0,"nm":459.0972,"spectrum":"O II","medium":"air"},{"intensity":300.0,"nm":464.181,"spectrum":"O II","medium":"air"}],"lineCount":12,"row":2,"col":16},"W":{"name":"Tungsten","symbol":"W","atomicNumber":74,"lines":[{"intensity":150.0,"nm":381.748,"spectrum":"W I","medium":"air"},{"intensity":130.0,"nm":383.506,"spectrum":"W I","medium":"air"},{"intensity":80.0,"nm":384.622,"spectrum":"W I","medium":"air"},{"intensity":200.0,"nm":386.799,"spectrum":"W I","medium":"air"},{"intensity":1000.0,"nm":400.875,"spectrum":"W I","medium":"air"},{"intensity":110.0,"nm":404.559,"spectrum":"W I","medium":"air"},{"intensity":600.0,"nm":407.436,"spectrum":"W I","medium":"air"},{"intensity":120.0,"nm":410.27,"spectrum":"W I","medium":"air"},{"intensity":150.0,"nm":426.938,"spectrum":"W I","medium":"air"},{"intensity":500.0,"nm":429.461,"spectrum":"W I","medium":"air"},{"intensity":250.0,"nm":430.211,"spectrum":"W I","medium":"air"},{"intensity":90.0,"nm":484.381,"spectrum":"W I","medium":"air"}],"lineCount":12,"row":6,"col":6},"Er":{"name":"Erbium","symbol":"Er","atomicNumber":68,"lines":[{"intensity":300.0,"nm":383.0482,"spectrum":"Er II","medium":"air"},{"intensity":500.0,"nm":386.2851,"spectrum":"Er I","medium":"air"},{"intensity":140.0,"nm":388.0611,"spectrum":"Er II","medium":"air"},{"intensity":300.0,"nm":389.2684,"spectrum":"Er I","medium":"air"},{"intensity":500.0,"nm":389.6234,"spectrum":"Er II","medium":"air"},{"intensity":1000.0,"nm":390.6311,"spectrum":"Er II","medium":"air"},{"intensity":250.0,"nm":393.7014,"spectrum":"Er I","medium":"air"},{"intensity":200.0,"nm":393.8626,"spectrum":"Er II","medium":"air"},{"intensity":250.0,"nm":394.442,"spectrum":"Er I","medium":"air"},{"intensity":250.0,"nm":397.3575,"spectrum":"Er I","medium":"air"},{"intensity":1000.0,"nm":400.7965,"spectrum":"Er I","medium":"air"},{"intensity":200.0,"nm":402.0512,"spectrum":"Er I","medium":"air"}],"lineCount":12,"row":8,"col":14},"Pd":{"name":"Palladium","symbol":"Pd","atomicNumber":46,"lines":[{"intensity":90.0,"nm":389.4199,"spectrum":"Pd I","medium":"air"},{"intensity":100.0,"nm":421.2954,"spectrum":"Pd I","medium":"air"}],"lineCount":2,"row":5,"col":10},"U":{"name":"Uranium","symbol":"U","atomicNumber":92,"lines":[{"intensity":600.0,"nm":381.1991,"spectrum":"U I","medium":"air"},{"intensity":400.0,"nm":383.1459,"spectrum":"U II","medium":"air"},{"intensity":400.0,"nm":383.9626,"spectrum":"U I","medium":"air"},{"intensity":500.0,"nm":385.4645,"spectrum":"U II","medium":"air"},{"intensity":1000.0,"nm":385.9572,"spectrum":"U II","medium":"air"},{"intensity":400.0,"nm":386.5918,"spectrum":"U II","medium":"air"},{"intensity":500.0,"nm":387.1035,"spectrum":"U I","medium":"air"},{"intensity":400.0,"nm":389.0362,"spectrum":"U II","medium":"air"},{"intensity":400.0,"nm":393.2022,"spectrum":"U II","medium":"air"},{"intensity":400.0,"nm":394.3816,"spectrum":"U I","medium":"air"},{"intensity":300.0,"nm":404.275,"spectrum":"U I","medium":"air"},{"intensity":300.0,"nm":405.0041,"spectrum":"U II","medium":"air"}],"lineCount":12,"row":9,"col":6},"Eu":{"name":"Europium","symbol":"Eu","atomicNumber":63,"lines":[{"intensity":600.0,"nm":381.967,"spectrum":"Eu II","medium":"air"},{"intensity":500.0,"nm":390.71,"spectrum":"Eu II","medium":"air"},{"intensity":500.0,"nm":393.048,"spectrum":"Eu II","medium":"air"},{"intensity":500.0,"nm":397.196,"spectrum":"Eu II","medium":"air"},{"intensity":600.0,"nm":412.97,"spectrum":"Eu II","medium":"air"},{"intensity":1000.0,"nm":420.505,"spectrum":"Eu II","medium":"air"},{"intensity":250.0,"nm":443.556,"spectrum":"Eu II","medium":"air"},{"intensity":50.0,"nm":452.257,"spectrum":"Eu II","medium":"air"},{"intensity":1000.0,"nm":459.403,"spectrum":"Eu I","medium":"air"},{"intensity":900.0,"nm":462.722,"spectrum":"Eu I","medium":"air"},{"intensity":800.0,"nm":466.188,"spectrum":"Eu I","medium":"air"},{"intensity":70.0,"nm":521.51,"spectrum":"Eu I","medium":"air"}],"lineCount":12,"row":8,"col":9},"P":{"name":"Phosphorus","symbol":"P","atomicNumber":15,"lines":[{"intensity":80.0,"nm":442.071,"spectrum":"P II","medium":"air"},{"intensity":110.0,"nm":458.804,"spectrum":"P II","medium":"air"},{"intensity":110.0,"nm":458.986,"spectrum":"P II","medium":"air"},{"intensity":130.0,"nm":460.208,"spectrum":"P II","medium":"air"},{"intensity":110.0,"nm":494.353,"spectrum":"P II","medium":"air"},{"intensity":80.0,"nm":529.613,"spectrum":"P II","medium":"air"},{"intensity":80.0,"nm":542.591,"spectrum":"P II","medium":"air"},{"intensity":80.0,"nm":545.074,"spectrum":"P II","medium":"air"},{"intensity":110.0,"nm":602.418,"spectrum":"P II","medium":"air"},{"intensity":80.0,"nm":603.404,"spectrum":"P II","medium":"air"},{"intensity":110.0,"nm":604.312,"spectrum":"P II","medium":"air"},{"intensity":130.0,"nm":645.999,"spectrum":"P II","medium":"air"}],"lineCount":12,"row":3,"col":15},"V":{"name":"Vanadium","symbol":"V","atomicNumber":23,"lines":[{"intensity":200.0,"nm":384.075,"spectrum":"V I","medium":"air"},{"intensity":250.0,"nm":385.5845,"spectrum":"V I","medium":"air"},{"intensity":200.0,"nm":390.2256,"spectrum":"V I","medium":"air"},{"intensity":250.0,"nm":409.9784,"spectrum":"V I","medium":"air"},{"intensity":250.0,"nm":410.5155,"spectrum":"V I","medium":"air"},{"intensity":700.0,"nm":411.178,"spectrum":"V I","medium":"air"},{"intensity":400.0,"nm":411.518,"spectrum":"V I","medium":"air"},{"intensity":250.0,"nm":412.8064,"spectrum":"V I","medium":"air"},{"intensity":250.0,"nm":413.1989,"spectrum":"V I","medium":"air"},{"intensity":1000.0,"nm":437.923,"spectrum":"V I","medium":"air"},{"intensity":600.0,"nm":438.471,"spectrum":"V I","medium":"air"},{"intensity":400.0,"nm":438.998,"spectrum":"V I","medium":"air"}],"lineCount":12,"row":4,"col":5},"F":{"name":"Fluorine","symbol":"F","atomicNumber":9,"lines":[{"intensity":250.0,"nm":384.7086,"spectrum":"F II","medium":"air"},{"intensity":250.0,"nm":384.9985,"spectrum":"F II","medium":"air"},{"intensity":250.0,"nm":385.1668,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":389.8825,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":390.1933,"spectrum":"F II","medium":"air"},{"intensity":250.0,"nm":402.4726,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":410.3074,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":424.6227,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":429.917,"spectrum":"F II","medium":"air"},{"intensity":200.0,"nm":444.7188,"spectrum":"F II","medium":"air"},{"intensity":500.0,"nm":685.603,"spectrum":"F I","medium":"air"},{"intensity":150.0,"nm":690.2475,"spectrum":"F I","medium":"air"}],"lineCount":12,"row":2,"col":17},"Pt":{"name":"Platinum","symbol":"Pt","atomicNumber":78,"lines":[{"intensity":250.0,"nm":381.8687,"spectrum":"Pt I","medium":"air"},{"intensity":30.0,"nm":390.0723,"spectrum":"Pt I","medium":"air"},{"intensity":60.0,"nm":392.2956,"spectrum":"Pt I","medium":"air"},{"intensity":100.0,"nm":396.6357,"spectrum":"Pt I","medium":"air"},{"intensity":60.0,"nm":401.3714,"spectrum":"Pt II","medium":"air"},{"intensity":30.0,"nm":406.5705,"spectrum":"Pt II","medium":"air"},{"intensity":60.0,"nm":411.8675,"spectrum":"Pt I","medium":"air"},{"intensity":50.0,"nm":416.4549,"spectrum":"Pt I","medium":"air"},{"intensity":25.0,"nm":419.2423,"spectrum":"Pt I","medium":"air"},{"intensity":50.0,"nm":444.255,"spectrum":"Pt I","medium":"air"},{"intensity":25.0,"nm":455.242,"spectrum":"Pt I","medium":"air"},{"intensity":25.0,"nm":522.766,"spectrum":"Pt I","medium":"air"}],"lineCount":12,"row":6,"col":10},"Xe":{"name":"Xenon","symbol":"Xe","atomicNumber":54,"lines":[{"intensity":300.0,"nm":418.01,"spectrum":"Xe II","medium":"air"},{"intensity":300.0,"nm":433.052,"spectrum":"Xe II","medium":"air"},{"intensity":300.0,"nm":446.219,"spectrum":"Xe II","medium":"air"},{"intensity":700.0,"nm":484.433,"spectrum":"Xe II","medium":"air"},{"intensity":300.0,"nm":508.062,"spectrum":"Xe II","medium":"air"},{"intensity":700.0,"nm":529.222,"spectrum":"Xe II","medium":"air"},{"intensity":300.0,"nm":531.387,"spectrum":"Xe II","medium":"air"},{"intensity":700.0,"nm":533.933,"spectrum":"Xe II","medium":"air"},{"intensity":1000.0,"nm":541.915,"spectrum":"Xe II","medium":"air"},{"intensity":300.0,"nm":547.261,"spectrum":"Xe II","medium":"air"},{"intensity":700.0,"nm":597.646,"spectrum":"Xe II","medium":"air"},{"intensity":700.0,"nm":605.115,"spectrum":"Xe II","medium":"air"}],"lineCount":12,"row":5,"col":18},"Fr":{"name":"Francium","symbol":"Fr","atomicNumber":87,"lines":[],"lineCount":0,"row":7,"col":1},"Pu":{"name":"Plutonium","symbol":"Pu","atomicNumber":94,"lines":[{"intensity":500.0,"nm":380.5923,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":381.1396,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":383.552,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":385.1007,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":387.854,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":413.3005,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":414.0041,"spectrum":"Pu I","medium":"air"},{"intensity":500.0,"nm":415.1091,"spectrum":"Pu I","medium":"air"},{"intensity":1000.0,"nm":420.6481,"spectrum":"Pu I","medium":"air"},{"intensity":1000.0,"nm":453.6146,"spectrum":"Pu II","medium":"air"},{"intensity":800.0,"nm":630.4661,"spectrum":"Pu I","medium":"air"},{"intensity":800.0,"nm":648.6707,"spectrum":"Pu I","medium":"air"}],"lineCount":12,"row":9,"col":8},"Yb":{"name":"Ytterbium","symbol":"Yb","atomicNumber":70,"lines":[{"intensity":20.0,"nm":387.2852,"spectrum":"Yb I","medium":"air"},{"intensity":20.0,"nm":390.085,"spectrum":"Yb I","medium":"air"},{"intensity":1000.0,"nm":398.799,"spectrum":"Yb I","medium":"air"},{"intensity":50.0,"nm":399.0885,"spectrum":"Yb I","medium":"air"},{"intensity":25.0,"nm":408.968,"spectrum":"Yb I","medium":"air"},{"intensity":25.0,"nm":414.9066,"spectrum":"Yb I","medium":"air"},{"intensity":20.0,"nm":418.0809,"spectrum":"Yb II","medium":"air"},{"intensity":25.0,"nm":443.919,"spectrum":"Yb I","medium":"air"},{"intensity":40.0,"nm":457.6209,"spectrum":"Yb I","medium":"air"},{"intensity":40.0,"nm":493.55,"spectrum":"Yb I","medium":"air"},{"intensity":12.0,"nm":507.434,"spectrum":"Yb I","medium":"air"},{"intensity":130.0,"nm":555.6466,"spectrum":"Yb I","medium":"air"}],"lineCount":12,"row":8,"col":16},"Gd":{"name":"Gadolinium","symbol":"Gd","atomicNumber":64,"lines":[{"intensity":400.0,"nm":381.397,"spectrum":"Gd II","medium":"air"},{"intensity":300.0,"nm":384.328,"spectrum":"Gd I","medium":"air"},{"intensity":600.0,"nm":385.097,"spectrum":"Gd II","medium":"air"},{"intensity":500.0,"nm":385.245,"spectrum":"Gd II","medium":"air"},{"intensity":300.0,"nm":386.699,"spectrum":"Gd I","medium":"air"},{"intensity":500.0,"nm":405.364,"spectrum":"Gd I","medium":"air"},{"intensity":500.0,"nm":405.822,"spectrum":"Gd I","medium":"air"},{"intensity":600.0,"nm":407.87,"spectrum":"Gd I","medium":"air"},{"intensity":500.0,"nm":417.554,"spectrum":"Gd I","medium":"air"},{"intensity":500.0,"nm":419.078,"spectrum":"Gd I","medium":"air"},{"intensity":1000.0,"nm":422.585,"spectrum":"Gd I","medium":"air"},{"intensity":400.0,"nm":431.384,"spectrum":"Gd I","medium":"air"}],"lineCount":12,"row":8,"col":10},"Po":{"name":"Polonium","symbol":"Po","atomicNumber":84,"lines":[{"intensity":500.0,"nm":417.052,"spectrum":"Po I","medium":"air"},{"intensity":300.0,"nm":449.321,"spectrum":"Po I","medium":"air"}],"lineCount":2,"row":6,"col":16},"Y":{"name":"Yttrium","symbol":"Y","atomicNumber":39,"lines":[{"intensity":300.0,"nm":383.2889,"spectrum":"Y II","medium":"air"},{"intensity":300.0,"nm":395.0349,"spectrum":"Y II","medium":"air"},{"intensity":300.0,"nm":398.2592,"spectrum":"Y II","medium":"air"},{"intensity":900.0,"nm":407.7359,"spectrum":"Y I","medium":"air"},{"intensity":1000.0,"nm":410.2364,"spectrum":"Y I","medium":"air"},{"intensity":900.0,"nm":412.8299,"spectrum":"Y I","medium":"air"},{"intensity":800.0,"nm":414.2841,"spectrum":"Y I","medium":"air"},{"intensity":600.0,"nm":417.7528,"spectrum":"Y II","medium":"air"},{"intensity":900.0,"nm":437.4933,"spectrum":"Y II","medium":"air"},{"intensity":300.0,"nm":485.4861,"spectrum":"Y II","medium":"air"},{"intensity":700.0,"nm":488.3682,"spectrum":"Y II","medium":"air"},{"intensity":600.0,"nm":490.0118,"spectrum":"Y II","medium":"air"}],"lineCount":12,"row":5,"col":3},"Ga":{"name":"Gallium","symbol":"Ga","atomicNumber":31,"lines":[{"intensity":500.0,"nm":403.2984,"spectrum":"Ga I","medium":"air"},{"intensity":1000.0,"nm":417.2042,"spectrum":"Ga I","medium":"air"},{"intensity":300.0,"nm":426.2019,"spectrum":"Ga II","medium":"air"},{"intensity":500.0,"nm":521.965,"spectrum":"Ga II","medium":"air"},{"intensity":500.0,"nm":541.636,"spectrum":"Ga II","medium":"air"},{"intensity":1000.0,"nm":633.405,"spectrum":"Ga II","medium":"air"},{"intensity":100.0,"nm":639.656,"spectrum":"Ga I","medium":"air"},{"intensity":70.0,"nm":641.345,"spectrum":"Ga I","medium":"air"},{"intensity":900.0,"nm":641.923,"spectrum":"Ga II","medium":"air"},{"intensity":800.0,"nm":645.589,"spectrum":"Ga II","medium":"air"}],"lineCount":10,"row":4,"col":13},"K":{"name":"Potassium","symbol":"K","atomicNumber":19,"lines":[{"intensity":700.0,"nm":404.414,"spectrum":"K I","medium":"air"},{"intensity":700.0,"nm":404.721,"spectrum":"K I","medium":"air"},{"intensity":500.0,"nm":511.225,"spectrum":"K I","medium":"air"},{"intensity":500.0,"nm":532.328,"spectrum":"K I","medium":"air"},{"intensity":500.0,"nm":533.969,"spectrum":"K I","medium":"air"},{"intensity":500.0,"nm":534.297,"spectrum":"K I","medium":"air"},{"intensity":600.0,"nm":535.957,"spectrum":"K I","medium":"air"},{"intensity":600.0,"nm":578.238,"spectrum":"K I","medium":"air"},{"intensity":700.0,"nm":580.175,"spectrum":"K I","medium":"air"},{"intensity":600.0,"nm":581.215,"spectrum":"K I","medium":"air"},{"intensity":700.0,"nm":583.189,"spectrum":"K I","medium":"air"},{"intensity":800.0,"nm":691.108,"spectrum":"K I","medium":"air"}],"lineCount":12,"row":4,"col":1},"Zn":{"name":"Zinc","symbol":"Zn","atomicNumber":30,"lines":[{"intensity":100.0,"nm":468.0136,"spectrum":"Zn I","medium":"air"},{"intensity":250.0,"nm":472.2157,"spectrum":"Zn I","medium":"air"},{"intensity":400.0,"nm":481.0532,"spectrum":"Zn I","medium":"air"},{"intensity":80.0,"nm":491.1627,"spectrum":"Zn II","medium":"air"},{"intensity":120.0,"nm":492.4013,"spectrum":"Zn II","medium":"air"},{"intensity":100.0,"nm":589.4361,"spectrum":"Zn II","medium":"air"},{"intensity":40.0,"nm":621.4578,"spectrum":"Zn II","medium":"air"},{"intensity":30.0,"nm":636.2346,"spectrum":"Zn I","medium":"air"}],"lineCount":8,"row":4,"col":12},"Ge":{"name":"Germanium","symbol":"Ge","atomicNumber":32,"lines":[{"intensity":1000.0,"nm":474.1806,"spectrum":"Ge II","medium":"air"},{"intensity":1000.0,"nm":481.4608,"spectrum":"Ge II","medium":"air"},{"intensity":1000.0,"nm":589.3389,"spectrum":"Ge II","medium":"air"},{"intensity":500.0,"nm":602.1041,"spectrum":"Ge II","medium":"air"}],"lineCount":4,"row":4,"col":14},"Pr":{"name":"Praseodymium","symbol":"Pr","atomicNumber":59,"lines":[{"intensity":500.0,"nm":395.944,"spectrum":"Pr I","medium":"air"},{"intensity":600.0,"nm":410.0717,"spectrum":"Pr II","medium":"air"},{"intensity":500.0,"nm":414.3112,"spectrum":"Pr II","medium":"air"},{"intensity":1000.0,"nm":417.9391,"spectrum":"Pr II","medium":"air"},{"intensity":500.0,"nm":418.9479,"spectrum":"Pr II","medium":"air"},{"intensity":500.0,"nm":420.6719,"spectrum":"Pr II","medium":"air"},{"intensity":700.0,"nm":422.2931,"spectrum":"Pr II","medium":"air"},{"intensity":700.0,"nm":422.5346,"spectrum":"Pr II","medium":"air"},{"intensity":800.0,"nm":469.577,"spectrum":"Pr I","medium":"air"},{"intensity":700.0,"nm":473.669,"spectrum":"Pr I","medium":"air"},{"intensity":800.0,"nm":493.974,"spectrum":"Pr I","medium":"air"},{"intensity":1000.0,"nm":495.137,"spectrum":"Pr I","medium":"air"}],"lineCount":12,"row":8,"col":5},"Zr":{"name":"Zirconium","symbol":"Zr","atomicNumber":40,"lines":[{"intensity":600.0,"nm":383.5962,"spectrum":"Zr I","medium":"air"},{"intensity":800.0,"nm":386.3872,"spectrum":"Zr I","medium":"air"},{"intensity":300.0,"nm":387.7595,"spectrum":"Zr I","medium":"air"},{"intensity":400.0,"nm":388.5422,"spectrum":"Zr I","medium":"air"},{"intensity":800.0,"nm":389.0316,"spectrum":"Zr I","medium":"air"},{"intensity":300.0,"nm":392.9529,"spectrum":"Zr I","medium":"air"},{"intensity":400.0,"nm":406.4151,"spectrum":"Zr I","medium":"air"},{"intensity":600.0,"nm":407.2698,"spectrum":"Zr I","medium":"air"},{"intensity":600.0,"nm":408.1209,"spectrum":"Zr I","medium":"air"},{"intensity":600.0,"nm":422.775,"spectrum":"Zr I","medium":"air"},{"intensity":600.0,"nm":423.9309,"spectrum":"Zr I","medium":"air"},{"intensity":700.0,"nm":468.7799,"spectrum":"Zr I","medium":"air"}],"lineCount":12,"row":5,"col":4},"Fm":{"name":"Fermium","symbol":"Fm","atomicNumber":100,"lines":[],"lineCount":0,"row":9,"col":14},"Md":{"name":"Mendelevium","symbol":"Md","atomicNumber":101,"lines":[],"lineCount":0,"row":9,"col":15},"No":{"name":"Nobelium","symbol":"No","atomicNumber":102,"lines":[],"lineCount":0,"row":9,"col":16},"Lr":{"name":"Lawrencium","symbol":"Lr","atomicNumber":103,"lines":[],"lineCount":0,"row":9,"col":17},"Rf":{"name":"Rutherfordium","symbol":"Rf","atomicNumber":104,"lines":[],"lineCount":0,"row":7,"col":4},"Db":{"name":"Dubnium","symbol":"Db","atomicNumber":105,"lines":[],"lineCount":0,"row":7,"col":5},"Sg":{"name":"Seaborgium","symbol":"Sg","atomicNumber":106,"lines":[],"lineCount":0,"row":7,"col":6},"Bh":{"name":"Bohrium","symbol":"Bh","atomicNumber":107,"lines":[],"lineCount":0,"row":7,"col":7},"Hs":{"name":"Hassium","symbol":"Hs","atomicNumber":108,"lines":[],"lineCount":0,"row":7,"col":8},"Mt":{"name":"Meitnerium","symbol":"Mt","atomicNumber":109,"lines":[],"lineCount":0,"row":7,"col":9},"Ds":{"name":"Darmstadtium","symbol":"Ds","atomicNumber":110,"lines":[],"lineCount":0,"row":7,"col":10},"Rg":{"name":"Roentgenium","symbol":"Rg","atomicNumber":111,"lines":[],"lineCount":0,"row":7,"col":11},"Cn":{"name":"Copernicium","symbol":"Cn","atomicNumber":112,"lines":[],"lineCount":0,"row":7,"col":12},"Nh":{"name":"Nihonium","symbol":"Nh","atomicNumber":113,"lines":[],"lineCount":0,"row":7,"col":13},"Fl":{"name":"Flerovium","symbol":"Fl","atomicNumber":114,"lines":[],"lineCount":0,"row":7,"col":14},"Mc":{"name":"Moscovium","symbol":"Mc","atomicNumber":115,"lines":[],"lineCount":0,"row":7,"col":15},"Lv":{"name":"Livermorium","symbol":"Lv","atomicNumber":116,"lines":[],"lineCount":0,"row":7,"col":16},"Ts":{"name":"Tennessine","symbol":"Ts","atomicNumber":117,"lines":[],"lineCount":0,"row":7,"col":17},"Og":{"name":"Oganesson","symbol":"Og","atomicNumber":118,"lines":[],"lineCount":0,"row":7,"col":18}};
+const LAYOUT = [{"symbol":"H","row":1,"col":1},{"symbol":"He","row":1,"col":18},{"symbol":"Li","row":2,"col":1},{"symbol":"Be","row":2,"col":2},{"symbol":"B","row":2,"col":13},{"symbol":"C","row":2,"col":14},{"symbol":"N","row":2,"col":15},{"symbol":"O","row":2,"col":16},{"symbol":"F","row":2,"col":17},{"symbol":"Ne","row":2,"col":18},{"symbol":"Na","row":3,"col":1},{"symbol":"Mg","row":3,"col":2},{"symbol":"Al","row":3,"col":13},{"symbol":"Si","row":3,"col":14},{"symbol":"P","row":3,"col":15},{"symbol":"S","row":3,"col":16},{"symbol":"Cl","row":3,"col":17},{"symbol":"Ar","row":3,"col":18},{"symbol":"K","row":4,"col":1},{"symbol":"Ca","row":4,"col":2},{"symbol":"Sc","row":4,"col":3},{"symbol":"Ti","row":4,"col":4},{"symbol":"V","row":4,"col":5},{"symbol":"Cr","row":4,"col":6},{"symbol":"Mn","row":4,"col":7},{"symbol":"Fe","row":4,"col":8},{"symbol":"Co","row":4,"col":9},{"symbol":"Ni","row":4,"col":10},{"symbol":"Cu","row":4,"col":11},{"symbol":"Zn","row":4,"col":12},{"symbol":"Ga","row":4,"col":13},{"symbol":"Ge","row":4,"col":14},{"symbol":"As","row":4,"col":15},{"symbol":"Se","row":4,"col":16},{"symbol":"Br","row":4,"col":17},{"symbol":"Kr","row":4,"col":18},{"symbol":"Rb","row":5,"col":1},{"symbol":"Sr","row":5,"col":2},{"symbol":"Y","row":5,"col":3},{"symbol":"Zr","row":5,"col":4},{"symbol":"Nb","row":5,"col":5},{"symbol":"Mo","row":5,"col":6},{"symbol":"Tc","row":5,"col":7},{"symbol":"Ru","row":5,"col":8},{"symbol":"Rh","row":5,"col":9},{"symbol":"Pd","row":5,"col":10},{"symbol":"Ag","row":5,"col":11},{"symbol":"Cd","row":5,"col":12},{"symbol":"In","row":5,"col":13},{"symbol":"Sn","row":5,"col":14},{"symbol":"Sb","row":5,"col":15},{"symbol":"Te","row":5,"col":16},{"symbol":"I","row":5,"col":17},{"symbol":"Xe","row":5,"col":18},{"symbol":"Cs","row":6,"col":1},{"symbol":"Ba","row":6,"col":2},{"symbol":"La","row":6,"col":3},{"symbol":"Hf","row":6,"col":4},{"symbol":"Ta","row":6,"col":5},{"symbol":"W","row":6,"col":6},{"symbol":"Re","row":6,"col":7},{"symbol":"Os","row":6,"col":8},{"symbol":"Ir","row":6,"col":9},{"symbol":"Pt","row":6,"col":10},{"symbol":"Au","row":6,"col":11},{"symbol":"Hg","row":6,"col":12},{"symbol":"Tl","row":6,"col":13},{"symbol":"Pb","row":6,"col":14},{"symbol":"Bi","row":6,"col":15},{"symbol":"Po","row":6,"col":16},{"symbol":"At","row":6,"col":17},{"symbol":"Rn","row":6,"col":18},{"symbol":"Fr","row":7,"col":1},{"symbol":"Ra","row":7,"col":2},{"symbol":"Ac","row":7,"col":3},{"symbol":"Rf","row":7,"col":4},{"symbol":"Db","row":7,"col":5},{"symbol":"Sg","row":7,"col":6},{"symbol":"Bh","row":7,"col":7},{"symbol":"Hs","row":7,"col":8},{"symbol":"Mt","row":7,"col":9},{"symbol":"Ds","row":7,"col":10},{"symbol":"Rg","row":7,"col":11},{"symbol":"Cn","row":7,"col":12},{"symbol":"Nh","row":7,"col":13},{"symbol":"Fl","row":7,"col":14},{"symbol":"Mc","row":7,"col":15},{"symbol":"Lv","row":7,"col":16},{"symbol":"Ts","row":7,"col":17},{"symbol":"Og","row":7,"col":18},{"symbol":"Ce","row":8,"col":4},{"symbol":"Pr","row":8,"col":5},{"symbol":"Nd","row":8,"col":6},{"symbol":"Pm","row":8,"col":7},{"symbol":"Sm","row":8,"col":8},{"symbol":"Eu","row":8,"col":9},{"symbol":"Gd","row":8,"col":10},{"symbol":"Tb","row":8,"col":11},{"symbol":"Dy","row":8,"col":12},{"symbol":"Ho","row":8,"col":13},{"symbol":"Er","row":8,"col":14},{"symbol":"Tm","row":8,"col":15},{"symbol":"Yb","row":8,"col":16},{"symbol":"Lu","row":8,"col":17},{"symbol":"Th","row":9,"col":4},{"symbol":"Pa","row":9,"col":5},{"symbol":"U","row":9,"col":6},{"symbol":"Np","row":9,"col":7},{"symbol":"Pu","row":9,"col":8},{"symbol":"Am","row":9,"col":9},{"symbol":"Cm","row":9,"col":10},{"symbol":"Bk","row":9,"col":11},{"symbol":"Cf","row":9,"col":12},{"symbol":"Es","row":9,"col":13},{"symbol":"Fm","row":9,"col":14},{"symbol":"Md","row":9,"col":15},{"symbol":"No","row":9,"col":16},{"symbol":"Lr","row":9,"col":17}];
+const STARS = {"Sun":{"label":"The Sun","peakNm":500,"desc":"broad continuum with many metal lines","composition":{"H":0.55,"Na":0.75,"Ca":0.8,"Fe":0.7,"Mg":0.55,"O":0.2}},"Sirius":{"label":"Sirius","peakNm":290,"desc":"hot blue-white star with strong hydrogen absorption","composition":{"H":0.95,"He":0.25,"Ca":0.12,"Fe":0.08}},"Betelgeuse":{"label":"Betelgeuse","peakNm":800,"desc":"cool red supergiant with strong neutral-metal features","composition":{"H":0.25,"Na":0.85,"Ca":0.9,"Fe":0.75,"Ti":0.55}},"Vega":{"label":"Vega","peakNm":300,"desc":"A-type star dominated in visible light by hydrogen lines","composition":{"H":0.9,"He":0.15}},"Arcturus":{"label":"Arcturus","peakNm":670,"desc":"orange giant with strong sodium, calcium, and iron lines","composition":{"H":0.45,"Na":0.85,"Ca":0.95,"Fe":0.8,"Mg":0.5}}};
 const WL_MIN = 380;
 const WL_MAX = 730;
-const TELLURIC_LINES = [628.0, 687.0, 719.0];
+const TELLURIC = [628.0, 687.0, 719.0];
 
-const elements = {
-  Hydrogen: { color: '#2b5db0', lines: [410.2, 434.0, 486.1, 656.3], names: ['Hδ', 'Hγ', 'Hβ', 'Hα'] },
-  Helium: { color: '#a16918', lines: [402.6, 447.1, 471.3, 501.6, 587.6], names: ['', '', '', '', 'He'] },
-  Sodium: { color: '#8a7613', lines: [589.0, 589.6], names: ['D1', 'D2'] },
-  Calcium: { color: '#a43b3b', lines: [393.4, 396.8, 422.7], names: ['K', 'H', ''] },
-  Iron: { color: '#566577', lines: [404.6, 438.4, 466.8, 495.8, 516.7, 527.0], names: [] }
-};
+let prismPlaced = false;
+let selectedSymbol = 'H';
+let labMode = 'emission';
+let showEarth = false;
+let currentStar = 'Sun';
+let explored = new Set(['H','Na','Ca']);
+let activeOverlays = new Set(['H']);
 
-const stars = {
-  'The Sun': {
-    type: 'G2V',
-    temp: '5,800 K',
-    desc: 'Broad continuum with many metal lines',
-    peakNm: 500,
-    composition: {
-      Hydrogen: { present: true, strength: 0.7 },
-      Helium: { present: true, strength: 0.15 },
-      Sodium: { present: true, strength: 0.8 },
-      Calcium: { present: true, strength: 0.85 },
-      Iron: { present: true, strength: 0.6 }
-    }
-  },
-  Sirius: {
-    type: 'A1V',
-    temp: '9,940 K',
-    desc: 'Blue-white star with strong visible hydrogen lines',
-    peakNm: 290,
-    composition: {
-      Hydrogen: { present: true, strength: 0.95 },
-      Helium: { present: true, strength: 0.3 },
-      Sodium: { present: false, strength: 0.0 },
-      Calcium: { present: true, strength: 0.15 },
-      Iron: { present: true, strength: 0.1 }
-    }
-  },
-  Betelgeuse: {
-    type: 'M2Iab',
-    temp: '3,600 K',
-    desc: 'Cool red supergiant with strong sodium, calcium, and iron features',
-    peakNm: 800,
-    composition: {
-      Hydrogen: { present: true, strength: 0.3 },
-      Helium: { present: true, strength: 0.05 },
-      Sodium: { present: true, strength: 0.75 },
-      Calcium: { present: true, strength: 0.9 },
-      Iron: { present: true, strength: 0.8 }
-    }
-  },
-  Vega: {
-    type: 'A0V',
-    temp: '9,600 K',
-    desc: 'Bright star whose visible spectrum is dominated by hydrogen',
-    peakNm: 300,
-    composition: {
-      Hydrogen: { present: true, strength: 0.9 },
-      Helium: { present: true, strength: 0.2 },
-      Sodium: { present: false, strength: 0.0 },
-      Calcium: { present: false, strength: 0.0 },
-      Iron: { present: false, strength: 0.0 }
-    }
-  },
-  Arcturus: {
-    type: 'K1.5III',
-    temp: '4,290 K',
-    desc: 'Orange giant with many strong metal lines',
-    peakNm: 670,
-    composition: {
-      Hydrogen: { present: true, strength: 0.5 },
-      Helium: { present: true, strength: 0.05 },
-      Sodium: { present: true, strength: 0.85 },
-      Calcium: { present: true, strength: 0.95 },
-      Iron: { present: true, strength: 0.75 }
-    }
-  }
-};
-
-const stages = [
-  {
-    title: 'Stage 1: What A Spectrum Is',
-    copy: 'White light is not one thing. When you spread it out by wavelength, you can see the full continuous range of colors hiding inside it.',
-    heroTitle: 'A spectrum is structured light.',
-    heroText: 'This first view is just the light itself, separated into wavelength so that structure can become visible.',
-    question: 'Why do we need to spread light out before we can learn anything from it?',
-    answer: 'Because when all wavelengths arrive mixed together, missing pieces stay hidden. The spectrum makes those missing wavelengths visible.',
-    label: 'Continuous Spectrum',
-    spectrumTitle: 'White light spread into a continuous spectrum.',
-    spectrumHelp: 'No lines are missing yet. This is the baseline that later stages will alter.'
-  },
-  {
-    title: 'Stage 2: What An Element Does',
-    copy: 'A gas does not dim the whole rainbow evenly. It removes only specific wavelengths, leaving narrow dark lines where those wavelengths have gone missing.',
-    heroTitle: 'Absorption is selective, not general.',
-    heroText: 'That selectivity is why the pattern can identify an element instead of just telling you the light got dimmer.',
-    question: 'Why does adding hydrogen make a few thin lines instead of fading the whole spectrum?',
-    answer: 'Because atoms absorb only particular wavelengths tied to their internal structure. Most wavelengths pass through unchanged.',
-    label: 'Absorption By One Element',
-    spectrumTitle: 'An element cuts its own pattern into the light.',
-    spectrumHelp: 'Choose one element and watch only its specific wavelengths disappear.'
-  },
-  {
-    title: 'Stage 3: What Happens In A Star',
-    copy: 'A star produces broad-spectrum light in its hot interior. That light then passes through cooler gas in the star’s outer layers, which removes selected wavelengths on the way out.',
-    heroTitle: 'Stars give you both a source and a filter.',
-    heroText: 'The hot dense interior makes the broad glow. The cooler atmosphere edits that glow and leaves evidence behind.',
-    question: 'Where do the dark lines in a star spectrum come from?',
-    answer: 'They come from atoms in cooler material that the light passes through after it is produced. The atmosphere scratches missing wavelengths into the outgoing spectrum.',
-    label: 'A Real Star Spectrum',
-    spectrumTitle: 'Observed starlight after it has passed through the star’s atmosphere.',
-    spectrumHelp: 'This is The Sun. Hydrogen markers are shown below as one example of how a known pattern can line up with real gaps.'
-  },
-  {
-    title: 'Stage 4: Compare Causes',
-    copy: 'A good model should answer objections. If Earth’s atmosphere caused all the visible dark lines, then different stars observed through the same atmosphere would look much more alike than they do.',
-    heroTitle: 'Scientific understanding means comparing hypotheses.',
-    heroText: 'The question is not just what pattern you see. It is what different causes would predict.',
-    question: 'How do we know the dark lines are not all coming from Earth’s atmosphere?',
-    answer: 'Because Earth contributes the same small telluric pattern to every ground-based observation, but different stars still show very different additional patterns.',
-    label: 'Compare Causes',
-    spectrumTitle: 'Use the model to answer a real follow-up question.',
-    spectrumHelp: 'The comparison below shows one fixed Earth pattern and two very different stars observed through that same Earth atmosphere.'
-  },
-  {
-    title: 'Stage 5: Infer The Elements',
-    copy: 'Now the matching tool becomes meaningful. Compare observed dark lines with known element line positions and ask which overlays explain the evidence best.',
-    heroTitle: 'Inference works because the mechanism is now in place.',
-    heroText: 'You are no longer just matching bars. You are testing a causal explanation for the observed spectrum.',
-    question: 'Why do two stars with some of the same elements still show different visible patterns?',
-    answer: 'Because line visibility depends on physical conditions too, especially temperature. Composition matters, but conditions change which lines stand out in the visible spectrum.',
-    label: 'Compare And Infer',
-    spectrumTitle: 'Observed stellar spectrum with candidate element overlays.',
-    spectrumHelp: 'Choose a star, turn on element overlays, and ask which lines genuinely align with the evidence.'
-  }
-];
-
-let stage = 0;
-let currentStar = 'The Sun';
-let demoElement = 'Hydrogen';
-let activeElements = new Set();
-
-const spectrumCanvas = document.getElementById('spectrum');
-const markersCanvas = document.getElementById('markers');
 const dpr = window.devicePixelRatio || 1;
-let spectrumCtx;
-let markersCtx;
+const prism = document.getElementById('prism');
+const beamStage = document.getElementById('beamStage');
+const rainbow = document.getElementById('rainbow');
+const prismStatus = document.getElementById('prismStatus');
+const prismInstruction = document.getElementById('prismInstruction');
+const targetRing = document.getElementById('targetRing');
 
-function sizeCanvas(canvas, cssHeight) {
+const labSpectrum = document.getElementById('labSpectrum');
+const starSpectrum = document.getElementById('starSpectrum');
+const starMarkers = document.getElementById('starMarkers');
+const earthSpectrum = document.getElementById('earthSpectrum');
+const siriusSpectrum = document.getElementById('siriusSpectrum');
+const betelgeuseSpectrum = document.getElementById('betelgeuseSpectrum');
+
+let labCtx, starCtx, markerCtx, earthCtx, siriusCtx, betelCtx;
+
+function sizeCanvas(canvas, height) {
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
-  canvas.height = cssHeight * dpr;
-  canvas.style.height = `${cssHeight}px`;
+  canvas.height = height * dpr;
+  canvas.style.height = height + 'px';
   return canvas.getContext('2d');
 }
 
 function initCanvases() {
-  spectrumCtx = sizeCanvas(spectrumCanvas, 220);
-  markersCtx = sizeCanvas(markersCanvas, 82);
+  labCtx = sizeCanvas(labSpectrum, 160);
+  starCtx = sizeCanvas(starSpectrum, 160);
+  markerCtx = sizeCanvas(starMarkers, 70);
+  earthCtx = sizeCanvas(earthSpectrum, 92);
+  siriusCtx = sizeCanvas(siriusSpectrum, 92);
+  betelCtx = sizeCanvas(betelgeuseSpectrum, 92);
 }
 
-function wavelengthToColor(wl) {
+function wlToColor(wl) {
   let r = 0, g = 0, b = 0;
   if (wl >= 380 && wl < 440) { r = -(wl - 440) / 60; b = 1; }
   else if (wl < 490) { g = (wl - 440) / 50; b = 1; }
@@ -722,13 +446,15 @@ function wavelengthToColor(wl) {
   else if (wl < 580) { r = (wl - 510) / 70; g = 1; }
   else if (wl < 645) { r = 1; g = -(wl - 645) / 65; }
   else { r = 1; }
-
   let factor;
-  if (wl < 420) factor = 0.34 + 0.66 * (wl - 380) / 40;
-  else if (wl > 700) factor = 0.34 + 0.66 * (730 - wl) / 30;
+  if (wl < 420) factor = 0.35 + 0.65 * (wl - 380) / 40;
+  else if (wl > 700) factor = 0.35 + 0.65 * (730 - wl) / 30;
   else factor = 1;
-
   return [r * factor, g * factor, b * factor];
+}
+
+function wlToX(wl, width) {
+  return ((wl - WL_MIN) / (WL_MAX - WL_MIN)) * width;
 }
 
 function planckLike(wl, peakNm) {
@@ -736,60 +462,33 @@ function planckLike(wl, peakNm) {
   return Math.exp(-x * x * 0.5);
 }
 
-function wlToX(wl, width) {
-  return ((wl - WL_MIN) / (WL_MAX - WL_MIN)) * width;
+function normalizeLines(lines) {
+  if (!lines.length) return [];
+  const max = Math.max(...lines.map(l => l.intensity || 1));
+  return lines.map(l => ({ ...l, weight: (l.intensity || 1) / max }));
 }
 
-function absorptionsForElement(name) {
-  return elements[name].lines.map((wl) => ({ wl, strength: 0.92, source: name }));
-}
-
-function absorptionsForStar(name, includeTelluric = false) {
-  const star = stars[name];
-  const list = [];
-
-  Object.entries(star.composition).forEach(([elementName, comp]) => {
-    if (!comp.present) return;
-    elements[elementName].lines.forEach((wl) => {
-      list.push({ wl, strength: comp.strength, source: elementName });
-    });
-  });
-
-  if (includeTelluric) {
-    TELLURIC_LINES.forEach((wl) => list.push({ wl, strength: 0.22, source: 'Earth' }));
-  }
-
-  return list;
-}
-
-function absorptionsEarthOnly() {
-  return TELLURIC_LINES.map((wl) => ({ wl, strength: 0.3, source: 'Earth' }));
-}
-
-function drawSpectrum(ctx, width, height, peakNm, absorptions) {
+function drawContinuousSpectrum(ctx, width, height, peakNm, absorptions = []) {
   ctx.clearRect(0, 0, width, height);
-
   for (let px = 0; px < width; px++) {
     const wl = WL_MIN + (px / width) * (WL_MAX - WL_MIN);
-    const [r, g, b] = wavelengthToColor(wl);
-    const envelope = planckLike(wl, peakNm);
+    const [r, g, b] = wlToColor(wl);
+    let brightness = planckLike(wl, peakNm);
     let absorption = 0;
-
-    absorptions.forEach((line) => {
-      const dist = Math.abs(wl - line.wl);
-      const depth = line.strength * Math.exp(-(dist * dist) / (2 * 1.35 * 1.35));
+    absorptions.forEach(line => {
+      const dist = Math.abs(wl - line.nm);
+      const widthNm = 1.35;
+      const depth = (line.weight || 0.6) * Math.exp(-(dist * dist) / (2 * widthNm * widthNm));
       absorption = Math.max(absorption, depth);
     });
-
-    const brightness = envelope * (1 - absorption * 0.94);
+    brightness *= (1 - absorption * 0.94);
     const gamma = 0.64;
     const rr = Math.pow(r * brightness, gamma);
     const gg = Math.pow(g * brightness, gamma);
     const bb = Math.pow(b * brightness, gamma);
-    ctx.fillStyle = `rgb(${Math.round(rr * 255)}, ${Math.round(gg * 255)}, ${Math.round(bb * 255)})`;
+    ctx.fillStyle = `rgb(${Math.round(rr*255)}, ${Math.round(gg*255)}, ${Math.round(bb*255)})`;
     ctx.fillRect(px, 0, 1, height);
   }
-
   const veil = ctx.createLinearGradient(0, 0, 0, height);
   veil.addColorStop(0, 'rgba(247,248,250,0.18)');
   veil.addColorStop(0.15, 'rgba(247,248,250,0)');
@@ -799,320 +498,276 @@ function drawSpectrum(ctx, width, height, peakNm, absorptions) {
   ctx.fillRect(0, 0, width, height);
 }
 
-function drawMainSpectrum() {
-  const width = spectrumCanvas.width;
-  const height = spectrumCanvas.height;
-  markersCtx.clearRect(0, 0, markersCanvas.width, markersCanvas.height);
-
-  if (stage === 0) {
-    drawSpectrum(spectrumCtx, width, height, 560, []);
-    return;
-  }
-
-  if (stage === 1) {
-    drawSpectrum(spectrumCtx, width, height, 560, absorptionsForElement(demoElement));
-    drawMarkers([demoElement], false);
-    return;
-  }
-
-  if (stage === 2) {
-    drawSpectrum(spectrumCtx, width, height, stars['The Sun'].peakNm, absorptionsForStar('The Sun'));
-    drawMarkers(['Hydrogen'], true, 'The Sun');
-    return;
-  }
-
-  if (stage === 3) {
-    drawSpectrum(spectrumCtx, width, height, stars['Sirius'].peakNm, absorptionsForStar('Sirius', true));
-    drawTelluricMarkers();
-    return;
-  }
-
-  drawSpectrum(spectrumCtx, width, height, stars[currentStar].peakNm, absorptionsForStar(currentStar));
-  drawMarkers(Array.from(activeElements), true, currentStar);
+function drawEmissionSpectrum(ctx, width, height, lines) {
+  ctx.clearRect(0, 0, width, height);
+  const bg = ctx.createLinearGradient(0,0,0,height);
+  bg.addColorStop(0, '#05070d');
+  bg.addColorStop(1, '#0e1320');
+  ctx.fillStyle = bg;
+  ctx.fillRect(0,0,width,height);
+  normalizeLines(lines).forEach(line => {
+    const x = wlToX(line.nm, width);
+    const [r,g,b] = wlToColor(line.nm);
+    const alpha = 0.18 + line.weight * 0.82;
+    ctx.strokeStyle = `rgba(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)}, ${alpha})`;
+    ctx.lineWidth = (1.2 + line.weight * 4.5) * dpr;
+    ctx.beginPath();
+    ctx.moveTo(x, height * 0.08);
+    ctx.lineTo(x, height * 0.92);
+    ctx.stroke();
+    ctx.strokeStyle = `rgba(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)}, ${alpha*0.18})`;
+    ctx.lineWidth = (8 + line.weight * 12) * dpr;
+    ctx.beginPath();
+    ctx.moveTo(x, height * 0.12);
+    ctx.lineTo(x, height * 0.88);
+    ctx.stroke();
+  });
 }
 
-function drawMarkers(names, matchAgainstStar, starName) {
-  const width = markersCanvas.width;
-  const height = markersCanvas.height;
-  markersCtx.clearRect(0, 0, width, height);
+function starAbsorptions(key, includeEarth = false) {
+  const star = STARS[key];
+  const out = [];
+  Object.entries(star.composition).forEach(([sym, strength]) => {
+    const meta = ELEMENTS[sym];
+    if (!meta || !meta.lines) return;
+    meta.lines.forEach(line => out.push({ nm: line.nm, weight: Math.min(1, (line.intensity || 1) / 1000) * strength, symbol: sym }));
+  });
+  if (includeEarth) {
+    TELLURIC.forEach(nm => out.push({ nm, weight: 0.22, symbol: 'Earth' }));
+  }
+  return out;
+}
 
-  names.forEach((name) => {
-    const element = elements[name];
-    element.lines.forEach((wl, index) => {
-      const x = wlToX(wl, width);
-      const comp = matchAgainstStar ? stars[starName].composition[name] : { present: true };
-      const active = !!(comp && comp.present);
+function renderLab() {
+  const meta = ELEMENTS[selectedSymbol];
+  document.getElementById('selectedTitle').textContent = `${meta.name} (${meta.symbol})`;
+  document.getElementById('selectedMeta').textContent = `Atomic number ${meta.atomicNumber} · ${meta.lineCount ? meta.lineCount + ' visible strong lines embedded' : 'no visible strong-line data embedded here'}`;
+  document.getElementById('labStatus').textContent = `${meta.symbol} selected`;
 
-      markersCtx.strokeStyle = active ? element.color : `${element.color}55`;
-      markersCtx.lineWidth = active ? 2.6 * dpr : 1.5 * dpr;
-      markersCtx.beginPath();
-      markersCtx.moveTo(x, 0);
-      markersCtx.lineTo(x, height * 0.62);
-      markersCtx.stroke();
+  document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(labMode === 'emission' ? 'emissionBtn' : 'absorptionBtn').classList.add('active');
 
-      if (active) {
-        markersCtx.strokeStyle = `${element.color}30`;
-        markersCtx.lineWidth = 9 * dpr;
-        markersCtx.beginPath();
-        markersCtx.moveTo(x, 0);
-        markersCtx.lineTo(x, height * 0.62);
-        markersCtx.stroke();
-      }
+  if (labMode === 'emission') drawEmissionSpectrum(labCtx, labSpectrum.width, labSpectrum.height, meta.lines || []);
+  else drawContinuousSpectrum(labCtx, labSpectrum.width, labSpectrum.height, 560, normalizeLines(meta.lines || []));
 
-      if (element.names[index]) {
-        markersCtx.fillStyle = active ? element.color : `${element.color}88`;
-        markersCtx.font = `${13 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
-        markersCtx.textAlign = 'center';
-        markersCtx.fillText(element.names[index], x, height * 0.9);
-      }
+  const lineList = document.getElementById('lineList');
+  if (!meta.lineCount) {
+    lineList.innerHTML = `<div class="line-item"><strong>No strong visible lines</strong> were embedded for ${meta.name} in this source range.</div>`;
+  } else {
+    lineList.innerHTML = (meta.lines || []).slice(0, 10).map(line => `<div class="line-item"><strong>${line.nm.toFixed(1)} nm</strong> · ${line.spectrum}</div>`).join('');
+  }
+  document.getElementById('bridgeNote').innerHTML = labMode === 'emission'
+    ? 'You are seeing <strong>emission</strong>: a hot excited gas glows at specific wavelengths.'
+    : 'You are seeing <strong>absorption</strong>: the same wavelengths go dark when white light passes through cooler gas.';
+}
+
+function renderCompare() {
+  drawContinuousSpectrum(earthCtx, earthSpectrum.width, earthSpectrum.height, 560, TELLURIC.map(nm => ({ nm, weight: 0.32 })));
+  drawContinuousSpectrum(siriusCtx, siriusSpectrum.width, siriusSpectrum.height, STARS.Sirius.peakNm, starAbsorptions('Sirius', true));
+  drawContinuousSpectrum(betelCtx, betelgeuseSpectrum.width, betelgeuseSpectrum.height, STARS.Betelgeuse.peakNm, starAbsorptions('Betelgeuse', true));
+  if (showEarth) {
+    [earthCtx, siriusCtx, betelCtx].forEach((ctx, idx) => {
+      const canvas = [earthSpectrum, siriusSpectrum, betelgeuseSpectrum][idx];
+      TELLURIC.forEach(nm => {
+        const x = wlToX(nm, canvas.width);
+        ctx.setLineDash([5*dpr,4*dpr]);
+        ctx.strokeStyle = '#8d6226';
+        ctx.lineWidth = 1.8 * dpr;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      });
     });
-  });
+    document.getElementById('compareVerdict').innerHTML = `The dashed lines are the <strong>same Earth-atmosphere contribution</strong> on every observation. Sirius and Betelgeuse still differ strongly beyond those shared lines, so much of the structure must come from the stars themselves.`;
+  } else {
+    document.getElementById('compareVerdict').innerHTML = `Toggle the shared Earth lines. If Earth caused all the visible structure, the two stars would look much more alike than they do.`;
+  }
+  document.getElementById('earthToggle').classList.toggle('active', showEarth);
 }
 
-function drawTelluricMarkers() {
-  const width = markersCanvas.width;
-  const height = markersCanvas.height;
-  markersCtx.clearRect(0, 0, width, height);
-
-  TELLURIC_LINES.forEach((wl) => {
-    const x = wlToX(wl, width);
-    markersCtx.setLineDash([6 * dpr, 5 * dpr]);
-    markersCtx.strokeStyle = '#8c6124';
-    markersCtx.lineWidth = 2 * dpr;
-    markersCtx.beginPath();
-    markersCtx.moveTo(x, 0);
-    markersCtx.lineTo(x, height * 0.62);
-    markersCtx.stroke();
-    markersCtx.setLineDash([]);
-  });
-
-  markersCtx.fillStyle = '#8c6124';
-  markersCtx.font = `${13 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
-  markersCtx.textAlign = 'center';
-  markersCtx.fillText('Earth atmosphere markers', width / 2, height * 0.9);
-}
-
-function buildButtons() {
-  const demoWrap = document.getElementById('demoElementButtons');
-  ['Hydrogen', 'Helium', 'Sodium', 'Calcium'].forEach((name) => {
-    const btn = document.createElement('button');
-    btn.className = 'chip';
-    btn.textContent = name;
-    btn.addEventListener('click', () => {
-      demoElement = name;
-      update();
+function renderStarUI() {
+  const starButtons = document.getElementById('starButtons');
+  if (!starButtons.childElementCount) {
+    Object.entries(STARS).forEach(([key, star]) => {
+      const btn = document.createElement('button');
+      btn.className = 'star-btn';
+      btn.textContent = star.label;
+      btn.addEventListener('click', () => { currentStar = key; renderStarUI(); renderStarSpectrum(); });
+      starButtons.appendChild(btn);
     });
-    demoWrap.appendChild(btn);
-  });
+  }
+  Array.from(starButtons.children).forEach(btn => btn.classList.toggle('active', btn.textContent === STARS[currentStar].label));
+  document.getElementById('starInfo').textContent = `${STARS[currentStar].label} · ${STARS[currentStar].desc}`;
 
-  const starWrap = document.getElementById('starButtons');
-  Object.keys(stars).forEach((name) => {
-    const btn = document.createElement('button');
-    btn.className = 'star-btn';
-    btn.textContent = name;
-    btn.addEventListener('click', () => {
-      currentStar = name;
-      update();
+  const rack = document.getElementById('overlayRack');
+  rack.innerHTML = '';
+  const exploredList = Array.from(explored).sort((a,b) => ELEMENTS[a].atomicNumber - ELEMENTS[b].atomicNumber);
+  exploredList.forEach(sym => {
+    const chip = document.createElement('button');
+    chip.className = 'overlay-chip' + (activeOverlays.has(sym) ? ' active' : '');
+    chip.textContent = `${sym} ${ELEMENTS[sym].name}`;
+    chip.addEventListener('click', () => {
+      if (activeOverlays.has(sym)) activeOverlays.delete(sym); else activeOverlays.add(sym);
+      renderStarUI(); renderStarSpectrum();
     });
-    starWrap.appendChild(btn);
+    rack.appendChild(chip);
   });
-
-  const elementWrap = document.getElementById('elementButtons');
-  Object.entries(elements).forEach(([name, element]) => {
-    const btn = document.createElement('button');
-    btn.className = 'element-btn';
-    btn.textContent = name;
-    btn.addEventListener('click', () => {
-      if (activeElements.has(name)) activeElements.delete(name);
-      else activeElements.add(name);
-      update();
-    });
-    elementWrap.appendChild(btn);
-  });
+  document.getElementById('overlayHint').style.display = exploredList.length ? 'none' : 'block';
 }
 
-function updateButtons() {
-  document.querySelectorAll('#demoElementButtons .chip').forEach((btn) => {
-    btn.classList.toggle('active', btn.textContent === demoElement);
-  });
-  document.querySelectorAll('#starButtons .star-btn').forEach((btn) => {
-    btn.classList.toggle('active', btn.textContent === currentStar);
-  });
-  document.querySelectorAll('#elementButtons .element-btn').forEach((btn) => {
-    const active = activeElements.has(btn.textContent);
-    btn.classList.toggle('active', active);
-    btn.style.borderColor = active ? elements[btn.textContent].color : '';
-  });
-}
-
-function updateStageText() {
-  const config = stages[stage];
-  document.getElementById('stagePill').textContent = `Stage ${stage + 1}`;
-  document.getElementById('stageProgress').textContent = `${stage + 1} of ${stages.length}`;
-  document.getElementById('stageTitle').textContent = config.title;
-  document.getElementById('stageCopy').textContent = config.copy;
-  document.getElementById('heroTitle').textContent = config.heroTitle;
-  document.getElementById('heroText').textContent = config.heroText;
-  document.getElementById('questionText').textContent = config.question;
-  document.getElementById('questionAnswer').innerHTML = config.answer;
-  document.getElementById('spectrumLabel').textContent = config.label;
-  document.getElementById('spectrumTitle').textContent = config.spectrumTitle;
-  document.getElementById('spectrumHelp').textContent = config.spectrumHelp;
-  document.getElementById('prevBtn').disabled = stage === 0;
-  document.getElementById('nextBtn').disabled = stage === stages.length - 1;
-  document.getElementById('demoElementWrap').classList.toggle('hidden', stage !== 1);
-  document.getElementById('starTool').classList.toggle('hidden', stage !== 4);
-  document.getElementById('elementTool').classList.toggle('hidden', stage !== 4);
-  document.getElementById('compareCard').classList.toggle('active', stage === 3);
-}
-
-function updateReadout() {
-  const readout = document.getElementById('readout');
-
-  if (stage === 0) {
-    readout.innerHTML = `
-      <div class="readout-main">This is the raw material: a continuous spread of wavelengths.</div>
-      <div class="readout-line">Until you separate the light, the hidden structure is invisible.</div>
-    `;
-    return;
-  }
-
-  if (stage === 1) {
-    readout.innerHTML = `
-      <div class="readout-main"><strong>${demoElement}</strong> removes a small set of exact wavelengths.</div>
-      <div class="readout-line">That is why spectral lines are informative. The pattern is selective enough to identify a cause.</div>
-    `;
-    return;
-  }
-
-  if (stage === 2) {
-    readout.innerHTML = `
-      <div class="readout-main">A star gives you both the source and the filter.</div>
-      <div class="readout-line">The hot interior produces the broad glow. Cooler gas outside removes selected wavelengths and leaves evidence in the outgoing light.</div>
-    `;
-    return;
-  }
-
-  if (stage === 3) {
-    readout.innerHTML = `
-      <div class="readout-main">The same Earth atmosphere sits in front of every star you observe from the ground.</div>
-      <div class="readout-line">So if Earth were causing all the visible dark lines, the stars would share nearly the same pattern. They do not.</div>
-    `;
-    return;
-  }
-
-  if (activeElements.size === 0) {
-    readout.innerHTML = `
-      <div class="readout-main">Turn on one or more element overlays.</div>
-      <div class="readout-line">Now you are testing an explanation, not just looking at a picture.</div>
-    `;
-    return;
-  }
-
-  const star = stars[currentStar];
-  let totalLines = 0;
+function renderStarSpectrum() {
+  drawContinuousSpectrum(starCtx, starSpectrum.width, starSpectrum.height, STARS[currentStar].peakNm, starAbsorptions(currentStar));
+  markerCtx.clearRect(0, 0, starMarkers.width, starMarkers.height);
   let explained = 0;
-  const aligned = [];
-  const weak = [];
-
-  Object.entries(star.composition).forEach(([name, comp]) => {
-    if (!comp.present) return;
-    totalLines += elements[name].lines.length;
+  const present = new Set(Object.keys(STARS[currentStar].composition));
+  Array.from(activeOverlays).forEach(sym => {
+    const meta = ELEMENTS[sym];
+    if (!meta || !meta.lines) return;
+    const good = present.has(sym);
+    if (good) explained++;
+    meta.lines.forEach(line => {
+      const x = wlToX(line.nm, starMarkers.width);
+      const [r,g,b] = wlToColor(line.nm);
+      markerCtx.strokeStyle = good ? `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.9)` : `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.3)`;
+      markerCtx.lineWidth = good ? 2.6 * dpr : 1.4 * dpr;
+      markerCtx.beginPath();
+      markerCtx.moveTo(x, 0);
+      markerCtx.lineTo(x, starMarkers.height * 0.62);
+      markerCtx.stroke();
+      if (good) {
+        markerCtx.strokeStyle = `rgba(${Math.round(r*255)},${Math.round(g*255)},${Math.round(b*255)},0.16)`;
+        markerCtx.lineWidth = 9 * dpr;
+        markerCtx.beginPath();
+        markerCtx.moveTo(x, 0);
+        markerCtx.lineTo(x, starMarkers.height * 0.62);
+        markerCtx.stroke();
+      }
+    });
   });
 
-  Array.from(activeElements).forEach((name) => {
-    const comp = star.composition[name];
-    if (comp && comp.present) {
-      aligned.push(name);
-      explained += elements[name].lines.length;
+  const aligned = Array.from(activeOverlays).filter(sym => present.has(sym));
+  const weak = Array.from(activeOverlays).filter(sym => !present.has(sym));
+  let msg = 'Choose overlays and look for alignment. Strong matches glow. Weak explanations stay faint.';
+  if (aligned.length || weak.length) {
+    msg = '';
+    if (aligned.length) msg += `${aligned.join(', ')} line up with important gaps in ${STARS[currentStar].label}. `;
+    if (weak.length) msg += `${weak.join(', ')} do not explain much of this visible pattern. `;
+    msg += 'The point is not to get a hidden answer. The point is to test a causal explanation against the spectrum.';
+  }
+  document.getElementById('starReadout').textContent = msg;
+  document.getElementById('starStatus').textContent = `${aligned.length} strong overlay matches`;
+}
+
+function renderPeriodicTable() {
+  const grid = document.getElementById('periodicGrid');
+  grid.innerHTML = '';
+  for (let row = 1; row <= 9; row++) {
+    for (let col = 1; col <= 18; col++) {
+      const item = LAYOUT.find(d => d.row === row && d.col === col);
+      if (!item) {
+        const blank = document.createElement('div');
+        blank.className = 'blank-cell';
+        grid.appendChild(blank);
+        continue;
+      }
+      const meta = ELEMENTS[item.symbol];
+      const el = document.createElement('button');
+      el.className = 'element-cell' + (meta.symbol === selectedSymbol ? ' selected' : '');
+      el.title = `${meta.name} (${meta.symbol})`;
+      el.innerHTML = `<div class="element-num">${meta.atomicNumber}</div><div class="element-symbol">${meta.symbol}</div><div class="element-lines">${meta.lineCount ? meta.lineCount + ' lines' : 'no visible data'}</div>`;
+      el.addEventListener('click', () => {
+        selectedSymbol = meta.symbol;
+        explored.add(meta.symbol);
+        renderPeriodicTable();
+        renderLab();
+        renderStarUI();
+      });
+      grid.appendChild(el);
+    }
+  }
+}
+
+function placePrismState(done) {
+  prismPlaced = done;
+  rainbow.classList.toggle('visible', done);
+  targetRing.classList.toggle('done', done);
+  prismStatus.textContent = done ? 'Spectrum created' : 'Prism not placed';
+  prismInstruction.innerHTML = done
+    ? '<strong>You made the spectrum.</strong> Now the wavelengths are separated, so later changes will become visible.'
+    : 'Move the prism into the dashed zone so the hidden colors separate.';
+}
+
+function setupPrism() {
+  const start = { x: 320, y: 120 };
+  prism.style.left = start.x + 'px';
+  prism.style.top = start.y + 'px';
+  let dragging = false;
+  let offsetX = 0, offsetY = 0;
+
+  const onMove = (clientX, clientY) => {
+    const rect = beamStage.getBoundingClientRect();
+    let x = clientX - rect.left - offsetX;
+    let y = clientY - rect.top - offsetY;
+    x = Math.max(20, Math.min(rect.width - 130, x));
+    y = Math.max(18, Math.min(rect.height - 110, y));
+    prism.style.left = x + 'px';
+    prism.style.top = y + 'px';
+  };
+
+  prism.addEventListener('pointerdown', (e) => {
+    dragging = true;
+    prism.classList.add('dragging');
+    const rect = prism.getBoundingClientRect();
+    offsetX = e.clientX - rect.left;
+    offsetY = e.clientY - rect.top;
+    prism.setPointerCapture(e.pointerId);
+  });
+
+  prism.addEventListener('pointermove', (e) => {
+    if (!dragging) return;
+    onMove(e.clientX, e.clientY);
+  });
+
+  prism.addEventListener('pointerup', (e) => {
+    if (!dragging) return;
+    dragging = false;
+    prism.classList.remove('dragging');
+    const x = parseFloat(prism.style.left);
+    const y = parseFloat(prism.style.top);
+    if (x > 208 && x < 245 && y > 58 && y < 102) {
+      prism.style.left = '220px';
+      prism.style.top = '70px';
+      placePrismState(true);
     } else {
-      weak.push(name);
+      placePrismState(false);
     }
   });
-
-  const lines = [];
-  if (aligned.length > 0) {
-    lines.push(`<div class="readout-main">${aligned.join(', ')} align with prominent dark lines in ${currentStar}.</div>`);
-  } else {
-    lines.push(`<div class="readout-main">The current overlays are not explaining much of ${currentStar}'s pattern yet.</div>`);
-  }
-  lines.push(`<div class="readout-line"><strong>${explained} of ${totalLines}</strong> visible stellar lines are currently explained by your selected overlays.</div>`);
-  if (aligned.includes('Sodium')) lines.push(`<div class="readout-line">Sodium is especially recognizable because of the close pair near 589 nm.</div>`);
-  if (aligned.includes('Hydrogen')) lines.push(`<div class="readout-line">Hydrogen stands out when the Balmer lines, especially Hβ and Hα, land on strong gaps.</div>`);
-  if (weak.length > 0) lines.push(`<div class="readout-line">${weak.join(', ')} do not align strongly with this star's visible pattern.</div>`);
-  lines.push(`<div class="readout-line">${currentStar} still differs from other stars because visible line strength depends on conditions too, not composition alone.</div>`);
-  readout.innerHTML = lines.join('');
 }
 
-function updateCompareCard() {
-  const compareReadout = document.getElementById('compareReadout');
-  compareReadout.innerHTML = `Earth contributes a <strong>shared</strong> visible pattern at a few wavelengths. Sirius and Betelgeuse both include that same small telluric contribution, but their additional stellar absorption patterns are clearly different. <strong>So the stars themselves must be supplying much of the structure.</strong>`;
+function initButtons() {
+  document.getElementById('emissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
+  document.getElementById('absorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
+  document.getElementById('earthToggle').addEventListener('click', () => { showEarth = !showEarth; renderCompare(); });
 }
-
-function renderMiniCanvas(id, peakNm, absorptions) {
-  const canvas = document.getElementById(id);
-  const ctx = sizeCanvas(canvas, 92);
-  drawSpectrum(ctx, canvas.width, canvas.height, peakNm, absorptions);
-
-  TELLURIC_LINES.forEach((wl) => {
-    const x = wlToX(wl, canvas.width);
-    ctx.setLineDash([5 * dpr, 4 * dpr]);
-    ctx.strokeStyle = '#8c6124';
-    ctx.lineWidth = 1.6 * dpr;
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(x, canvas.height);
-    ctx.stroke();
-    ctx.setLineDash([]);
-  });
-}
-
-function updateCompareCanvases() {
-  renderMiniCanvas('miniEarth', 560, absorptionsEarthOnly());
-  renderMiniCanvas('miniSirius', stars.Sirius.peakNm, absorptionsForStar('Sirius', true));
-  renderMiniCanvas('miniBetelgeuse', stars.Betelgeuse.peakNm, absorptionsForStar('Betelgeuse', true));
-  updateCompareCard();
-}
-
-function updateStarInfo() {
-  const info = document.getElementById('starInfo');
-  if (stage !== 4) {
-    info.innerHTML = '';
-    return;
-  }
-  const star = stars[currentStar];
-  info.innerHTML = `<strong>${star.type}</strong> · ${star.temp} · ${star.desc}`;
-}
-
-function update() {
-  updateStageText();
-  updateButtons();
-  updateStarInfo();
-  drawMainSpectrum();
-  updateReadout();
-  updateCompareCanvases();
-}
-
-document.getElementById('prevBtn').addEventListener('click', () => {
-  stage = Math.max(0, stage - 1);
-  update();
-});
-
-document.getElementById('nextBtn').addEventListener('click', () => {
-  stage = Math.min(stages.length - 1, stage + 1);
-  update();
-});
 
 function init() {
   initCanvases();
-  buildButtons();
-  update();
+  setupPrism();
+  initButtons();
+  renderPeriodicTable();
+  renderLab();
+  renderCompare();
+  renderStarUI();
+  renderStarSpectrum();
 }
 
 window.addEventListener('resize', () => {
   initCanvases();
-  drawMainSpectrum();
-  updateCompareCanvases();
+  renderLab();
+  renderCompare();
+  renderStarSpectrum();
 });
 
 init();

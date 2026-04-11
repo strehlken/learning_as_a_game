@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reading Starlight</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2B50;</text></svg>">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Brandon Grotesque', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    background: #f7f8fa;
+    color: #232324;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1.5rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.4rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: #232324;
+    text-transform: uppercase;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    color: #7a7a80;
+    margin-top: 0.3rem;
+  }
+
+  .instrument {
+    width: 100%;
+    max-width: 900px;
+  }
+
+  /* Star selector */
+  .star-selector {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .star-btn {
+    background: #fff;
+    border: 1px solid #d0d0d6;
+    color: #6a6a70;
+    font-family: inherit;
+    font-size: 0.82rem;
+    padding: 0.45rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.03em;
+  }
+
+  .star-btn:hover {
+    border-color: #a0a0aa;
+    color: #232324;
+  }
+
+  .star-btn.active {
+    border-color: #4a5a80;
+    color: #232324;
+    background: #eef0f5;
+  }
+
+  .star-info {
+    font-size: 0.78rem;
+    color: #7a7a80;
+    margin-bottom: 1.2rem;
+    min-height: 1.4rem;
+  }
+
+  .star-info span {
+    color: #232324;
+  }
+
+  /* Spectrum display */
+  .spectrum-container {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+
+  .spectrum-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #8a8a90;
+    margin-bottom: 0.5rem;
+  }
+
+  canvas#spectrum {
+    width: 100%;
+    height: 120px;
+    border-radius: 3px;
+    display: block;
+    border: 1px solid #d0d0d6;
+  }
+
+  canvas#markers {
+    width: 100%;
+    height: 40px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .wavelength-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.65rem;
+    color: #a0a0a8;
+    margin-top: 4px;
+    padding: 0 2px;
+  }
+
+  /* Element toggles */
+  .elements-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .elements-section .spectrum-label {
+    margin-bottom: 0.6rem;
+  }
+
+  .element-toggles {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .element-btn {
+    background: #fff;
+    border: 2px solid #d0d0d6;
+    color: #6a6a70;
+    font-family: inherit;
+    font-size: 0.82rem;
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+  }
+
+  .element-btn:hover {
+    border-color: #a0a0aa;
+    color: #232324;
+  }
+
+  .element-btn.active {
+    color: #232324;
+  }
+
+  /* Readout */
+  .readout {
+    background: #fff;
+    border: 1px solid #d0d0d6;
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  .readout .composition {
+    color: #5a5a60;
+  }
+
+  .readout .composition strong {
+    color: #232324;
+    font-weight: 500;
+  }
+
+  .readout .match-status {
+    color: #7a7a80;
+    font-size: 0.78rem;
+    margin-top: 0.3rem;
+  }
+
+  .match-status .explained {
+    color: #3a7a3a;
+  }
+
+  .match-status .unexplained {
+    color: #9a5a3a;
+  }
+
+  footer {
+    margin-top: 2.5rem;
+    text-align: center;
+  }
+
+  footer a {
+    font-size: 0.75rem;
+    color: #a0a0a8;
+    text-decoration: none;
+  }
+
+  footer a:hover {
+    color: #232324;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Reading Starlight</h1>
+  <p>Point your instrument at a star. Read what's missing.</p>
+</header>
+
+<div class="instrument">
+
+  <div class="spectrum-label">Choose a star</div>
+  <div class="star-selector" id="starSelector"></div>
+  <div class="star-info" id="starInfo"></div>
+
+  <div class="spectrum-container">
+    <div class="spectrum-label">Observed spectrum</div>
+    <canvas id="spectrum"></canvas>
+    <canvas id="markers"></canvas>
+    <div class="wavelength-axis">
+      <span>380 nm</span>
+      <span>450</span>
+      <span>520</span>
+      <span>590</span>
+      <span>660</span>
+      <span>730 nm</span>
+    </div>
+  </div>
+
+  <div class="elements-section">
+    <div class="spectrum-label">Test elements</div>
+    <div class="element-toggles" id="elementToggles"></div>
+  </div>
+
+  <div class="readout" id="readout">
+    <div class="composition">Select a star to begin.</div>
+  </div>
+
+</div>
+
+<footer>
+  <a href="../index.html">&larr; back</a>
+</footer>
+
+<script>
+// ── Element data: real absorption lines in the visible range (nm) ──
+const elements = {
+  Hydrogen: {
+    color: '#2a5a9e',
+    lines: [410.2, 434.0, 486.1, 656.3],
+    names: ['Hδ', 'Hγ', 'Hβ', 'Hα']
+  },
+  Helium: {
+    color: '#9a6a1a',
+    lines: [402.6, 447.1, 471.3, 501.6, 587.6],
+    names: ['', '', '', '', 'D₃']
+  },
+  Sodium: {
+    color: '#8a7a10',
+    lines: [589.0, 589.6],
+    names: ['D₁', 'D₂']
+  },
+  Calcium: {
+    color: '#a03030',
+    lines: [393.4, 396.8, 422.7],
+    names: ['K', 'H', '']
+  },
+  Iron: {
+    color: '#4a5a70',
+    lines: [404.6, 438.4, 466.8, 495.8, 516.7, 527.0],
+    names: []
+  }
+};
+
+// ── Star data: real-ish compositions with approximate absorption strengths ──
+// strength 0–1 indicates how dark the absorption line appears
+const stars = {
+  'The Sun': {
+    type: 'G2V',
+    temp: '5,800 K',
+    desc: 'Our star — yellow-white, rich in metals',
+    composition: {
+      Hydrogen:  { present: true, strength: 0.7 },
+      Helium:    { present: true, strength: 0.15 },
+      Sodium:    { present: true, strength: 0.8 },
+      Calcium:   { present: true, strength: 0.85 },
+      Iron:      { present: true, strength: 0.6 }
+    },
+    peakNm: 500
+  },
+  'Sirius': {
+    type: 'A1V',
+    temp: '9,940 K',
+    desc: 'Brightest star in the night sky — hot, blue-white',
+    composition: {
+      Hydrogen:  { present: true, strength: 0.95 },
+      Helium:    { present: true, strength: 0.3 },
+      Sodium:    { present: false, strength: 0 },
+      Calcium:   { present: true, strength: 0.15 },
+      Iron:      { present: true, strength: 0.1 }
+    },
+    peakNm: 290
+  },
+  'Betelgeuse': {
+    type: 'M2Iab',
+    temp: '3,600 K',
+    desc: 'Red supergiant in Orion — cool, enormous',
+    composition: {
+      Hydrogen:  { present: true, strength: 0.3 },
+      Helium:    { present: true, strength: 0.05 },
+      Sodium:    { present: true, strength: 0.75 },
+      Calcium:   { present: true, strength: 0.9 },
+      Iron:      { present: true, strength: 0.8 }
+    },
+    peakNm: 800
+  },
+  'Vega': {
+    type: 'A0V',
+    temp: '9,600 K',
+    desc: 'Bright star in Lyra — nearly pure hydrogen spectrum',
+    composition: {
+      Hydrogen:  { present: true, strength: 0.9 },
+      Helium:    { present: true, strength: 0.2 },
+      Sodium:    { present: false, strength: 0 },
+      Calcium:   { present: false, strength: 0 },
+      Iron:      { present: false, strength: 0 }
+    },
+    peakNm: 300
+  },
+  'Arcturus': {
+    type: 'K1.5III',
+    temp: '4,290 K',
+    desc: 'Orange giant in Boötes — metal-rich',
+    composition: {
+      Hydrogen:  { present: true, strength: 0.5 },
+      Helium:    { present: true, strength: 0.05 },
+      Sodium:    { present: true, strength: 0.85 },
+      Calcium:   { present: true, strength: 0.95 },
+      Iron:      { present: true, strength: 0.75 }
+    },
+    peakNm: 670
+  }
+};
+
+// ── State ──
+let currentStar = null;
+let activeElements = new Set();
+
+// ── Spectrum range ──
+const WL_MIN = 380;
+const WL_MAX = 730;
+
+// ── Canvas setup ──
+const specCanvas = document.getElementById('spectrum');
+const markCanvas = document.getElementById('markers');
+const dpr = window.devicePixelRatio || 1;
+
+function sizeCanvas(canvas, h) {
+  const rect = canvas.getBoundingClientRect();
+  canvas.width = rect.width * dpr;
+  canvas.height = h * dpr;
+  canvas.style.height = h + 'px';
+  return canvas.getContext('2d');
+}
+
+let specCtx, markCtx;
+
+function initCanvases() {
+  specCtx = sizeCanvas(specCanvas, 120);
+  markCtx = sizeCanvas(markCanvas, 40);
+}
+
+// ── Wavelength to color ──
+function wlToRGB(wl) {
+  let r = 0, g = 0, b = 0;
+  if (wl >= 380 && wl < 440) {
+    r = -(wl - 440) / (440 - 380);
+    b = 1;
+  } else if (wl >= 440 && wl < 490) {
+    g = (wl - 440) / (490 - 440);
+    b = 1;
+  } else if (wl >= 490 && wl < 510) {
+    g = 1;
+    b = -(wl - 510) / (510 - 490);
+  } else if (wl >= 510 && wl < 580) {
+    r = (wl - 510) / (580 - 510);
+    g = 1;
+  } else if (wl >= 580 && wl < 645) {
+    r = 1;
+    g = -(wl - 645) / (645 - 580);
+  } else if (wl >= 645 && wl <= 730) {
+    r = 1;
+  }
+
+  // Intensity falloff at edges
+  let factor;
+  if (wl >= 380 && wl < 420) factor = 0.3 + 0.7 * (wl - 380) / (420 - 380);
+  else if (wl >= 700 && wl <= 730) factor = 0.3 + 0.7 * (730 - wl) / (730 - 700);
+  else factor = 1;
+
+  return [r * factor, g * factor, b * factor];
+}
+
+// ── Blackbody-ish envelope (approximate relative brightness in visible range) ──
+function planckRelative(wl, peakNm) {
+  // Simple gaussian-ish approximation for visual envelope
+  const x = (wl - peakNm) / (peakNm * 0.6);
+  return Math.exp(-x * x * 0.5);
+}
+
+// ── Map wavelength to x position ──
+function wlToX(wl, width) {
+  return ((wl - WL_MIN) / (WL_MAX - WL_MIN)) * width;
+}
+
+// ── Draw spectrum ──
+function drawSpectrum() {
+  if (!specCtx) return;
+  const w = specCanvas.width;
+  const h = specCanvas.height;
+  specCtx.clearRect(0, 0, w, h);
+
+  if (!currentStar) {
+    // Empty state
+    specCtx.fillStyle = '#e8e8ee';
+    specCtx.fillRect(0, 0, w, h);
+    return;
+  }
+
+  const star = stars[currentStar];
+
+  // Collect all absorption lines for this star
+  const absorptions = [];
+  for (const [elName, elData] of Object.entries(elements)) {
+    const comp = star.composition[elName];
+    if (comp && comp.present) {
+      for (const line of elData.lines) {
+        if (line >= WL_MIN && line <= WL_MAX) {
+          absorptions.push({ wl: line, strength: comp.strength });
+        }
+      }
+    }
+  }
+
+  // Draw column by column
+  for (let px = 0; px < w; px++) {
+    const wl = WL_MIN + (px / w) * (WL_MAX - WL_MIN);
+    const [r, g, b] = wlToRGB(wl);
+    const envelope = planckRelative(wl, star.peakNm);
+
+    // Calculate absorption at this wavelength
+    let absorption = 0;
+    for (const abs of absorptions) {
+      const dist = Math.abs(wl - abs.wl);
+      // Gaussian absorption profile — width ~1.5nm
+      const lineWidth = 1.5;
+      const depth = abs.strength * Math.exp(-(dist * dist) / (2 * lineWidth * lineWidth));
+      absorption = Math.max(absorption, depth);
+    }
+
+    const brightness = envelope * (1 - absorption * 0.92);
+    const gamma = 0.6;
+    const rr = Math.pow(r * brightness, gamma);
+    const gg = Math.pow(g * brightness, gamma);
+    const bb = Math.pow(b * brightness, gamma);
+
+    specCtx.fillStyle = `rgb(${Math.round(rr * 255)}, ${Math.round(gg * 255)}, ${Math.round(bb * 255)})`;
+    specCtx.fillRect(px, 0, 1, h);
+  }
+
+  // Subtle vignette at top and bottom
+  const grad = specCtx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, 'rgba(247,248,250,0.25)');
+  grad.addColorStop(0.15, 'rgba(247,248,250,0)');
+  grad.addColorStop(0.85, 'rgba(247,248,250,0)');
+  grad.addColorStop(1, 'rgba(247,248,250,0.25)');
+  specCtx.fillStyle = grad;
+  specCtx.fillRect(0, 0, w, h);
+}
+
+// ── Draw element markers ──
+function drawMarkers() {
+  if (!markCtx) return;
+  const w = markCanvas.width;
+  const h = markCanvas.height;
+  markCtx.clearRect(0, 0, w, h);
+
+  if (!currentStar || activeElements.size === 0) return;
+
+  const star = stars[currentStar];
+
+  for (const elName of activeElements) {
+    const el = elements[elName];
+    if (!el) continue;
+
+    for (let i = 0; i < el.lines.length; i++) {
+      const wl = el.lines[i];
+      if (wl < WL_MIN || wl > WL_MAX) continue;
+
+      const x = wlToX(wl, w);
+      const comp = star.composition[elName];
+      const isMatch = comp && comp.present;
+
+      // Draw marker line
+      markCtx.strokeStyle = isMatch
+        ? el.color
+        : el.color + '40';
+      markCtx.lineWidth = isMatch ? 2 * dpr : 1 * dpr;
+      markCtx.beginPath();
+      markCtx.moveTo(x, 0);
+      markCtx.lineTo(x, h * 0.6);
+      markCtx.stroke();
+
+      // Small glow if match
+      if (isMatch) {
+        markCtx.strokeStyle = el.color + '30';
+        markCtx.lineWidth = 6 * dpr;
+        markCtx.beginPath();
+        markCtx.moveTo(x, 0);
+        markCtx.lineTo(x, h * 0.6);
+        markCtx.stroke();
+      }
+
+      // Label
+      if (el.names[i]) {
+        markCtx.fillStyle = isMatch ? el.color : el.color + '50';
+        markCtx.font = `${10 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
+        markCtx.textAlign = 'center';
+        markCtx.fillText(el.names[i], x, h * 0.85);
+      }
+    }
+  }
+}
+
+// ── Update readout ──
+function updateReadout() {
+  const readout = document.getElementById('readout');
+
+  if (!currentStar) {
+    readout.innerHTML = '<div class="composition">Select a star to begin.</div>';
+    return;
+  }
+
+  if (activeElements.size === 0) {
+    readout.innerHTML = '<div class="composition">Toggle elements below to test which ones are present in this star.</div>';
+    return;
+  }
+
+  const star = stars[currentStar];
+
+  // Count total star lines and how many are explained
+  let totalStarLines = 0;
+  let explainedLines = 0;
+  let selectedPresent = [];
+  let selectedAbsent = [];
+
+  // Total visible absorption lines in this star
+  for (const [elName, comp] of Object.entries(star.composition)) {
+    if (comp.present) {
+      for (const wl of elements[elName].lines) {
+        if (wl >= WL_MIN && wl <= WL_MAX) totalStarLines++;
+      }
+    }
+  }
+
+  // Which of the user's selections are actually present?
+  for (const elName of activeElements) {
+    const comp = star.composition[elName];
+    if (comp && comp.present) {
+      selectedPresent.push(elName);
+      for (const wl of elements[elName].lines) {
+        if (wl >= WL_MIN && wl <= WL_MAX) explainedLines++;
+      }
+    } else {
+      selectedAbsent.push(elName);
+    }
+  }
+
+  let html = '<div class="composition">';
+  if (selectedPresent.length > 0) {
+    html += 'Found: <strong>' + selectedPresent.join(', ') + '</strong>';
+  }
+  if (selectedAbsent.length > 0) {
+    if (selectedPresent.length > 0) html += ' &nbsp;·&nbsp; ';
+    html += 'Not a match: ' + selectedAbsent.join(', ');
+  }
+  html += '</div>';
+
+  html += '<div class="match-status">';
+  html += '<span class="explained">' + explainedLines + ' of ' + totalStarLines + ' dark lines explained</span>';
+  const remaining = totalStarLines - explainedLines;
+  if (remaining > 0) {
+    html += ' &nbsp;·&nbsp; <span class="unexplained">' + remaining + ' unexplained</span>';
+  } else if (explainedLines === totalStarLines && totalStarLines > 0) {
+    html += ' &nbsp;·&nbsp; <span class="explained">all lines accounted for</span>';
+  }
+  html += '</div>';
+
+  readout.innerHTML = html;
+}
+
+// ── Build UI ──
+function buildStarButtons() {
+  const container = document.getElementById('starSelector');
+  for (const name of Object.keys(stars)) {
+    const btn = document.createElement('button');
+    btn.className = 'star-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => selectStar(name));
+    container.appendChild(btn);
+  }
+}
+
+function buildElementButtons() {
+  const container = document.getElementById('elementToggles');
+  for (const [name, data] of Object.entries(elements)) {
+    const btn = document.createElement('button');
+    btn.className = 'element-btn';
+    btn.textContent = name;
+    btn.dataset.element = name;
+    btn.addEventListener('click', () => toggleElement(name, btn));
+    container.appendChild(btn);
+  }
+}
+
+function selectStar(name) {
+  currentStar = name;
+  // Update buttons
+  document.querySelectorAll('.star-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent === name);
+  });
+  // Update info
+  const star = stars[name];
+  document.getElementById('starInfo').innerHTML =
+    `<span>${star.type}</span> · ${star.temp} · ${star.desc}`;
+
+  drawSpectrum();
+  drawMarkers();
+  updateReadout();
+}
+
+function toggleElement(name, btn) {
+  if (activeElements.has(name)) {
+    activeElements.delete(name);
+    btn.classList.remove('active');
+    btn.style.borderColor = '';
+  } else {
+    activeElements.add(name);
+    btn.classList.add('active');
+    btn.style.borderColor = elements[name].color;
+  }
+  drawMarkers();
+  updateReadout();
+}
+
+// ── Init ──
+function init() {
+  initCanvases();
+  buildStarButtons();
+  buildElementButtons();
+  drawSpectrum();
+  updateReadout();
+}
+
+window.addEventListener('resize', () => {
+  initCanvases();
+  drawSpectrum();
+  drawMarkers();
+});
+
+init();
+</script>
+
+</body>
+</html>

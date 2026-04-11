@@ -95,9 +95,31 @@
   .prompt { font-size: 1.08rem; color: var(--muted); margin-bottom: 0.8rem; }
   .instruction { font-size: 1.08rem; margin-top: 0.75rem; }
   .instruction strong { color: var(--text); }
-  .beam-stage {
+  .experiment-controls {
+    display: flex;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-bottom: 0.8rem;
+  }
+  .control-stack {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+  .slider-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+  .slider-wrap input[type="range"] { width: 180px; }
+  .experiment-stage {
     position: relative;
-    height: 260px;
+    height: 300px;
     border-radius: 18px;
     background:
       linear-gradient(180deg, rgba(28, 32, 41, 0.05), rgba(255,255,255,0)),
@@ -105,54 +127,12 @@
     border: 1px solid var(--border);
     overflow: hidden;
   }
-  .beam-label { position: absolute; left: 1rem; top: 1rem; color: var(--muted); font-size: 0.95rem; }
-  .beam {
-    position: absolute;
-    left: 0;
-    top: 104px;
-    width: 250px;
-    height: 14px;
-    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.94) 18%, rgba(255,255,255,0.94) 100%);
-    box-shadow: 0 0 18px rgba(255,255,255,0.9);
+  .experiment-canvas {
+    width: 100%;
+    height: 300px;
+    display: block;
+    background: transparent;
   }
-  .prism {
-    position: absolute;
-    left: 320px;
-    top: 120px;
-    width: 110px;
-    height: 96px;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background: linear-gradient(180deg, rgba(230,236,248,0.96), rgba(197,210,236,0.96));
-    border: 2px solid #aab8d6;
-    cursor: grab;
-    box-shadow: 0 14px 26px rgba(54, 77, 121, 0.16);
-  }
-  .prism.dragging { cursor: grabbing; }
-  .target-ring {
-    position: absolute;
-    left: 208px;
-    top: 72px;
-    width: 128px;
-    height: 128px;
-    border: 2px dashed rgba(49,90,163,0.24);
-    border-radius: 22px;
-    pointer-events: none;
-  }
-  .target-ring.done { border-color: rgba(53,103,76,0.55); }
-  .rainbow {
-    position: absolute;
-    left: 292px;
-    top: 118px;
-    width: 0;
-    height: 130px;
-    background: linear-gradient(180deg, #6f00ff 0%, #365bff 16%, #00b7ff 32%, #00cf72 49%, #ffd200 67%, #ff8f00 82%, #ff2f2f 100%);
-    transform-origin: top left;
-    transform: skewX(-31deg);
-    filter: saturate(1.15) brightness(1.02);
-    border-radius: 0 0 12px 12px;
-    transition: width 320ms ease;
-  }
-  .rainbow.visible { width: 120px; }
   .mini-spectrum, .main-spectrum, .marker-strip {
     width: 100%;
     display: block;
@@ -273,26 +253,33 @@
   <section class="section">
     <div class="section-head">
       <div>
-        <div class="kicker">1. Make A Spectrum</div>
-        <div class="section-title">Drag the prism into the beam.</div>
+        <div class="kicker">1. The Experiment</div>
+        <div class="section-title">Watch the light travel through the apparatus.</div>
       </div>
-      <div class="status-pill" id="prismStatus">Prism not placed</div>
+      <div class="status-pill" id="prismStatus">Absorption experiment</div>
     </div>
     <div class="grid-2">
       <div class="card">
-        <div class="prompt">Do the action first. Then read the sentence.</div>
-        <div class="beam-stage" id="beamStage">
-          <div class="beam-label">white beam</div>
-          <div class="target-ring" id="targetRing"></div>
-          <div class="beam"></div>
-          <div class="rainbow" id="rainbow"></div>
-          <div class="prism" id="prism"></div>
+        <div class="prompt">This is the physical setup: source, slit, prism, and detector. Switch between the hot-gas and cool-gas versions of the experiment and change the prism dispersion to see the separation grow or shrink.</div>
+        <div class="experiment-controls">
+          <div class="control-stack">
+            <button class="mode-btn active" id="experimentEmissionBtn">Hot glowing gas</button>
+            <button class="mode-btn" id="experimentAbsorptionBtn">White light through cool gas</button>
+          </div>
+          <div class="slider-wrap">
+            <label for="dispersionSlider">Prism dispersion</label>
+            <input type="range" id="dispersionSlider" min="0.6" max="1.6" step="0.05" value="1.0">
+            <span id="dispersionValue">1.00x</span>
+          </div>
         </div>
-        <div class="instruction" id="prismInstruction">Move the prism into the dashed zone so the hidden colors separate.</div>
+        <div class="experiment-stage">
+          <canvas class="experiment-canvas" id="experimentCanvas"></canvas>
+        </div>
+        <div class="instruction" id="prismInstruction">Short wavelengths bend more in the prism, long wavelengths bend less. In hot-gas mode the detector records bright emission lines. In cool-gas mode those same wavelengths become dark absorption lines.</div>
       </div>
       <div class="card">
-        <div class="kicker">Why This Matters</div>
-        <div class="section-note">When the wavelengths stay mixed together, you cannot tell which ones are missing. The spectrum is what makes structure visible in the first place.</div>
+        <div class="kicker">What To Notice</div>
+        <div class="section-note">The prism matters because it turns wavelength into position. The detector does not “know colors.” It records where different wavelengths land after the prism splits them. That is why spectral lines can be photographed and measured.</div>
       </div>
     </div>
   </section>
@@ -396,21 +383,22 @@ const WL_MIN = 380;
 const WL_MAX = 730;
 const TELLURIC = [628.0, 687.0, 719.0];
 
-let prismPlaced = false;
 let selectedSymbol = 'H';
 let labMode = 'emission';
 let showEarth = false;
 let currentStar = 'Sun';
 let explored = new Set(['H','Na','Ca']);
 let activeOverlays = new Set(['H']);
+let dispersionStrength = 1.0;
+let experimentFrame = null;
+let experimentTime = 0;
 
 const dpr = window.devicePixelRatio || 1;
-const prism = document.getElementById('prism');
-const beamStage = document.getElementById('beamStage');
-const rainbow = document.getElementById('rainbow');
+const experimentCanvas = document.getElementById('experimentCanvas');
 const prismStatus = document.getElementById('prismStatus');
 const prismInstruction = document.getElementById('prismInstruction');
-const targetRing = document.getElementById('targetRing');
+const dispersionSlider = document.getElementById('dispersionSlider');
+const dispersionValue = document.getElementById('dispersionValue');
 
 const labSpectrum = document.getElementById('labSpectrum');
 const starSpectrum = document.getElementById('starSpectrum');
@@ -419,7 +407,7 @@ const earthSpectrum = document.getElementById('earthSpectrum');
 const siriusSpectrum = document.getElementById('siriusSpectrum');
 const betelgeuseSpectrum = document.getElementById('betelgeuseSpectrum');
 
-let labCtx, starCtx, markerCtx, earthCtx, siriusCtx, betelCtx;
+let experimentCtx, labCtx, starCtx, markerCtx, earthCtx, siriusCtx, betelCtx;
 
 function sizeCanvas(canvas, height) {
   const rect = canvas.getBoundingClientRect();
@@ -430,6 +418,7 @@ function sizeCanvas(canvas, height) {
 }
 
 function initCanvases() {
+  experimentCtx = sizeCanvas(experimentCanvas, 300);
   labCtx = sizeCanvas(labSpectrum, 160);
   starCtx = sizeCanvas(starSpectrum, 160);
   markerCtx = sizeCanvas(starMarkers, 70);
@@ -524,6 +513,208 @@ function drawEmissionSpectrum(ctx, width, height, lines) {
   });
 }
 
+function drawSpectrumRect(ctx, x, y, width, height, mode, lines) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(x, y, width, height);
+  ctx.clip();
+  if (mode === 'emission') {
+    const bg = ctx.createLinearGradient(x, y, x, y + height);
+    bg.addColorStop(0, '#05070d');
+    bg.addColorStop(1, '#0e1320');
+    ctx.fillStyle = bg;
+    ctx.fillRect(x, y, width, height);
+    normalizeLines(lines).forEach(line => {
+      const lx = x + wlToX(line.nm, width);
+      const [r, g, b] = wlToColor(line.nm);
+      const alpha = 0.18 + line.weight * 0.82;
+      ctx.strokeStyle = `rgba(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)}, ${alpha})`;
+      ctx.lineWidth = (1.0 + line.weight * 3.4) * dpr;
+      ctx.beginPath();
+      ctx.moveTo(lx, y + height * 0.08);
+      ctx.lineTo(lx, y + height * 0.92);
+      ctx.stroke();
+      ctx.strokeStyle = `rgba(${Math.round(r*255)}, ${Math.round(g*255)}, ${Math.round(b*255)}, ${alpha * 0.18})`;
+      ctx.lineWidth = (6 + line.weight * 9) * dpr;
+      ctx.beginPath();
+      ctx.moveTo(lx, y + height * 0.12);
+      ctx.lineTo(lx, y + height * 0.88);
+      ctx.stroke();
+    });
+  } else {
+    for (let px = 0; px < width; px++) {
+      const wl = WL_MIN + (px / width) * (WL_MAX - WL_MIN);
+      const [r, g, b] = wlToColor(wl);
+      let brightness = planckLike(wl, 560);
+      let absorption = 0;
+      normalizeLines(lines).forEach(line => {
+        const dist = Math.abs(wl - line.nm);
+        const depth = (line.weight || 0.6) * Math.exp(-(dist * dist) / (2 * 1.35 * 1.35));
+        absorption = Math.max(absorption, depth);
+      });
+      brightness *= (1 - absorption * 0.94);
+      const gamma = 0.64;
+      const rr = Math.pow(r * brightness, gamma);
+      const gg = Math.pow(g * brightness, gamma);
+      const bb = Math.pow(b * brightness, gamma);
+      ctx.fillStyle = `rgb(${Math.round(rr*255)}, ${Math.round(gg*255)}, ${Math.round(bb*255)})`;
+      ctx.fillRect(x + px, y, 1, height);
+    }
+  }
+  ctx.restore();
+  ctx.strokeStyle = '#cfd5df';
+  ctx.lineWidth = 1 * dpr;
+  ctx.strokeRect(x, y, width, height);
+}
+
+function drawWavePath(ctx, points, color, wavelengthPx, amplitude, phase, alpha) {
+  ctx.save();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2 * dpr;
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  const steps = 80;
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    let p0, p1, localT;
+    if (t <= 0.5) {
+      p0 = points[0];
+      p1 = points[1];
+      localT = t / 0.5;
+    } else {
+      p0 = points[1];
+      p1 = points[2];
+      localT = (t - 0.5) / 0.5;
+    }
+    const x = p0.x + (p1.x - p0.x) * localT;
+    const y = p0.y + (p1.y - p0.y) * localT;
+    const dx = p1.x - p0.x;
+    const dy = p1.y - p0.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+    const s = Math.sin((t * len / wavelengthPx) * Math.PI * 2 - phase);
+    const px = x + nx * amplitude * s;
+    const py = y + ny * amplitude * s;
+    if (i === 0) ctx.moveTo(px, py);
+    else ctx.lineTo(px, py);
+  }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function renderExperimentFrame(timeMs) {
+  experimentTime = timeMs * 0.001;
+  const ctx = experimentCtx;
+  const width = experimentCanvas.width;
+  const height = experimentCanvas.height;
+  ctx.clearRect(0, 0, width, height);
+
+  const S = dpr;
+  const sourceX = 58 * S;
+  const slitX = 188 * S;
+  const prismX = 360 * S;
+  const prismY = 78 * S;
+  const prismW = 110 * S;
+  const prismH = 132 * S;
+  const detectorX = width - 170 * S;
+  const detectorY = 62 * S;
+  const detectorW = 96 * S;
+  const detectorH = 176 * S;
+  const midY = 146 * S;
+
+  ctx.fillStyle = '#fbfcfd';
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = '#f2f4f8';
+  ctx.strokeStyle = '#d4d7dd';
+  ctx.lineWidth = 1 * S;
+  ctx.fillRect(sourceX - 36 * S, 88 * S, 92 * S, 116 * S);
+  ctx.strokeRect(sourceX - 36 * S, 88 * S, 92 * S, 116 * S);
+
+  ctx.fillStyle = '#232324';
+  ctx.font = `${13 * S}px 'Brandon Grotesque', system-ui, sans-serif`;
+  ctx.fillText(labMode === 'emission' ? 'hot gas' : 'white lamp', sourceX - 20 * S, 104 * S);
+  if (labMode === 'absorption') {
+    ctx.fillText('cool gas cell', sourceX - 26 * S, 196 * S);
+    ctx.strokeStyle = '#8d6226';
+    ctx.strokeRect(sourceX + 22 * S, 118 * S, 18 * S, 56 * S);
+  } else {
+    ctx.fillStyle = '#ffb347';
+    ctx.beginPath();
+    ctx.moveTo(sourceX + 26 * S, 168 * S);
+    ctx.lineTo(sourceX + 38 * S, 120 * S);
+    ctx.lineTo(sourceX + 50 * S, 168 * S);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  ctx.fillStyle = '#232324';
+  ctx.fillRect(slitX, 92 * S, 8 * S, 116 * S);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(slitX + 2 * S, 126 * S, 4 * S, 46 * S);
+  ctx.fillStyle = '#6f7379';
+  ctx.fillText('slit', slitX - 6 * S, 86 * S);
+
+  ctx.fillStyle = 'rgba(227,234,247,0.95)';
+  ctx.strokeStyle = '#9fb1d1';
+  ctx.lineWidth = 2 * S;
+  ctx.beginPath();
+  ctx.moveTo(prismX + prismW / 2, prismY);
+  ctx.lineTo(prismX, prismY + prismH);
+  ctx.lineTo(prismX + prismW, prismY + prismH);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+  ctx.fillStyle = '#6f7379';
+  ctx.fillText('prism', prismX + 20 * S, prismY - 10 * S);
+
+  ctx.fillStyle = '#f2f4f8';
+  ctx.strokeStyle = '#d4d7dd';
+  ctx.fillRect(detectorX, detectorY, detectorW, detectorH);
+  ctx.strokeRect(detectorX, detectorY, detectorW, detectorH);
+  ctx.fillStyle = '#6f7379';
+  ctx.fillText('detector', detectorX + 16 * S, detectorY - 10 * S);
+
+  const colors = [
+    { wl: 410, color: '#5d62ff', bend: 1.22, wavelengthPx: 18 * S, insideSpeed: 1.35 },
+    { wl: 540, color: '#24b65c', bend: 1.0, wavelengthPx: 28 * S, insideSpeed: 1.0 },
+    { wl: 680, color: '#ff5c4b', bend: 0.82, wavelengthPx: 40 * S, insideSpeed: 0.72 }
+  ];
+
+  colors.forEach((entry, idx) => {
+    const inStart = { x: sourceX + 42 * S, y: midY };
+    const prismEntry = { x: prismX + 6 * S, y: midY - 10 * S };
+    const insideY = prismY + 40 * S + idx * 18 * S + (entry.bend - 1) * 26 * S * dispersionStrength;
+    const prismExit = { x: prismX + prismW - 8 * S, y: insideY + 18 * S * entry.bend * dispersionStrength };
+    const detectorHit = { x: detectorX, y: 98 * S + idx * 38 * S + (entry.bend - 1) * 48 * S * dispersionStrength };
+
+    drawWavePath(ctx, [inStart, prismEntry, prismEntry], entry.color, entry.wavelengthPx, 4.5 * S, experimentTime * 8, 0.85);
+    drawWavePath(ctx, [prismEntry, prismExit, prismExit], entry.color, entry.wavelengthPx * entry.insideSpeed, 3.6 * S, experimentTime * (5 / entry.insideSpeed), 0.75);
+    drawWavePath(ctx, [prismExit, detectorHit, detectorHit], entry.color, entry.wavelengthPx, 4.5 * S, experimentTime * 8, 0.92);
+
+    ctx.fillStyle = entry.color;
+    ctx.beginPath();
+    ctx.arc(detectorHit.x, detectorHit.y, 3.2 * S, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  ctx.fillStyle = '#6f7379';
+  ctx.font = `${12 * S}px 'Brandon Grotesque', system-ui, sans-serif`;
+  ctx.fillText('violet bends more', detectorX - 134 * S, 94 * S);
+  ctx.fillText('green in between', detectorX - 130 * S, 132 * S);
+  ctx.fillText('red bends less', detectorX - 122 * S, 170 * S);
+
+  drawSpectrumRect(ctx, detectorX + 12 * S, detectorY + 18 * S, detectorW - 24 * S, detectorH - 36 * S, labMode, ELEMENTS[selectedSymbol].lines || []);
+
+  ctx.fillStyle = '#232324';
+  ctx.font = `${13 * S}px 'Brandon Grotesque', system-ui, sans-serif`;
+  ctx.fillText(labMode === 'emission' ? `${ELEMENTS[selectedSymbol].symbol} excited in flame` : `white light through cool ${ELEMENTS[selectedSymbol].symbol}`, 18 * S, 26 * S);
+  ctx.fillText(`dispersion ${dispersionStrength.toFixed(2)}x`, 18 * S, 46 * S);
+
+  experimentFrame = requestAnimationFrame(renderExperimentFrame);
+}
+
 function starAbsorptions(key, includeEarth = false) {
   const star = STARS[key];
   const out = [];
@@ -543,9 +734,15 @@ function renderLab() {
   document.getElementById('selectedTitle').textContent = `${meta.name} (${meta.symbol})`;
   document.getElementById('selectedMeta').textContent = `Atomic number ${meta.atomicNumber} · ${meta.lineCount ? meta.lineCount + ' visible strong lines embedded' : 'no visible strong-line data embedded here'}`;
   document.getElementById('labStatus').textContent = `${meta.symbol} selected`;
+  prismStatus.textContent = labMode === 'emission' ? 'Emission experiment' : 'Absorption experiment';
+  prismInstruction.innerHTML = labMode === 'emission'
+    ? `<strong>Hot gas version:</strong> the selected gas emits only certain wavelengths. The prism sends those wavelengths to different positions on the detector.`
+    : `<strong>Cool gas version:</strong> broad-spectrum light passes through cool ${meta.name.toLowerCase()}. The missing wavelengths travel through the same prism but now land as dark gaps on the detector.`;
+  dispersionValue.textContent = `${dispersionStrength.toFixed(2)}x`;
 
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
   document.getElementById(labMode === 'emission' ? 'emissionBtn' : 'absorptionBtn').classList.add('active');
+  document.getElementById(labMode === 'emission' ? 'experimentEmissionBtn' : 'experimentAbsorptionBtn').classList.add('active');
 
   if (labMode === 'emission') drawEmissionSpectrum(labCtx, labSpectrum.width, labSpectrum.height, meta.lines || []);
   else drawContinuousSpectrum(labCtx, labSpectrum.width, labSpectrum.height, 560, normalizeLines(meta.lines || []));
@@ -689,78 +886,28 @@ function renderPeriodicTable() {
   }
 }
 
-function placePrismState(done) {
-  prismPlaced = done;
-  rainbow.classList.toggle('visible', done);
-  targetRing.classList.toggle('done', done);
-  prismStatus.textContent = done ? 'Spectrum created' : 'Prism not placed';
-  prismInstruction.innerHTML = done
-    ? '<strong>You made the spectrum.</strong> Now the wavelengths are separated, so later changes will become visible.'
-    : 'Move the prism into the dashed zone so the hidden colors separate.';
-}
-
-function setupPrism() {
-  const start = { x: 320, y: 120 };
-  prism.style.left = start.x + 'px';
-  prism.style.top = start.y + 'px';
-  let dragging = false;
-  let offsetX = 0, offsetY = 0;
-
-  const onMove = (clientX, clientY) => {
-    const rect = beamStage.getBoundingClientRect();
-    let x = clientX - rect.left - offsetX;
-    let y = clientY - rect.top - offsetY;
-    x = Math.max(20, Math.min(rect.width - 130, x));
-    y = Math.max(18, Math.min(rect.height - 110, y));
-    prism.style.left = x + 'px';
-    prism.style.top = y + 'px';
-  };
-
-  prism.addEventListener('pointerdown', (e) => {
-    dragging = true;
-    prism.classList.add('dragging');
-    const rect = prism.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-    prism.setPointerCapture(e.pointerId);
-  });
-
-  prism.addEventListener('pointermove', (e) => {
-    if (!dragging) return;
-    onMove(e.clientX, e.clientY);
-  });
-
-  prism.addEventListener('pointerup', (e) => {
-    if (!dragging) return;
-    dragging = false;
-    prism.classList.remove('dragging');
-    const x = parseFloat(prism.style.left);
-    const y = parseFloat(prism.style.top);
-    if (x > 208 && x < 245 && y > 58 && y < 102) {
-      prism.style.left = '220px';
-      prism.style.top = '70px';
-      placePrismState(true);
-    } else {
-      placePrismState(false);
-    }
-  });
-}
-
 function initButtons() {
   document.getElementById('emissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
   document.getElementById('absorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
+  document.getElementById('experimentEmissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
+  document.getElementById('experimentAbsorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
   document.getElementById('earthToggle').addEventListener('click', () => { showEarth = !showEarth; renderCompare(); });
+  dispersionSlider.addEventListener('input', (e) => {
+    dispersionStrength = parseFloat(e.target.value);
+    dispersionValue.textContent = `${dispersionStrength.toFixed(2)}x`;
+  });
 }
 
 function init() {
   initCanvases();
-  setupPrism();
   initButtons();
   renderPeriodicTable();
   renderLab();
   renderCompare();
   renderStarUI();
   renderStarSpectrum();
+  if (experimentFrame) cancelAnimationFrame(experimentFrame);
+  experimentFrame = requestAnimationFrame(renderExperimentFrame);
 }
 
 window.addEventListener('resize', () => {
@@ -768,6 +915,8 @@ window.addEventListener('resize', () => {
   renderLab();
   renderCompare();
   renderStarSpectrum();
+  if (experimentFrame) cancelAnimationFrame(experimentFrame);
+  experimentFrame = requestAnimationFrame(renderExperimentFrame);
 });
 
 init();

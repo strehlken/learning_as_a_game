@@ -9,106 +9,105 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #f5f6f8;
+    --bg: #f7f8fa;
+    --text: #232324;
+    --muted: #6c6f76;
+    --border: #d1d4da;
     --panel: #ffffff;
-    --panel-soft: #eef1f6;
-    --text: #1f2328;
-    --muted: #646d78;
-    --border: #c9d0da;
-    --accent: #2f5fb2;
-    --accent-soft: #dce6fb;
-    --success: #2e6d4b;
-    --warning: #8d5a1e;
+    --panel-soft: #eef2f8;
+    --blue: #335ea8;
+    --blue-soft: #dbe6fb;
+    --green: #356b4f;
+    --amber: #8c6124;
+    --shadow: 0 18px 40px rgba(34, 40, 53, 0.08);
   }
 
   body {
-    font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
-    font-size: 19px;
-    line-height: 1.55;
+    font-family: 'Brandon Grotesque', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
     background:
-      radial-gradient(circle at top, rgba(55, 92, 154, 0.08), transparent 40%),
-      linear-gradient(180deg, #fbfcfe 0%, var(--bg) 100%);
+      radial-gradient(circle at top, rgba(70, 101, 163, 0.08), transparent 34%),
+      linear-gradient(180deg, #fbfcfd 0%, var(--bg) 100%);
     color: var(--text);
     min-height: 100vh;
-    padding: 2.5rem 1.5rem 3rem;
+    padding: 2rem 1.25rem 3rem;
   }
 
   .page {
     width: 100%;
-    max-width: 1100px;
+    max-width: 1160px;
     margin: 0 auto;
   }
 
   header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.7rem;
   }
 
   header h1 {
-    font-size: clamp(2.3rem, 4vw, 3.4rem);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.05;
+    letter-spacing: 0.01em;
+    margin-bottom: 0.5rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
-    margin-bottom: 0.45rem;
   }
 
   header p {
+    max-width: 820px;
+    margin: 0 auto;
     font-size: 1.18rem;
     color: var(--muted);
-    max-width: 760px;
-    margin: 0 auto;
   }
 
-  .teaching-panel,
-  .instrument,
-  .notes {
+  .panel {
     background: var(--panel);
     border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(20, 33, 61, 0.05);
+    border-radius: 22px;
+    box-shadow: var(--shadow);
   }
 
-  .teaching-panel {
-    padding: 1.35rem 1.4rem 1.4rem;
-    margin-bottom: 1.5rem;
+  .stage-panel {
+    padding: 1.25rem 1.25rem 1.35rem;
+    margin-bottom: 1rem;
   }
 
-  .stage-topline {
+  .stage-top {
     display: flex;
     justify-content: space-between;
-    gap: 1rem;
     align-items: center;
-    margin-bottom: 0.9rem;
+    gap: 1rem;
     flex-wrap: wrap;
+    margin-bottom: 0.85rem;
   }
 
   .stage-pill {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--accent-soft);
-    color: var(--accent);
+    background: var(--blue-soft);
+    color: var(--blue);
     border-radius: 999px;
-    padding: 0.45rem 0.85rem;
-    font-size: 0.95rem;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.98rem;
     font-weight: 700;
-    letter-spacing: 0.02em;
   }
 
   .stage-progress {
-    font-size: 0.98rem;
     color: var(--muted);
+    font-size: 1rem;
   }
 
   .stage-title {
-    font-size: clamp(1.6rem, 2.3vw, 2.15rem);
-    font-weight: 700;
-    margin-bottom: 0.55rem;
+    font-size: clamp(1.8rem, 2.6vw, 2.4rem);
+    line-height: 1.1;
+    margin-bottom: 0.45rem;
   }
 
   .stage-copy {
-    font-size: 1.12rem;
+    max-width: 980px;
     color: var(--muted);
-    max-width: 920px;
+    font-size: 1.1rem;
     margin-bottom: 1rem;
   }
 
@@ -116,136 +115,230 @@
     display: flex;
     gap: 0.7rem;
     flex-wrap: wrap;
-    margin-bottom: 0.9rem;
   }
 
-  .stage-btn,
-  .choice-btn,
+  .button,
+  .chip,
   .star-btn,
   .element-btn {
     font-family: inherit;
-    font-size: 1rem;
-    border-radius: 12px;
+    border-radius: 14px;
     border: 2px solid var(--border);
     background: #fff;
     color: var(--text);
     cursor: pointer;
-    transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+    transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
   }
 
-  .stage-btn:hover,
-  .choice-btn:hover,
+  .button:hover,
+  .chip:hover,
   .star-btn:hover,
   .element-btn:hover {
     transform: translateY(-1px);
-    border-color: #9eafc9;
+    border-color: #aeb6c6;
   }
 
-  .stage-btn {
-    padding: 0.7rem 1.1rem;
-    font-weight: 650;
-  }
-
-  .stage-btn.primary {
-    background: var(--accent);
-    color: #fff;
-    border-color: var(--accent);
-  }
-
-  .choice-group {
-    display: flex;
-    gap: 0.7rem;
-    flex-wrap: wrap;
-    margin-bottom: 0.2rem;
-  }
-
-  .choice-btn,
-  .star-btn,
-  .element-btn {
-    padding: 0.7rem 1rem;
-    font-weight: 600;
-  }
-
-  .choice-btn.active,
-  .star-btn.active,
-  .element-btn.active {
-    background: var(--panel-soft);
-    border-color: var(--accent);
-  }
-
-  .instrument {
-    padding: 1.4rem;
-  }
-
-  .section-label {
-    font-size: 0.98rem;
-    text-transform: uppercase;
-    letter-spacing: 0.11em;
-    color: var(--muted);
-    margin-bottom: 0.55rem;
+  .button {
+    padding: 0.75rem 1.15rem;
+    font-size: 1rem;
     font-weight: 700;
   }
 
-  .spectrum-shell {
-    margin-bottom: 1.4rem;
+  .button.primary {
+    background: var(--blue);
+    color: #fff;
+    border-color: var(--blue);
+  }
+
+  .button:disabled {
+    opacity: 0.45;
+    cursor: default;
+    transform: none;
+  }
+
+  .choice-row {
+    margin-top: 0.95rem;
+  }
+
+  .choice-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-bottom: 0.45rem;
+    font-weight: 700;
+  }
+
+  .chip-row,
+  .star-row,
+  .element-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .chip,
+  .star-btn,
+  .element-btn {
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+  }
+
+  .chip.active,
+  .star-btn.active,
+  .element-btn.active {
+    background: var(--panel-soft);
+    border-color: var(--blue);
+  }
+
+  .instrument {
+    padding: 1.25rem;
+  }
+
+  .instrument-header {
+    display: grid;
+    grid-template-columns: 1.2fr 0.9fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .hero-card,
+  .question-card,
+  .sidebar-card,
+  .compare-card {
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(255,255,255,1), rgba(248,249,252,1));
+  }
+
+  .hero-card {
+    padding: 1rem 1rem 0.9rem;
+  }
+
+  .hero-kicker {
+    font-size: 0.96rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+  }
+
+  .hero-title {
+    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    line-height: 1.1;
+    margin-bottom: 0.45rem;
+  }
+
+  .hero-text {
+    font-size: 1.08rem;
+    color: var(--muted);
+  }
+
+  .question-card {
+    padding: 1rem;
+    background:
+      linear-gradient(160deg, rgba(219,230,251,0.95), rgba(255,255,255,1) 55%),
+      #fff;
+  }
+
+  .question-label {
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--blue);
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+
+  .question-text {
+    font-size: 1.22rem;
+    line-height: 1.28;
+    margin-bottom: 0.55rem;
+  }
+
+  .question-answer {
+    color: var(--muted);
+    font-size: 1.02rem;
+  }
+
+  .question-answer strong {
+    color: var(--text);
+  }
+
+  .spectrum-frame {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background:
+      linear-gradient(180deg, rgba(33, 40, 57, 0.04), rgba(255,255,255,0)),
+      #fff;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+  }
+
+  .section-label {
+    font-size: 0.96rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 0.4rem;
+  }
+
+  .spectrum-title {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    margin-bottom: 0.2rem;
+  }
+
+  .spectrum-help {
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin-bottom: 0.8rem;
+    max-width: 860px;
   }
 
   canvas#spectrum {
     width: 100%;
-    height: 180px;
+    height: 220px;
     display: block;
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border);
-    background: #edf0f5;
+    background: #edf1f6;
   }
 
   canvas#markers {
     width: 100%;
-    height: 70px;
+    height: 82px;
     display: block;
-    margin-top: 0.35rem;
+    margin-top: 0.4rem;
   }
 
-  .wavelength-axis {
+  .axis {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.3rem;
     color: var(--muted);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
+    margin-top: 0.35rem;
     padding: 0 0.2rem;
   }
 
-  .instrument-grid {
+  .below-grid {
     display: grid;
-    grid-template-columns: 1.35fr 1fr;
-    gap: 1.2rem;
+    grid-template-columns: 1.15fr 0.95fr;
+    gap: 1rem;
   }
 
-  .panel-block {
-    background: #fbfcfe;
-    border: 1px solid #dbe1ea;
-    border-radius: 14px;
+  .sidebar-card {
     padding: 1rem;
   }
 
-  .help-line {
-    font-size: 1.03rem;
-    color: var(--muted);
-    margin-bottom: 1rem;
-  }
-
-  .star-selector,
-  .element-toggles {
-    display: flex;
-    gap: 0.65rem;
-    flex-wrap: wrap;
-  }
-
   .star-info {
+    margin-top: 0.7rem;
+    min-height: 1.45rem;
     font-size: 1rem;
     color: var(--muted);
-    margin-top: 0.75rem;
-    min-height: 1.5rem;
   }
 
   .star-info strong {
@@ -253,45 +346,80 @@
   }
 
   .readout {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 14px;
+    margin-top: 1rem;
     padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: #fff;
   }
 
   .readout-main {
-    font-size: 1.1rem;
-    margin-bottom: 0.55rem;
+    font-size: 1.14rem;
+    line-height: 1.35;
+    margin-bottom: 0.45rem;
   }
 
-  .readout-detail {
-    color: var(--muted);
+  .readout-line {
     font-size: 1rem;
+    color: var(--muted);
     margin-top: 0.45rem;
   }
 
-  .readout-detail strong {
-    color: var(--text);
+  .compare-card {
+    padding: 1rem;
+    display: none;
   }
 
-  .notes {
-    margin-top: 1.4rem;
-    padding: 1rem 1.15rem;
+  .compare-card.active {
+    display: block;
   }
 
-  .notes h2 {
-    font-size: 1.15rem;
-    margin-bottom: 0.35rem;
+  .compare-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin: 0.9rem 0;
   }
 
-  .notes p {
-    color: var(--muted);
+  .mini-panel {
+    padding: 0.85rem;
+    border-radius: 16px;
+    border: 1px solid var(--border);
+    background: #fff;
+  }
+
+  .mini-title {
     font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.15rem;
+  }
+
+  .mini-note {
+    color: var(--muted);
+    font-size: 0.94rem;
+    margin-bottom: 0.55rem;
+  }
+
+  .mini-spectrum {
+    width: 100%;
+    height: 92px;
+    display: block;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: #edf1f6;
+  }
+
+  .compare-readout {
+    padding: 0.95rem 1rem;
+    border-radius: 16px;
+    background: var(--panel-soft);
+    border: 1px solid #d5deec;
+    font-size: 1.03rem;
   }
 
   footer {
     text-align: center;
-    margin-top: 1.8rem;
+    margin-top: 1.5rem;
   }
 
   footer a {
@@ -304,26 +432,17 @@
     color: var(--text);
   }
 
-  .hidden {
-    display: none !important;
-  }
+  .hidden { display: none !important; }
 
-  @media (max-width: 820px) {
-    body {
-      font-size: 18px;
-      padding: 1.2rem 0.9rem 2rem;
-    }
-
-    .instrument-grid {
+  @media (max-width: 920px) {
+    .instrument-header,
+    .below-grid,
+    .compare-grid {
       grid-template-columns: 1fr;
     }
 
     canvas#spectrum {
-      height: 150px;
-    }
-
-    canvas#markers {
-      height: 64px;
+      height: 190px;
     }
   }
 </style>
@@ -332,35 +451,47 @@
 <div class="page">
   <header>
     <h1>Reading Starlight</h1>
-    <p>Build the idea in order: first a spectrum, then absorption, then a real star, then the actual inference.</p>
+    <p>Move from mechanism to explanation. By the end, the model should not just look right. It should answer real questions about where spectral lines come from.</p>
   </header>
 
-  <section class="teaching-panel">
-    <div class="stage-topline">
+  <section class="panel stage-panel">
+    <div class="stage-top">
       <div class="stage-pill" id="stagePill">Stage 1</div>
-      <div class="stage-progress" id="stageProgress">1 of 4</div>
+      <div class="stage-progress" id="stageProgress">1 of 5</div>
     </div>
-
     <div class="stage-title" id="stageTitle"></div>
     <div class="stage-copy" id="stageCopy"></div>
-
     <div class="stage-controls">
-      <button class="stage-btn" id="prevStage">Previous</button>
-      <button class="stage-btn primary" id="nextStage">Next</button>
+      <button class="button" id="prevBtn">Previous</button>
+      <button class="button primary" id="nextBtn">Next</button>
     </div>
-
-    <div id="demoElementWrap" class="hidden">
-      <div class="section-label">Choose One Element</div>
-      <div class="choice-group" id="demoElementButtons"></div>
+    <div class="choice-row hidden" id="demoElementWrap">
+      <div class="choice-label">Choose One Element</div>
+      <div class="chip-row" id="demoElementButtons"></div>
     </div>
   </section>
 
-  <section class="instrument">
-    <div class="spectrum-shell">
-      <div class="section-label" id="spectrumLabel">Observed Spectrum</div>
+  <section class="panel instrument">
+    <div class="instrument-header">
+      <div class="hero-card">
+        <div class="hero-kicker">Learning Goal</div>
+        <div class="hero-title" id="heroTitle">A spectrum is light spread out.</div>
+        <div class="hero-text" id="heroText">First understand the object you are looking at. Then understand what changes it.</div>
+      </div>
+      <div class="question-card">
+        <div class="question-label">Question To Carry</div>
+        <div class="question-text" id="questionText">Why do we need to spread light out before we can learn anything from it?</div>
+        <div class="question-answer" id="questionAnswer">Because when all wavelengths arrive mixed together, the missing ones are hidden. <strong>The spectrum makes the structure visible.</strong></div>
+      </div>
+    </div>
+
+    <div class="spectrum-frame">
+      <div class="section-label" id="spectrumLabel">Continuous Spectrum</div>
+      <div class="spectrum-title" id="spectrumTitle">White light spread into a visible range of colors.</div>
+      <div class="spectrum-help" id="spectrumHelp">This is the baseline. No absorption lines have been added yet.</div>
       <canvas id="spectrum"></canvas>
       <canvas id="markers"></canvas>
-      <div class="wavelength-axis">
+      <div class="axis">
         <span>380 nm</span>
         <span>450</span>
         <span>520</span>
@@ -370,34 +501,49 @@
       </div>
     </div>
 
-    <div class="instrument-grid">
-      <div class="panel-block">
-        <div class="section-label">What To Look For</div>
-        <div class="help-line" id="helpLine"></div>
+    <div class="compare-card" id="compareCard">
+      <div class="section-label">Compare Causes</div>
+      <div class="spectrum-title">If Earth caused all the visible dark lines, every star would look much more alike.</div>
+      <div class="spectrum-help">The dashed markers show a few fixed telluric wavelengths from Earth's atmosphere. Notice that the stars share those, but they also have many star-specific lines that differ from each other.</div>
+      <div class="compare-grid">
+        <div class="mini-panel">
+          <div class="mini-title">Earth Atmosphere Only</div>
+          <div class="mini-note">A small fixed set of visible telluric lines.</div>
+          <canvas class="mini-spectrum" id="miniEarth"></canvas>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-title">Sirius</div>
+          <div class="mini-note">Strong hydrogen pattern plus the same small telluric contribution.</div>
+          <canvas class="mini-spectrum" id="miniSirius"></canvas>
+        </div>
+        <div class="mini-panel">
+          <div class="mini-title">Betelgeuse</div>
+          <div class="mini-note">Very different star pattern, despite the same Earth atmosphere.</div>
+          <canvas class="mini-spectrum" id="miniBetelgeuse"></canvas>
+        </div>
+      </div>
+      <div class="compare-readout" id="compareReadout"></div>
+    </div>
 
-        <div id="starTool">
-          <div class="section-label">Choose A Star</div>
-          <div class="star-selector" id="starSelector"></div>
+    <div class="below-grid">
+      <div class="sidebar-card">
+        <div id="starTool" class="hidden">
+          <div class="choice-label">Choose A Star</div>
+          <div class="star-row" id="starButtons"></div>
           <div class="star-info" id="starInfo"></div>
         </div>
       </div>
 
-      <div class="panel-block">
-        <div id="elementTool">
-          <div class="section-label">Test Element Overlays</div>
-          <div class="element-toggles" id="elementToggles"></div>
+      <div class="sidebar-card">
+        <div id="elementTool" class="hidden">
+          <div class="choice-label">Test Element Overlays</div>
+          <div class="element-row" id="elementButtons"></div>
         </div>
-
         <div class="readout" id="readout">
-          <div class="readout-main">The tool is introducing the idea step by step.</div>
+          <div class="readout-main">The page is introducing the model step by step.</div>
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="notes">
-    <h2>Core Idea</h2>
-    <p id="coreIdea">White light can be spread into a continuous spectrum. The dark lines come later.</p>
   </section>
 
   <footer>
@@ -406,191 +552,186 @@
 </div>
 
 <script>
+const WL_MIN = 380;
+const WL_MAX = 730;
+const TELLURIC_LINES = [628.0, 687.0, 719.0];
+
 const elements = {
-  Hydrogen: {
-    color: '#2457aa',
-    lines: [410.2, 434.0, 486.1, 656.3],
-    names: ['Hδ', 'Hγ', 'Hβ', 'Hα']
-  },
-  Helium: {
-    color: '#a66a14',
-    lines: [402.6, 447.1, 471.3, 501.6, 587.6],
-    names: ['', '', '', '', 'D3']
-  },
-  Sodium: {
-    color: '#8b770e',
-    lines: [589.0, 589.6],
-    names: ['D1', 'D2']
-  },
-  Calcium: {
-    color: '#a23535',
-    lines: [393.4, 396.8, 422.7],
-    names: ['K', 'H', '']
-  },
-  Iron: {
-    color: '#4b5e78',
-    lines: [404.6, 438.4, 466.8, 495.8, 516.7, 527.0],
-    names: []
-  }
+  Hydrogen: { color: '#2b5db0', lines: [410.2, 434.0, 486.1, 656.3], names: ['Hδ', 'Hγ', 'Hβ', 'Hα'] },
+  Helium: { color: '#a16918', lines: [402.6, 447.1, 471.3, 501.6, 587.6], names: ['', '', '', '', 'He'] },
+  Sodium: { color: '#8a7613', lines: [589.0, 589.6], names: ['D1', 'D2'] },
+  Calcium: { color: '#a43b3b', lines: [393.4, 396.8, 422.7], names: ['K', 'H', ''] },
+  Iron: { color: '#566577', lines: [404.6, 438.4, 466.8, 495.8, 516.7, 527.0], names: [] }
 };
 
 const stars = {
   'The Sun': {
     type: 'G2V',
     temp: '5,800 K',
-    desc: 'Our star — broad continuum with many strong metal lines',
+    desc: 'Broad continuum with many metal lines',
+    peakNm: 500,
     composition: {
-      Hydrogen:  { present: true, strength: 0.7 },
-      Helium:    { present: true, strength: 0.15 },
-      Sodium:    { present: true, strength: 0.8 },
-      Calcium:   { present: true, strength: 0.85 },
-      Iron:      { present: true, strength: 0.6 }
-    },
-    peakNm: 500
+      Hydrogen: { present: true, strength: 0.7 },
+      Helium: { present: true, strength: 0.15 },
+      Sodium: { present: true, strength: 0.8 },
+      Calcium: { present: true, strength: 0.85 },
+      Iron: { present: true, strength: 0.6 }
+    }
   },
-  'Sirius': {
+  Sirius: {
     type: 'A1V',
     temp: '9,940 K',
-    desc: 'Blue-white star with strong hydrogen absorption lines',
+    desc: 'Blue-white star with strong visible hydrogen lines',
+    peakNm: 290,
     composition: {
-      Hydrogen:  { present: true, strength: 0.95 },
-      Helium:    { present: true, strength: 0.3 },
-      Sodium:    { present: false, strength: 0 },
-      Calcium:   { present: true, strength: 0.15 },
-      Iron:      { present: true, strength: 0.1 }
-    },
-    peakNm: 290
+      Hydrogen: { present: true, strength: 0.95 },
+      Helium: { present: true, strength: 0.3 },
+      Sodium: { present: false, strength: 0.0 },
+      Calcium: { present: true, strength: 0.15 },
+      Iron: { present: true, strength: 0.1 }
+    }
   },
-  'Betelgeuse': {
+  Betelgeuse: {
     type: 'M2Iab',
     temp: '3,600 K',
     desc: 'Cool red supergiant with strong sodium, calcium, and iron features',
+    peakNm: 800,
     composition: {
-      Hydrogen:  { present: true, strength: 0.3 },
-      Helium:    { present: true, strength: 0.05 },
-      Sodium:    { present: true, strength: 0.75 },
-      Calcium:   { present: true, strength: 0.9 },
-      Iron:      { present: true, strength: 0.8 }
-    },
-    peakNm: 800
+      Hydrogen: { present: true, strength: 0.3 },
+      Helium: { present: true, strength: 0.05 },
+      Sodium: { present: true, strength: 0.75 },
+      Calcium: { present: true, strength: 0.9 },
+      Iron: { present: true, strength: 0.8 }
+    }
   },
-  'Vega': {
+  Vega: {
     type: 'A0V',
     temp: '9,600 K',
     desc: 'Bright star whose visible spectrum is dominated by hydrogen',
+    peakNm: 300,
     composition: {
-      Hydrogen:  { present: true, strength: 0.9 },
-      Helium:    { present: true, strength: 0.2 },
-      Sodium:    { present: false, strength: 0 },
-      Calcium:   { present: false, strength: 0 },
-      Iron:      { present: false, strength: 0 }
-    },
-    peakNm: 300
+      Hydrogen: { present: true, strength: 0.9 },
+      Helium: { present: true, strength: 0.2 },
+      Sodium: { present: false, strength: 0.0 },
+      Calcium: { present: false, strength: 0.0 },
+      Iron: { present: false, strength: 0.0 }
+    }
   },
-  'Arcturus': {
+  Arcturus: {
     type: 'K1.5III',
     temp: '4,290 K',
-    desc: 'Orange giant with many strong metal absorption features',
+    desc: 'Orange giant with many strong metal lines',
+    peakNm: 670,
     composition: {
-      Hydrogen:  { present: true, strength: 0.5 },
-      Helium:    { present: true, strength: 0.05 },
-      Sodium:    { present: true, strength: 0.85 },
-      Calcium:   { present: true, strength: 0.95 },
-      Iron:      { present: true, strength: 0.75 }
-    },
-    peakNm: 670
+      Hydrogen: { present: true, strength: 0.5 },
+      Helium: { present: true, strength: 0.05 },
+      Sodium: { present: true, strength: 0.85 },
+      Calcium: { present: true, strength: 0.95 },
+      Iron: { present: true, strength: 0.75 }
+    }
   }
 };
 
 const stages = [
   {
     title: 'Stage 1: What A Spectrum Is',
-    copy: 'Start with the baseline. A spectrum is white light spread out by wavelength into a continuous band of color.',
-    help: 'There are no dark lines yet. This is just the star\'s light unfolded into color.',
-    idea: 'A continuous spectrum means the light is present across a wide range of wavelengths.',
-    label: 'Continuous Spectrum'
+    copy: 'White light is not one thing. When you spread it out by wavelength, you can see the full continuous range of colors hiding inside it.',
+    heroTitle: 'A spectrum is structured light.',
+    heroText: 'This first view is just the light itself, separated into wavelength so that structure can become visible.',
+    question: 'Why do we need to spread light out before we can learn anything from it?',
+    answer: 'Because when all wavelengths arrive mixed together, missing pieces stay hidden. The spectrum makes those missing wavelengths visible.',
+    label: 'Continuous Spectrum',
+    spectrumTitle: 'White light spread into a continuous spectrum.',
+    spectrumHelp: 'No lines are missing yet. This is the baseline that later stages will alter.'
   },
   {
-    title: 'Stage 2: What An Element Does To Light',
-    copy: 'Now put one element in the path. It does not remove random colors. It removes very specific wavelengths and leaves narrow dark lines behind.',
-    help: 'Choose one element and watch its absorption pattern cut exact gaps into the continuous spectrum.',
-    idea: 'Each element removes a distinctive set of wavelengths. Those missing wavelengths are the clue.',
-    label: 'Absorption By One Element'
+    title: 'Stage 2: What An Element Does',
+    copy: 'A gas does not dim the whole rainbow evenly. It removes only specific wavelengths, leaving narrow dark lines where those wavelengths have gone missing.',
+    heroTitle: 'Absorption is selective, not general.',
+    heroText: 'That selectivity is why the pattern can identify an element instead of just telling you the light got dimmer.',
+    question: 'Why does adding hydrogen make a few thin lines instead of fading the whole spectrum?',
+    answer: 'Because atoms absorb only particular wavelengths tied to their internal structure. Most wavelengths pass through unchanged.',
+    label: 'Absorption By One Element',
+    spectrumTitle: 'An element cuts its own pattern into the light.',
+    spectrumHelp: 'Choose one element and watch only its specific wavelengths disappear.'
   },
   {
-    title: 'Stage 3: Why Stars Show Dark Lines',
-    copy: 'A star produces a broad spectrum, but its atmosphere absorbs selected wavelengths. The dark lines in the observed spectrum are that missing light.',
-    help: 'This is a real star spectrum. The atmosphere has already scratched narrow lines into the continuous glow.',
-    idea: 'Starlight carries the imprint of the atoms that absorbed part of it on the way out.',
-    label: 'A Real Star Spectrum'
+    title: 'Stage 3: What Happens In A Star',
+    copy: 'A star produces broad-spectrum light in its hot interior. That light then passes through cooler gas in the star’s outer layers, which removes selected wavelengths on the way out.',
+    heroTitle: 'Stars give you both a source and a filter.',
+    heroText: 'The hot dense interior makes the broad glow. The cooler atmosphere edits that glow and leaves evidence behind.',
+    question: 'Where do the dark lines in a star spectrum come from?',
+    answer: 'They come from atoms in cooler material that the light passes through after it is produced. The atmosphere scratches missing wavelengths into the outgoing spectrum.',
+    label: 'A Real Star Spectrum',
+    spectrumTitle: 'Observed starlight after it has passed through the star’s atmosphere.',
+    spectrumHelp: 'This is The Sun. Hydrogen markers are shown below as one example of how a known pattern can line up with real gaps.'
   },
   {
-    title: 'Stage 4: Infer The Elements',
-    copy: 'Now do the actual reasoning. Turn on candidate element overlays and compare their known line positions to the star\'s dark lines.',
-    help: 'Look for alignments. If an element\'s markers land on the dark gaps, that element is a plausible contributor.',
-    idea: 'Spectral analysis works by comparing observed missing wavelengths to known atomic line patterns.',
-    label: 'Compare And Infer'
+    title: 'Stage 4: Compare Causes',
+    copy: 'A good model should answer objections. If Earth’s atmosphere caused all the visible dark lines, then different stars observed through the same atmosphere would look much more alike than they do.',
+    heroTitle: 'Scientific understanding means comparing hypotheses.',
+    heroText: 'The question is not just what pattern you see. It is what different causes would predict.',
+    question: 'How do we know the dark lines are not all coming from Earth’s atmosphere?',
+    answer: 'Because Earth contributes the same small telluric pattern to every ground-based observation, but different stars still show very different additional patterns.',
+    label: 'Compare Causes',
+    spectrumTitle: 'Use the model to answer a real follow-up question.',
+    spectrumHelp: 'The comparison below shows one fixed Earth pattern and two very different stars observed through that same Earth atmosphere.'
+  },
+  {
+    title: 'Stage 5: Infer The Elements',
+    copy: 'Now the matching tool becomes meaningful. Compare observed dark lines with known element line positions and ask which overlays explain the evidence best.',
+    heroTitle: 'Inference works because the mechanism is now in place.',
+    heroText: 'You are no longer just matching bars. You are testing a causal explanation for the observed spectrum.',
+    question: 'Why do two stars with some of the same elements still show different visible patterns?',
+    answer: 'Because line visibility depends on physical conditions too, especially temperature. Composition matters, but conditions change which lines stand out in the visible spectrum.',
+    label: 'Compare And Infer',
+    spectrumTitle: 'Observed stellar spectrum with candidate element overlays.',
+    spectrumHelp: 'Choose a star, turn on element overlays, and ask which lines genuinely align with the evidence.'
   }
 ];
 
-const WL_MIN = 380;
-const WL_MAX = 730;
-const DEMO_STAR = 'The Sun';
-
-let currentStage = 0;
+let stage = 0;
 let currentStar = 'The Sun';
 let demoElement = 'Hydrogen';
 let activeElements = new Set();
 
-const specCanvas = document.getElementById('spectrum');
-const markCanvas = document.getElementById('markers');
+const spectrumCanvas = document.getElementById('spectrum');
+const markersCanvas = document.getElementById('markers');
 const dpr = window.devicePixelRatio || 1;
-let specCtx;
-let markCtx;
+let spectrumCtx;
+let markersCtx;
 
-function sizeCanvas(canvas, height) {
+function sizeCanvas(canvas, cssHeight) {
   const rect = canvas.getBoundingClientRect();
   canvas.width = rect.width * dpr;
-  canvas.height = height * dpr;
-  canvas.style.height = height + 'px';
+  canvas.height = cssHeight * dpr;
+  canvas.style.height = `${cssHeight}px`;
   return canvas.getContext('2d');
 }
 
 function initCanvases() {
-  specCtx = sizeCanvas(specCanvas, 180);
-  markCtx = sizeCanvas(markCanvas, 70);
+  spectrumCtx = sizeCanvas(spectrumCanvas, 220);
+  markersCtx = sizeCanvas(markersCanvas, 82);
 }
 
-function wlToRGB(wl) {
+function wavelengthToColor(wl) {
   let r = 0, g = 0, b = 0;
-  if (wl >= 380 && wl < 440) {
-    r = -(wl - 440) / (440 - 380);
-    b = 1;
-  } else if (wl >= 440 && wl < 490) {
-    g = (wl - 440) / (490 - 440);
-    b = 1;
-  } else if (wl >= 490 && wl < 510) {
-    g = 1;
-    b = -(wl - 510) / (510 - 490);
-  } else if (wl >= 510 && wl < 580) {
-    r = (wl - 510) / (580 - 510);
-    g = 1;
-  } else if (wl >= 580 && wl < 645) {
-    r = 1;
-    g = -(wl - 645) / (645 - 580);
-  } else if (wl >= 645 && wl <= 730) {
-    r = 1;
-  }
+  if (wl >= 380 && wl < 440) { r = -(wl - 440) / 60; b = 1; }
+  else if (wl < 490) { g = (wl - 440) / 50; b = 1; }
+  else if (wl < 510) { g = 1; b = -(wl - 510) / 20; }
+  else if (wl < 580) { r = (wl - 510) / 70; g = 1; }
+  else if (wl < 645) { r = 1; g = -(wl - 645) / 65; }
+  else { r = 1; }
 
   let factor;
-  if (wl >= 380 && wl < 420) factor = 0.35 + 0.65 * (wl - 380) / (420 - 380);
-  else if (wl >= 700 && wl <= 730) factor = 0.35 + 0.65 * (730 - wl) / (730 - 700);
+  if (wl < 420) factor = 0.34 + 0.66 * (wl - 380) / 40;
+  else if (wl > 700) factor = 0.34 + 0.66 * (730 - wl) / 30;
   else factor = 1;
 
   return [r * factor, g * factor, b * factor];
 }
 
-function planckRelative(wl, peakNm) {
+function planckLike(wl, peakNm) {
   const x = (wl - peakNm) / (peakNm * 0.6);
   return Math.exp(-x * x * 0.5);
 }
@@ -599,244 +740,263 @@ function wlToX(wl, width) {
   return ((wl - WL_MIN) / (WL_MAX - WL_MIN)) * width;
 }
 
-function makeAbsorptionsFromStar(starName) {
-  const star = stars[starName];
-  const absorptions = [];
+function absorptionsForElement(name) {
+  return elements[name].lines.map((wl) => ({ wl, strength: 0.92, source: name }));
+}
 
-  for (const [elementName, comp] of Object.entries(star.composition)) {
-    if (!comp.present) continue;
-    for (const line of elements[elementName].lines) {
-      if (line >= WL_MIN && line <= WL_MAX) {
-        absorptions.push({ wl: line, strength: comp.strength, source: elementName });
-      }
-    }
+function absorptionsForStar(name, includeTelluric = false) {
+  const star = stars[name];
+  const list = [];
+
+  Object.entries(star.composition).forEach(([elementName, comp]) => {
+    if (!comp.present) return;
+    elements[elementName].lines.forEach((wl) => {
+      list.push({ wl, strength: comp.strength, source: elementName });
+    });
+  });
+
+  if (includeTelluric) {
+    TELLURIC_LINES.forEach((wl) => list.push({ wl, strength: 0.22, source: 'Earth' }));
   }
-  return absorptions;
+
+  return list;
 }
 
-function makeAbsorptionsFromElement(elementName) {
-  return elements[elementName].lines
-    .filter((line) => line >= WL_MIN && line <= WL_MAX)
-    .map((line) => ({ wl: line, strength: 0.9, source: elementName }));
+function absorptionsEarthOnly() {
+  return TELLURIC_LINES.map((wl) => ({ wl, strength: 0.3, source: 'Earth' }));
 }
 
-function drawSpectrumFromAbsorptions(peakNm, absorptions = []) {
-  const w = specCanvas.width;
-  const h = specCanvas.height;
-  specCtx.clearRect(0, 0, w, h);
+function drawSpectrum(ctx, width, height, peakNm, absorptions) {
+  ctx.clearRect(0, 0, width, height);
 
-  for (let px = 0; px < w; px++) {
-    const wl = WL_MIN + (px / w) * (WL_MAX - WL_MIN);
-    const [r, g, b] = wlToRGB(wl);
-    const envelope = planckRelative(wl, peakNm);
-
+  for (let px = 0; px < width; px++) {
+    const wl = WL_MIN + (px / width) * (WL_MAX - WL_MIN);
+    const [r, g, b] = wavelengthToColor(wl);
+    const envelope = planckLike(wl, peakNm);
     let absorption = 0;
-    for (const abs of absorptions) {
-      const dist = Math.abs(wl - abs.wl);
-      const lineWidth = 1.4;
-      const depth = abs.strength * Math.exp(-(dist * dist) / (2 * lineWidth * lineWidth));
-      absorption = Math.max(absorption, depth);
-    }
 
-    const brightness = envelope * (1 - absorption * 0.92);
-    const gamma = 0.65;
+    absorptions.forEach((line) => {
+      const dist = Math.abs(wl - line.wl);
+      const depth = line.strength * Math.exp(-(dist * dist) / (2 * 1.35 * 1.35));
+      absorption = Math.max(absorption, depth);
+    });
+
+    const brightness = envelope * (1 - absorption * 0.94);
+    const gamma = 0.64;
     const rr = Math.pow(r * brightness, gamma);
     const gg = Math.pow(g * brightness, gamma);
     const bb = Math.pow(b * brightness, gamma);
-
-    specCtx.fillStyle = `rgb(${Math.round(rr * 255)}, ${Math.round(gg * 255)}, ${Math.round(bb * 255)})`;
-    specCtx.fillRect(px, 0, 1, h);
+    ctx.fillStyle = `rgb(${Math.round(rr * 255)}, ${Math.round(gg * 255)}, ${Math.round(bb * 255)})`;
+    ctx.fillRect(px, 0, 1, height);
   }
 
-  const overlay = specCtx.createLinearGradient(0, 0, 0, h);
-  overlay.addColorStop(0, 'rgba(247,249,252,0.22)');
-  overlay.addColorStop(0.12, 'rgba(247,249,252,0)');
-  overlay.addColorStop(0.88, 'rgba(247,249,252,0)');
-  overlay.addColorStop(1, 'rgba(247,249,252,0.22)');
-  specCtx.fillStyle = overlay;
-  specCtx.fillRect(0, 0, w, h);
+  const veil = ctx.createLinearGradient(0, 0, 0, height);
+  veil.addColorStop(0, 'rgba(247,248,250,0.18)');
+  veil.addColorStop(0.15, 'rgba(247,248,250,0)');
+  veil.addColorStop(0.85, 'rgba(247,248,250,0)');
+  veil.addColorStop(1, 'rgba(247,248,250,0.18)');
+  ctx.fillStyle = veil;
+  ctx.fillRect(0, 0, width, height);
 }
 
-function drawMarkers(mode) {
-  const w = markCanvas.width;
-  const h = markCanvas.height;
-  markCtx.clearRect(0, 0, w, h);
+function drawMainSpectrum() {
+  const width = spectrumCanvas.width;
+  const height = spectrumCanvas.height;
+  markersCtx.clearRect(0, 0, markersCanvas.width, markersCanvas.height);
 
-  if (mode === 'none') return;
-
-  let list = [];
-  if (mode === 'demo-element') {
-    list = [{ name: demoElement, matchAgainstStar: false }];
-  } else if (mode === 'example-star') {
-    list = [{ name: 'Hydrogen', matchAgainstStar: true, starName: DEMO_STAR }];
-  } else if (mode === 'full-tool') {
-    list = Array.from(activeElements).map((name) => ({ name, matchAgainstStar: true, starName: currentStar }));
+  if (stage === 0) {
+    drawSpectrum(spectrumCtx, width, height, 560, []);
+    return;
   }
 
-  for (const item of list) {
-    const el = elements[item.name];
-    if (!el) continue;
-
-    for (let i = 0; i < el.lines.length; i++) {
-      const wl = el.lines[i];
-      if (wl < WL_MIN || wl > WL_MAX) continue;
-
-      const x = wlToX(wl, w);
-      const comp = item.matchAgainstStar ? stars[item.starName].composition[item.name] : { present: true };
-      const isMatch = !!(comp && comp.present);
-
-      markCtx.strokeStyle = isMatch ? el.color : `${el.color}55`;
-      markCtx.lineWidth = isMatch ? 2.5 * dpr : 1.5 * dpr;
-      markCtx.beginPath();
-      markCtx.moveTo(x, 0);
-      markCtx.lineTo(x, h * 0.58);
-      markCtx.stroke();
-
-      if (isMatch) {
-        markCtx.strokeStyle = `${el.color}33`;
-        markCtx.lineWidth = 8 * dpr;
-        markCtx.beginPath();
-        markCtx.moveTo(x, 0);
-        markCtx.lineTo(x, h * 0.58);
-        markCtx.stroke();
-      }
-
-      if (el.names[i]) {
-        markCtx.fillStyle = isMatch ? el.color : `${el.color}88`;
-        markCtx.font = `${13 * dpr}px "Avenir Next", "Segoe UI", sans-serif`;
-        markCtx.textAlign = 'center';
-        markCtx.fillText(el.names[i], x, h * 0.88);
-      }
-    }
+  if (stage === 1) {
+    drawSpectrum(spectrumCtx, width, height, 560, absorptionsForElement(demoElement));
+    drawMarkers([demoElement], false);
+    return;
   }
+
+  if (stage === 2) {
+    drawSpectrum(spectrumCtx, width, height, stars['The Sun'].peakNm, absorptionsForStar('The Sun'));
+    drawMarkers(['Hydrogen'], true, 'The Sun');
+    return;
+  }
+
+  if (stage === 3) {
+    drawSpectrum(spectrumCtx, width, height, stars['Sirius'].peakNm, absorptionsForStar('Sirius', true));
+    drawTelluricMarkers();
+    return;
+  }
+
+  drawSpectrum(spectrumCtx, width, height, stars[currentStar].peakNm, absorptionsForStar(currentStar));
+  drawMarkers(Array.from(activeElements), true, currentStar);
 }
 
-function buildStarButtons() {
-  const container = document.getElementById('starSelector');
-  container.innerHTML = '';
+function drawMarkers(names, matchAgainstStar, starName) {
+  const width = markersCanvas.width;
+  const height = markersCanvas.height;
+  markersCtx.clearRect(0, 0, width, height);
 
-  for (const name of Object.keys(stars)) {
+  names.forEach((name) => {
+    const element = elements[name];
+    element.lines.forEach((wl, index) => {
+      const x = wlToX(wl, width);
+      const comp = matchAgainstStar ? stars[starName].composition[name] : { present: true };
+      const active = !!(comp && comp.present);
+
+      markersCtx.strokeStyle = active ? element.color : `${element.color}55`;
+      markersCtx.lineWidth = active ? 2.6 * dpr : 1.5 * dpr;
+      markersCtx.beginPath();
+      markersCtx.moveTo(x, 0);
+      markersCtx.lineTo(x, height * 0.62);
+      markersCtx.stroke();
+
+      if (active) {
+        markersCtx.strokeStyle = `${element.color}30`;
+        markersCtx.lineWidth = 9 * dpr;
+        markersCtx.beginPath();
+        markersCtx.moveTo(x, 0);
+        markersCtx.lineTo(x, height * 0.62);
+        markersCtx.stroke();
+      }
+
+      if (element.names[index]) {
+        markersCtx.fillStyle = active ? element.color : `${element.color}88`;
+        markersCtx.font = `${13 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
+        markersCtx.textAlign = 'center';
+        markersCtx.fillText(element.names[index], x, height * 0.9);
+      }
+    });
+  });
+}
+
+function drawTelluricMarkers() {
+  const width = markersCanvas.width;
+  const height = markersCanvas.height;
+  markersCtx.clearRect(0, 0, width, height);
+
+  TELLURIC_LINES.forEach((wl) => {
+    const x = wlToX(wl, width);
+    markersCtx.setLineDash([6 * dpr, 5 * dpr]);
+    markersCtx.strokeStyle = '#8c6124';
+    markersCtx.lineWidth = 2 * dpr;
+    markersCtx.beginPath();
+    markersCtx.moveTo(x, 0);
+    markersCtx.lineTo(x, height * 0.62);
+    markersCtx.stroke();
+    markersCtx.setLineDash([]);
+  });
+
+  markersCtx.fillStyle = '#8c6124';
+  markersCtx.font = `${13 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
+  markersCtx.textAlign = 'center';
+  markersCtx.fillText('Earth atmosphere markers', width / 2, height * 0.9);
+}
+
+function buildButtons() {
+  const demoWrap = document.getElementById('demoElementButtons');
+  ['Hydrogen', 'Helium', 'Sodium', 'Calcium'].forEach((name) => {
+    const btn = document.createElement('button');
+    btn.className = 'chip';
+    btn.textContent = name;
+    btn.addEventListener('click', () => {
+      demoElement = name;
+      update();
+    });
+    demoWrap.appendChild(btn);
+  });
+
+  const starWrap = document.getElementById('starButtons');
+  Object.keys(stars).forEach((name) => {
     const btn = document.createElement('button');
     btn.className = 'star-btn';
     btn.textContent = name;
     btn.addEventListener('click', () => {
       currentStar = name;
-      updateAll();
+      update();
     });
-    container.appendChild(btn);
-  }
-}
+    starWrap.appendChild(btn);
+  });
 
-function buildElementButtons() {
-  const container = document.getElementById('elementToggles');
-  container.innerHTML = '';
-
-  for (const [name, data] of Object.entries(elements)) {
+  const elementWrap = document.getElementById('elementButtons');
+  Object.entries(elements).forEach(([name, element]) => {
     const btn = document.createElement('button');
     btn.className = 'element-btn';
     btn.textContent = name;
-    btn.style.setProperty('--element-color', data.color);
     btn.addEventListener('click', () => {
       if (activeElements.has(name)) activeElements.delete(name);
       else activeElements.add(name);
-      updateAll();
+      update();
     });
-    container.appendChild(btn);
-  }
+    elementWrap.appendChild(btn);
+  });
 }
 
-function buildDemoElementButtons() {
-  const container = document.getElementById('demoElementButtons');
-  container.innerHTML = '';
-
-  for (const name of ['Hydrogen', 'Helium', 'Sodium', 'Calcium']) {
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = name;
-    btn.addEventListener('click', () => {
-      demoElement = name;
-      updateAll();
-    });
-    container.appendChild(btn);
-  }
-}
-
-function updateStagePanel() {
-  const stage = stages[currentStage];
-  document.getElementById('stagePill').textContent = `Stage ${currentStage + 1}`;
-  document.getElementById('stageProgress').textContent = `${currentStage + 1} of ${stages.length}`;
-  document.getElementById('stageTitle').textContent = stage.title;
-  document.getElementById('stageCopy').textContent = stage.copy;
-  document.getElementById('coreIdea').textContent = stage.idea;
-
-  document.getElementById('prevStage').disabled = currentStage === 0;
-  document.getElementById('nextStage').disabled = currentStage === stages.length - 1;
-  document.getElementById('demoElementWrap').classList.toggle('hidden', currentStage !== 1);
-}
-
-function updateUIVisibility() {
-  const starTool = document.getElementById('starTool');
-  const elementTool = document.getElementById('elementTool');
-
-  if (currentStage < 3) {
-    starTool.classList.add('hidden');
-    elementTool.classList.add('hidden');
-  } else {
-    starTool.classList.remove('hidden');
-    elementTool.classList.remove('hidden');
-  }
-}
-
-function updateButtonStates() {
-  document.querySelectorAll('#demoElementButtons .choice-btn').forEach((btn) => {
+function updateButtons() {
+  document.querySelectorAll('#demoElementButtons .chip').forEach((btn) => {
     btn.classList.toggle('active', btn.textContent === demoElement);
   });
-
-  document.querySelectorAll('#starSelector .star-btn').forEach((btn) => {
+  document.querySelectorAll('#starButtons .star-btn').forEach((btn) => {
     btn.classList.toggle('active', btn.textContent === currentStar);
   });
-
-  document.querySelectorAll('#elementToggles .element-btn').forEach((btn) => {
-    btn.classList.toggle('active', activeElements.has(btn.textContent));
-    btn.style.borderColor = activeElements.has(btn.textContent) ? elements[btn.textContent].color : '';
+  document.querySelectorAll('#elementButtons .element-btn').forEach((btn) => {
+    const active = activeElements.has(btn.textContent);
+    btn.classList.toggle('active', active);
+    btn.style.borderColor = active ? elements[btn.textContent].color : '';
   });
 }
 
-function updateStarInfo() {
-  const info = document.getElementById('starInfo');
-  if (currentStage < 3) {
-    info.innerHTML = '';
-    return;
-  }
-
-  const star = stars[currentStar];
-  info.innerHTML = `<strong>${star.type}</strong> · ${star.temp} · ${star.desc}`;
+function updateStageText() {
+  const config = stages[stage];
+  document.getElementById('stagePill').textContent = `Stage ${stage + 1}`;
+  document.getElementById('stageProgress').textContent = `${stage + 1} of ${stages.length}`;
+  document.getElementById('stageTitle').textContent = config.title;
+  document.getElementById('stageCopy').textContent = config.copy;
+  document.getElementById('heroTitle').textContent = config.heroTitle;
+  document.getElementById('heroText').textContent = config.heroText;
+  document.getElementById('questionText').textContent = config.question;
+  document.getElementById('questionAnswer').innerHTML = config.answer;
+  document.getElementById('spectrumLabel').textContent = config.label;
+  document.getElementById('spectrumTitle').textContent = config.spectrumTitle;
+  document.getElementById('spectrumHelp').textContent = config.spectrumHelp;
+  document.getElementById('prevBtn').disabled = stage === 0;
+  document.getElementById('nextBtn').disabled = stage === stages.length - 1;
+  document.getElementById('demoElementWrap').classList.toggle('hidden', stage !== 1);
+  document.getElementById('starTool').classList.toggle('hidden', stage !== 4);
+  document.getElementById('elementTool').classList.toggle('hidden', stage !== 4);
+  document.getElementById('compareCard').classList.toggle('active', stage === 3);
 }
 
 function updateReadout() {
   const readout = document.getElementById('readout');
 
-  if (currentStage === 0) {
+  if (stage === 0) {
     readout.innerHTML = `
-      <div class="readout-main">This is the baseline: a continuous spectrum.</div>
-      <div class="readout-detail">No wavelengths are missing yet, so there are no dark absorption lines to explain.</div>
+      <div class="readout-main">This is the raw material: a continuous spread of wavelengths.</div>
+      <div class="readout-line">Until you separate the light, the hidden structure is invisible.</div>
     `;
     return;
   }
 
-  if (currentStage === 1) {
+  if (stage === 1) {
     readout.innerHTML = `
-      <div class="readout-main"><strong>${demoElement}</strong> removes a specific set of wavelengths.</div>
-      <div class="readout-detail">Those exact missing wavelengths create the dark lines. This is the mechanism behind spectral analysis.</div>
+      <div class="readout-main"><strong>${demoElement}</strong> removes a small set of exact wavelengths.</div>
+      <div class="readout-line">That is why spectral lines are informative. The pattern is selective enough to identify a cause.</div>
     `;
     return;
   }
 
-  if (currentStage === 2) {
+  if (stage === 2) {
     readout.innerHTML = `
-      <div class="readout-main">This observed spectrum already contains absorption lines from a real star.</div>
-      <div class="readout-detail">The star emits a broad spectrum, and atoms in its atmosphere remove selected wavelengths on the way out.</div>
-      <div class="readout-detail"><strong>Example:</strong> Hydrogen markers are shown underneath so you can see one part of the pattern-matching idea before the full tool opens.</div>
+      <div class="readout-main">A star gives you both the source and the filter.</div>
+      <div class="readout-line">The hot interior produces the broad glow. Cooler gas outside removes selected wavelengths and leaves evidence in the outgoing light.</div>
+    `;
+    return;
+  }
+
+  if (stage === 3) {
+    readout.innerHTML = `
+      <div class="readout-main">The same Earth atmosphere sits in front of every star you observe from the ground.</div>
+      <div class="readout-line">So if Earth were causing all the visible dark lines, the stars would share nearly the same pattern. They do not.</div>
     `;
     return;
   }
@@ -844,114 +1004,115 @@ function updateReadout() {
   if (activeElements.size === 0) {
     readout.innerHTML = `
       <div class="readout-main">Turn on one or more element overlays.</div>
-      <div class="readout-detail">You are looking for alignments between known element line positions and the star's dark absorption lines.</div>
+      <div class="readout-line">Now you are testing an explanation, not just looking at a picture.</div>
     `;
     return;
   }
 
   const star = stars[currentStar];
-  let totalStarLines = 0;
-  let explainedLines = 0;
-  let aligned = [];
-  let weak = [];
+  let totalLines = 0;
+  let explained = 0;
+  const aligned = [];
+  const weak = [];
 
-  for (const [elementName, comp] of Object.entries(star.composition)) {
-    if (!comp.present) continue;
-    totalStarLines += elements[elementName].lines.filter((line) => line >= WL_MIN && line <= WL_MAX).length;
-  }
+  Object.entries(star.composition).forEach(([name, comp]) => {
+    if (!comp.present) return;
+    totalLines += elements[name].lines.length;
+  });
 
-  for (const name of activeElements) {
+  Array.from(activeElements).forEach((name) => {
     const comp = star.composition[name];
     if (comp && comp.present) {
       aligned.push(name);
-      explainedLines += elements[name].lines.filter((line) => line >= WL_MIN && line <= WL_MAX).length;
+      explained += elements[name].lines.length;
     } else {
       weak.push(name);
     }
-  }
+  });
 
   const lines = [];
   if (aligned.length > 0) {
-    lines.push(`<div class="readout-main">${aligned.join(', ')} line up with prominent dark gaps in ${currentStar}.</div>`);
+    lines.push(`<div class="readout-main">${aligned.join(', ')} align with prominent dark lines in ${currentStar}.</div>`);
   } else {
-    lines.push(`<div class="readout-main">The selected overlays are not explaining much of ${currentStar}'s observed pattern yet.</div>`);
+    lines.push(`<div class="readout-main">The current overlays are not explaining much of ${currentStar}'s pattern yet.</div>`);
   }
-
-  lines.push(`<div class="readout-detail"><strong>${explainedLines} of ${totalStarLines}</strong> visible dark lines are currently explained by your selected overlays.</div>`);
-
-  if (aligned.includes('Sodium')) {
-    lines.push('<div class="readout-detail">Sodium is especially recognizable because of its close pair near 589 nm.</div>');
-  }
-  if (aligned.includes('Hydrogen')) {
-    lines.push('<div class="readout-detail">Hydrogen is easy to spot when its Balmer lines, especially Hβ and Hα, fall on clear gaps.</div>');
-  }
-  if (weak.length > 0) {
-    lines.push(`<div class="readout-detail">${weak.join(', ')} do not align strongly with many of the dark lines in this star.</div>`);
-  }
-
+  lines.push(`<div class="readout-line"><strong>${explained} of ${totalLines}</strong> visible stellar lines are currently explained by your selected overlays.</div>`);
+  if (aligned.includes('Sodium')) lines.push(`<div class="readout-line">Sodium is especially recognizable because of the close pair near 589 nm.</div>`);
+  if (aligned.includes('Hydrogen')) lines.push(`<div class="readout-line">Hydrogen stands out when the Balmer lines, especially Hβ and Hα, land on strong gaps.</div>`);
+  if (weak.length > 0) lines.push(`<div class="readout-line">${weak.join(', ')} do not align strongly with this star's visible pattern.</div>`);
+  lines.push(`<div class="readout-line">${currentStar} still differs from other stars because visible line strength depends on conditions too, not composition alone.</div>`);
   readout.innerHTML = lines.join('');
 }
 
-function drawCurrentSpectrum() {
-  if (currentStage === 0) {
-    drawSpectrumFromAbsorptions(560, []);
-    drawMarkers('none');
-    return;
-  }
-
-  if (currentStage === 1) {
-    drawSpectrumFromAbsorptions(560, makeAbsorptionsFromElement(demoElement));
-    drawMarkers('demo-element');
-    return;
-  }
-
-  if (currentStage === 2) {
-    drawSpectrumFromAbsorptions(stars[DEMO_STAR].peakNm, makeAbsorptionsFromStar(DEMO_STAR));
-    drawMarkers('example-star');
-    return;
-  }
-
-  drawSpectrumFromAbsorptions(stars[currentStar].peakNm, makeAbsorptionsFromStar(currentStar));
-  drawMarkers('full-tool');
+function updateCompareCard() {
+  const compareReadout = document.getElementById('compareReadout');
+  compareReadout.innerHTML = `Earth contributes a <strong>shared</strong> visible pattern at a few wavelengths. Sirius and Betelgeuse both include that same small telluric contribution, but their additional stellar absorption patterns are clearly different. <strong>So the stars themselves must be supplying much of the structure.</strong>`;
 }
 
-function updateTextualContext() {
-  const stage = stages[currentStage];
-  document.getElementById('spectrumLabel').textContent = stage.label;
-  document.getElementById('helpLine').textContent = stage.help;
+function renderMiniCanvas(id, peakNm, absorptions) {
+  const canvas = document.getElementById(id);
+  const ctx = sizeCanvas(canvas, 92);
+  drawSpectrum(ctx, canvas.width, canvas.height, peakNm, absorptions);
+
+  TELLURIC_LINES.forEach((wl) => {
+    const x = wlToX(wl, canvas.width);
+    ctx.setLineDash([5 * dpr, 4 * dpr]);
+    ctx.strokeStyle = '#8c6124';
+    ctx.lineWidth = 1.6 * dpr;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  });
 }
 
-function updateAll() {
-  updateStagePanel();
-  updateUIVisibility();
-  updateTextualContext();
-  updateButtonStates();
+function updateCompareCanvases() {
+  renderMiniCanvas('miniEarth', 560, absorptionsEarthOnly());
+  renderMiniCanvas('miniSirius', stars.Sirius.peakNm, absorptionsForStar('Sirius', true));
+  renderMiniCanvas('miniBetelgeuse', stars.Betelgeuse.peakNm, absorptionsForStar('Betelgeuse', true));
+  updateCompareCard();
+}
+
+function updateStarInfo() {
+  const info = document.getElementById('starInfo');
+  if (stage !== 4) {
+    info.innerHTML = '';
+    return;
+  }
+  const star = stars[currentStar];
+  info.innerHTML = `<strong>${star.type}</strong> · ${star.temp} · ${star.desc}`;
+}
+
+function update() {
+  updateStageText();
+  updateButtons();
   updateStarInfo();
-  drawCurrentSpectrum();
+  drawMainSpectrum();
   updateReadout();
+  updateCompareCanvases();
 }
 
-document.getElementById('prevStage').addEventListener('click', () => {
-  currentStage = Math.max(0, currentStage - 1);
-  updateAll();
+document.getElementById('prevBtn').addEventListener('click', () => {
+  stage = Math.max(0, stage - 1);
+  update();
 });
 
-document.getElementById('nextStage').addEventListener('click', () => {
-  currentStage = Math.min(stages.length - 1, currentStage + 1);
-  updateAll();
+document.getElementById('nextBtn').addEventListener('click', () => {
+  stage = Math.min(stages.length - 1, stage + 1);
+  update();
 });
 
 function init() {
   initCanvases();
-  buildStarButtons();
-  buildElementButtons();
-  buildDemoElementButtons();
-  updateAll();
+  buildButtons();
+  update();
 }
 
 window.addEventListener('resize', () => {
   initCanvases();
-  drawCurrentSpectrum();
+  drawMainSpectrum();
+  updateCompareCanvases();
 });
 
 init();

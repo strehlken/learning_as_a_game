@@ -125,27 +125,154 @@ function resize() {
   cv.style.height = (H / D) + 'px';
 }
 
-// ── Wave drawing with smooth curves ──
-function drawWave(x0, y0, x1, y1, wavePx, phase, rgb, alpha, lineW) {
-  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
-  if (len < 2) return;
-  const nx = -dy / len, ny = dx / len;
-  const amp = 14 * D; // large amplitude
-  const steps = Math.max(80, (len / (1.0 * D)) | 0);
+// ── Lagrangian wave drawing ──
+//
+// We track material points of the wave. At t=0, N points are evenly spaced
+// along one wavelength of a sine curve, far behind the source. Each point
+// moves along the ray path at speed c (in air) or c/n (in glass).
+//
+// At any time t, we find where each labeled point has reached along the path,
+// given piecewise-constant speeds. Then we draw the curve connecting all of
+// them, with transverse displacement = sin(2pi * label/N) * amplitude,
+// perpendicular to the local travel direction at each point's current position.
+//
+// This automatically produces:
+// - Continuous curve (no joints)
+// - Crests bunching together in glass (because points slow down)
+// - Correct wavelength contraction (lambda/n) inside glass
+// - Physically honest animation
 
-  cx.save();
-  cx.strokeStyle = rgba(rgb, alpha);
-  cx.lineWidth = lineW;
-  cx.beginPath();
-  for (let i = 0; i <= steps; i++) {
-    const t = i / steps;
-    const x = x0 + dx * t, y = y0 + dy * t;
-    const s = Math.sin(phase + (t * len / wavePx) * Math.PI * 2) * amp;
-    const px = x + nx * s, py = y + ny * s;
-    i ? cx.lineTo(px, py) : cx.moveTo(px, py);
+function drawRayWave(segments, speed_c, lambdaFree, rgb, lineW) {
+  const amp = 14 * D;
+
+  // Precompute path: list of segments with cumulative arc length and local speed
+  const segs = segments.map(seg => {
+    const dx = seg.x1 - seg.x0, dy = seg.y1 - seg.y0;
+    const len = Math.hypot(dx, dy);
+    return { ...seg, dx, dy, len,
+      dirX: len > 0 ? dx / len : 0,
+      dirY: len > 0 ? dy / len : 0,
+      nx: len > 0 ? -dy / len : 0,
+      ny: len > 0 ? dx / len : 0,
+      speed: speed_c / seg.n  // local speed: c in air (n=1), c/n in glass
+    };
+  });
+
+  // Cumulative start distances along the path
+  let totalLen = 0;
+  const segStarts = [];
+  for (const seg of segs) {
+    segStarts.push(totalLen);
+    totalLen += seg.len;
   }
-  cx.stroke();
-  cx.restore();
+
+  // Given a distance along the path, return (x, y, nx, ny)
+  function posAtDist(dist) {
+    let d = dist;
+    for (let i = 0; i < segs.length; i++) {
+      if (d <= segs[i].len || i === segs.length - 1) {
+        const t = segs[i].len > 0 ? Math.min(1, Math.max(0, d / segs[i].len)) : 0;
+        return {
+          x: segs[i].x0 + segs[i].dx * t,
+          y: segs[i].y0 + segs[i].dy * t,
+          nx: segs[i].nx, ny: segs[i].ny
+        };
+      }
+      d -= segs[i].len;
+    }
+    const last = segs[segs.length - 1];
+    return { x: last.x1, y: last.y1, nx: last.nx, ny: last.ny };
+  }
+
+  // Given a starting distance s0 and elapsed time dt, compute how far
+  // along the path a point has traveled, respecting piecewise speeds.
+  function advanceAlongPath(s0, dt) {
+    let s = s0;
+    let timeLeft = dt;
+
+    for (let i = 0; i < segs.length; i++) {
+      const segEnd = segStarts[i] + segs[i].len;
+      if (s >= segEnd) continue; // already past this segment
+      if (s < segStarts[i]) s = segStarts[i]; // clamp to segment start
+
+      const distInSeg = segEnd - s;
+      const timeToTraverse = distInSeg / segs[i].speed;
+
+      if (timeLeft <= timeToTraverse) {
+        return s + segs[i].speed * timeLeft;
+      }
+      timeLeft -= timeToTraverse;
+      s = segEnd;
+    }
+    return s; // past the end
+  }
+
+  // Generate labeled points: we emit a continuous stream of points from
+  // behind the source. Point with label u has initial position u * lambdaFree
+  // behind the start of the path (i.e., at distance -u * lambdaFree at t=0).
+  // Its transverse displacement is sin(2pi * u) * amp.
+  //
+  // At time t, it has traveled for time t, starting from position -u * lambdaFree.
+  // We track it through the piecewise-speed path.
+
+  // Continuous stream: draw each segment separately so the direction change
+  // at refraction boundaries is a sharp kink (physically correct).
+  // Phase is continuous across boundaries, but perpendicular direction jumps.
+  //
+  // For each segment, we sample points that are currently within that segment,
+  // compute their sine displacement using that segment's perpendicular direction,
+  // and draw a stroke. The endpoints at boundaries will have the same position
+  // on the ray path but different perpendicular offsets — that's the kink.
+
+  const nWavesOnPath = totalLen / lambdaFree + 2;
+  const jLatest = animTime * speed_c / lambdaFree;
+  const jEarliest = jLatest - nWavesOnPath * 3;
+
+  for (let segIdx = 0; segIdx < segs.length; segIdx++) {
+    const seg = segs[segIdx];
+    if (seg.len < 1) continue;
+
+    const segStart = segStarts[segIdx];
+    const segEnd = segStart + seg.len;
+
+    // Sample densely within this segment
+    const numPoints = Math.max(150, (seg.len / (0.3 * D)) | 0);
+
+    cx.save();
+    cx.strokeStyle = rgba(rgb, seg.alpha);
+    cx.lineWidth = lineW;
+    cx.beginPath();
+    let first = true;
+
+    for (let i = 0; i < numPoints; i++) {
+      const j = jEarliest + (i / numPoints) * (jLatest - jEarliest);
+
+      const timeEnter = j * lambdaFree / speed_c;
+      const timeOnPath = animTime - timeEnter;
+      if (timeOnPath < 0) continue;
+
+      const s = advanceAlongPath(0, timeOnPath);
+
+      // Only draw points that are within THIS segment
+      if (s < segStart || s > segEnd) continue;
+
+      // Position along this segment
+      const localD = s - segStart;
+      const t = localD / seg.len;
+      const x = seg.x0 + seg.dx * t;
+      const y = seg.y0 + seg.dy * t;
+
+      const sine = Math.sin(2 * Math.PI * j) * amp;
+      const px = x + seg.nx * sine;
+      const py = y + seg.ny * sine;
+
+      if (first) { cx.moveTo(px, py); first = false; }
+      else cx.lineTo(px, py);
+    }
+
+    cx.stroke();
+    cx.restore();
+  }
 }
 
 function render(ts) {
@@ -337,34 +464,21 @@ function render(ts) {
   cx.strokeRect(detX - detW/2, detTop, detW, detBot - detTop);
 
   // ── Draw traveling waves ──
-  const wScale = 0.05 * D; // wavelength → pixel scale
-  const speedBase = 300 * D;
+  const wScale = 0.05 * D; // nm → pixels for free-space wavelength
+  const speed_c = 220 * D; // visual speed of light in air (pixels per second)
 
   for (const r of animRays) {
     const rgb = wlRGB(r.wl);
-    const airWavePx = r.wl * wScale;
-    const insideWavePx = r.fp.insideNm * wScale;
-    const speed = speedBase / airWavePx; // same visual speed for all wavelengths
-    const phase = -animTime * speed;
+    const lambdaFree = r.wl * wScale;
 
     let al = mode === 'emission' ? (.3 + r.w * .6) : (r.blocked ? .08 : .5);
     const lw = (mode === 'emission' ? (1.8 + r.w * 1.8) : 2.2) * D;
 
-    // Source to entry
-    drawWave(r.fp.srcPt.x, r.fp.srcPt.y, r.fp.entryPt.x, r.fp.entryPt.y, airWavePx, phase, rgb, al, lw);
-
-    // Phase continuity: accumulate phase through entry segment
-    const entryLen = Math.hypot(r.fp.entryPt.x - r.fp.srcPt.x, r.fp.entryPt.y - r.fp.srcPt.y);
-    const phase1 = (entryLen / airWavePx) * Math.PI * 2;
-
-    // Inside prism
-    drawWave(r.fp.entryPt.x, r.fp.entryPt.y, r.fp.exitPt.x, r.fp.exitPt.y, insideWavePx, phase + phase1, rgb, al * .65, lw);
-
-    // Phase continuity through prism
-    const phase2 = phase1 + (r.fp.insLen / insideWavePx) * Math.PI * 2;
-
-    // Exit to detector
-    drawWave(r.fp.exitPt.x, r.fp.exitPt.y, r.fp.detPt.x, r.fp.detPt.y, airWavePx, phase + phase2, rgb, al, lw);
+    drawRayWave([
+      { x0: r.fp.srcPt.x, y0: r.fp.srcPt.y, x1: r.fp.entryPt.x, y1: r.fp.entryPt.y, n: 1, alpha: al },
+      { x0: r.fp.entryPt.x, y0: r.fp.entryPt.y, x1: r.fp.exitPt.x, y1: r.fp.exitPt.y, n: r.fp.n, alpha: al * .65 },
+      { x0: r.fp.exitPt.x, y0: r.fp.exitPt.y, x1: r.fp.detPt.x, y1: r.fp.detPt.y, n: 1, alpha: al }
+    ], speed_c, lambdaFree, rgb, lw);
   }
 
   // ── Labels ──

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wave Propagation Through Glass</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:17px;background:#0c0d12;color:#c8cad4;padding:1.4rem 1.4rem 2rem;}
+  .pg{max-width:1300px;margin:0 auto;}
+  h1{font-size:2rem;font-weight:700;color:#e8eaf0;margin-bottom:.15rem;}
+  .sub{font-size:.95rem;color:#6a6e7a;margin-bottom:.7rem;max-width:840px;line-height:1.5;}
+  .ctrls{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;margin-bottom:.45rem;}
+  .cl{font-size:.85rem;font-weight:600;color:#6a6e7a;margin-right:.05rem;}
+  button.b{font-family:inherit;font-size:.88rem;font-weight:600;border:1px solid #2e3140;border-radius:6px;background:#181a24;color:#a0a4b0;padding:.32rem .6rem;cursor:pointer;}
+  button.b.on{border-color:#5a8fd4;background:#1a2538;color:#8ac0ff;}
+  .sg{display:flex;align-items:center;gap:.3rem;font-size:.84rem;color:#6a6e7a;}
+  .sg input[type=range]{width:100px;accent-color:#5a8fd4;}
+  .sg .v{font-family:'IBM Plex Mono',monospace;font-size:.78rem;color:#8a8ea0;min-width:2rem;}
+  .cw{border-radius:10px;overflow:hidden;border:1px solid #22252e;}
+  canvas{display:block;width:100%;}
+  .nfo{margin-top:.35rem;font:.78rem 'IBM Plex Mono',monospace;color:#444a56;}
+  .note{margin-top:.6rem;font-size:.88rem;color:#555a66;max-width:840px;line-height:1.5;}
+  .note strong{color:#8a8ea0;}
+</style>
+</head>
+<body>
+<div class="pg">
+  <h1>Wave Propagation</h1>
+  <p class="sub">Each dot on the sine curve carries its value and moves at whatever speed the medium has at its current position. The wavelength compression inside the glass is not set — it emerges from the dots bunching up when they slow down.</p>
+  <div class="ctrls">
+    <span class="cl">Glass</span>
+    <button class="b" data-g=0>BK7</button><button class="b on" data-g=1>F2</button>
+    <button class="b" data-g=2>SF11</button><button class="b" data-g=3>SF66</button>
+    <span class="cl" style="margin-left:.3rem">Show</span>
+    <button class="b on" data-v="spectrum">Spectrum</button>
+    <button class="b" data-v="single">Single λ</button>
+    <button class="b" id="bR">Reset</button>
+  </div>
+  <div class="ctrls">
+    <div class="sg"><label>Incidence</label><input type=range id=sA min=38 max=66 step=.5 value=55><span class=v id=vA>55°</span></div>
+    <div class="sg"><label>Apex</label><input type=range id=sP min=40 max=70 step=.5 value=60><span class=v id=vP>60°</span></div>
+    <div class="sg"><label>Amplitude</label><input type=range id=sAmp min=2 max=14 step=.5 value=6><span class=v id=vAmp>6</span></div>
+  </div>
+  <div class="cw"><canvas id=cv></canvas></div>
+  <div class="nfo" id=nfo></div>
+  <p class="note"><strong>How it works:</strong> A source emits points at a fixed frequency. Each point is born with a sine value — sin(ω · t_birth) — that it keeps forever. It then moves through the scene at local speed: c in air, c/n in glass. When a point enters the glass, it slows down. The point behind it is still in air, still fast, closing the gap. By the time both are inside, they're closer together than they were in air — by exactly the factor 1/n. That's the wavelength contraction. It was not computed. It happened because the back point caught up to the front point. The direction change at each prism face is Snell's law applied to the velocity vector, once, at the moment of crossing. After that the point just keeps going straight at the new speed.</p>
+</div>
+<script>
+const GL=[
+  {name:'BK7',B:[1.03961212,0.231792344,1.01046945],C:[0.00600069867,0.0200179144,103.560653]},
+  {name:'F2',B:[1.34533359,0.209073176,0.937357162],C:[0.00997743871,0.0470450767,111.886764]},
+  {name:'SF11',B:[1.73759695,0.313747346,1.89878101],C:[0.01318870700,0.0623068142,155.236290]},
+  {name:'SF66',B:[2.02457674,0.470914816,1.43763551],C:[0.01471490850,0.0692534870,161.145480]},
+];
+function nSell(um,g){let l2=um*um,s=1;for(let i=0;i<3;i++)s+=g.B[i]*l2/(l2-g.C[i]);return Math.sqrt(s);}
+function wlRGB(wl){
+  let r=0,g=0,b=0;
+  if(wl>=380&&wl<440){r=-(wl-440)/60;b=1;}else if(wl<490){g=(wl-440)/50;b=1;}
+  else if(wl<510){g=1;b=-(wl-510)/20;}else if(wl<580){r=(wl-510)/70;g=1;}
+  else if(wl<645){r=1;g=-(wl-645)/65;}else if(wl<=730)r=1;
+  let f=1;if(wl<420)f=.3+.7*(wl-380)/40;else if(wl>700)f=.3+.7*(730-wl)/30;
+  return[r*f,g*f,b*f];
+}
+function cs(c,a){return`rgba(${c[0]*255|0},${c[1]*255|0},${c[2]*255|0},${a})`;}
+
+let thI=55,apexA=60,gIdx=1,amp=6,viewMode='spectrum';
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W,H;
+function sz(){const r=cv.parentElement.getBoundingClientRect();W=Math.round(r.width);H=Math.round(Math.min(560,r.width*.44));cv.width=W;cv.height=H;cv.style.height=H+'px';}
+
+// ── Prism geometry ──
+function prismTri(){
+  const A=apexA*Math.PI/180,cx=W*.35,cy=H*.28;
+  const sz=Math.min(W,H)*.24,hb=sz*Math.sin(A/2),ph=sz*Math.cos(A/2);
+  return{ax:cx,ay:cy-ph*.5,bx:cx-hb,by:cy+ph*.5,cx:cx+hb,cy:cy+ph*.5};
+}
+function inTri(x,y,t){
+  const d1=(x-t.bx)*(t.ay-t.by)-(t.ax-t.bx)*(y-t.by);
+  const d2=(x-t.cx)*(t.by-t.cy)-(t.bx-t.cx)*(y-t.cy);
+  const d3=(x-t.ax)*(t.cy-t.ay)-(t.cx-t.ax)*(y-t.ay);
+  return!((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0));
+}
+
+// ── Compute velocity vectors for each region ──
+function computeVelocities(nm){
+  const glass=GL[gIdx];
+  const n=nSell(nm/1000,glass);
+  const A_rad=apexA*Math.PI/180;
+  const ti_rad=thI*Math.PI/180;
+  // Snell at entry
+  const sinR1=Math.sin(ti_rad)/n;if(Math.abs(sinR1)>1)return null;
+  const r1=Math.asin(sinR1),r2=A_rad-r1;if(r2<0)return null;
+  const sinOut=n*Math.sin(r2);if(Math.abs(sinOut)>1)return null;
+  const thetaOut=Math.asin(sinOut);
+
+  // Prism face directions
+  const tri=prismTri();
+  const eFx=tri.bx-tri.ax,eFy=tri.by-tri.ay,eL=Math.hypot(eFx,eFy);
+  const eTx=eFx/eL,eTy=eFy/eL;
+  let eNx=-eTy,eNy=eTx;if(eNx>0){eNx=-eNx;eNy=-eNy;}
+  const xFx=tri.cx-tri.ax,xFy=tri.cy-tri.ay,xL=Math.hypot(xFx,xFy);
+  const xTx=xFx/xL,xTy=xFy/xL;
+  let xNx=xTy,xNy=-xTx;if(xNx<0){xNx=-xNx;xNy=-xNy;}
+
+  // Beam direction (incidence angle relative to entry face normal)
+  const enAng=Math.atan2(eNy,eNx),inAng=enAng+Math.PI;
+  const beamAng=inAng-ti_rad;
+  const bDx=Math.cos(beamAng),bDy=Math.sin(beamAng);
+  const airSpeed=1.5; // pixels per step
+
+  // Refracted direction inside glass
+  const iNx=-eNx,iNy=-eNy;
+  const ts=(bDx*eTx+bDy*eTy)>0?1:-1;
+  const gDx=Math.cos(r1)*iNx+Math.sin(r1)*eTx*ts;
+  const gDy=Math.cos(r1)*iNy+Math.sin(r1)*eTy*ts;
+  const glassSpeed=airSpeed/n;
+
+  // Exit direction
+  const xts=(gDx*xTx+gDy*xTy)>0?1:-1;
+  const eDx=Math.cos(thetaOut)*xNx+Math.sin(thetaOut)*xTx*xts;
+  const eDy=Math.cos(thetaOut)*xNy+Math.sin(thetaOut)*xTy*xts;
+
+  // Entry point (for source positioning)
+  const entryX=tri.ax+eFx*.5, entryY=tri.ay+eFy*.5;
+  // Source: extend beam backward
+  const srcX=entryX-bDx*W*.34, srcY=entryY-bDy*W*.34;
+
+  return{
+    beam:{dx:bDx,dy:bDy,speed:airSpeed},
+    glass:{dx:gDx,dy:gDy,speed:glassSpeed},
+    exit:{dx:eDx,dy:eDy,speed:airSpeed},
+    src:{x:srcX,y:srcY},
+    n, tri,
+    // Perpendiculars for drawing
+    beamPerp:{x:-bDy,y:bDx},
+    glassPerp:{x:-gDy,y:gDx},
+    exitPerp:{x:-eDy,y:eDx},
+  };
+}
+
+// ── Particle channel (one wavelength) ──
+class Channel{
+  constructor(nm,rgb){
+    this.nm=nm;
+    this.rgb=rgb;
+    this.particles=[]; // {x, y, val, state: 0=air_in, 1=glass, 2=air_out}
+    this.emitAcc=0;
+    this.vel=null;
+  }
+  init(){
+    this.vel=computeVelocities(this.nm);
+    this.particles=[];
+    this.emitAcc=0;
+  }
+  emit(dt,wlPx){
+    if(!this.vel)return;
+    this.emitAcc+=dt;
+    const period=wlPx/this.vel.beam.speed; // time for one wavelength to pass
+    const emitInterval=period/20; // ~20 particles per wavelength
+    while(this.emitAcc>=emitInterval){
+      this.emitAcc-=emitInterval;
+      const phase=2*Math.PI*(this.particles.length%20)/20;
+      this.particles.push({
+        x:this.vel.src.x,
+        y:this.vel.src.y,
+        val:Math.sin(phase),
+        state:0
+      });
+    }
+  }
+  step(dt){
+    if(!this.vel)return;
+    const {beam,glass,exit,tri}=this.vel;
+    for(const p of this.particles){
+      let dx,dy,spd;
+      if(p.state===0){
+        dx=beam.dx;dy=beam.dy;spd=beam.speed;
+      }else if(p.state===1){
+        dx=glass.dx;dy=glass.dy;spd=glass.speed;
+      }else{
+        dx=exit.dx;dy=exit.dy;spd=exit.speed;
+      }
+      p.x+=dx*spd*dt;
+      p.y+=dy*spd*dt;
+      // Check state transitions
+      const inside=inTri(p.x,p.y,tri);
+      if(p.state===0&&inside) p.state=1;
+      else if(p.state===1&&!inside) p.state=2;
+    }
+    // Remove off-screen
+    this.particles=this.particles.filter(p=>
+      p.x>-80&&p.x<W+80&&p.y>-80&&p.y<H+80);
+  }
+  draw(ctx,amplitude){
+    if(!this.vel||this.particles.length<2)return;
+    const {beamPerp,glassPerp,exitPerp}=this.vel;
+    // Glow pass
+    ctx.strokeStyle=cs(this.rgb,0.12);
+    ctx.lineWidth=5;
+    ctx.beginPath();
+    for(let i=0;i<this.particles.length;i++){
+      const p=this.particles[i];
+      const perp=p.state===0?beamPerp:p.state===1?glassPerp:exitPerp;
+      const dx=p.x+perp.x*p.val*amplitude;
+      const dy=p.y+perp.y*p.val*amplitude;
+      i?ctx.lineTo(dx,dy):ctx.moveTo(dx,dy);
+    }
+    ctx.stroke();
+    // Core pass
+    ctx.strokeStyle=cs(this.rgb,0.65);
+    ctx.lineWidth=1.6;
+    ctx.beginPath();
+    for(let i=0;i<this.particles.length;i++){
+      const p=this.particles[i];
+      const perp=p.state===0?beamPerp:p.state===1?glassPerp:exitPerp;
+      const dx=p.x+perp.x*p.val*amplitude;
+      const dy=p.y+perp.y*p.val*amplitude;
+      i?ctx.lineTo(dx,dy):ctx.moveTo(dx,dy);
+    }
+    ctx.stroke();
+  }
+}
+
+// ── Channels ──
+const specChans=[];
+for(let i=0;i<14;i++){
+  const nm=410+i*(680-410)/13;
+  specChans.push(new Channel(nm,wlRGB(nm)));
+}
+const singleChan=[new Channel(550,[0.7,0.75,0.85])];
+let channels=specChans;
+
+function initAll(){
+  specChans.forEach(c=>c.init());
+  singleChan.forEach(c=>c.init());
+}
+initAll();
+
+const airWL=38; // visual wavelength in pixels (air)
+const dt=1;
+
+function reset(){initAll();}
+
+function render(){
+  sz();
+  ctx.fillStyle='#0c0d12';ctx.fillRect(0,0,W,H);
+
+  channels=viewMode==='spectrum'?specChans:singleChan;
+
+  // Step
+  for(const ch of channels){
+    if(!ch.vel)continue;
+    ch.emit(dt,airWL);
+    ch.step(dt);
+  }
+
+  // Draw prism
+  const tri=prismTri();
+  ctx.fillStyle='rgba(180,200,240,0.05)';
+  ctx.strokeStyle='rgba(140,160,200,0.2)';
+  ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(tri.ax,tri.ay);ctx.lineTo(tri.bx,tri.by);ctx.lineTo(tri.cx,tri.cy);ctx.closePath();
+  ctx.fill();ctx.stroke();
+
+  // Draw channels
+  for(const ch of channels) ch.draw(ctx,amp);
+
+  // Info
+  const g=GL[gIdx];
+  const nB=nSell(.43,g).toFixed(4),nR=nSell(.65,g).toFixed(4);
+  const totalP=channels.reduce((s,c)=>s+c.particles.length,0);
+  document.getElementById('nfo').textContent=
+    `${g.name}  n(430)=${nB}  n(650)=${nR}  Δn=${(nB-nR).toFixed(4)}  particles=${totalP}`;
+
+  requestAnimationFrame(render);
+}
+
+// ── UI ──
+document.querySelectorAll('[data-g]').forEach(b=>{b.onclick=()=>{
+  gIdx=+b.dataset.g;document.querySelectorAll('[data-g]').forEach(x=>x.classList.toggle('on',x.dataset.g==gIdx));
+  initAll();};});
+document.querySelectorAll('[data-v]').forEach(b=>{b.onclick=()=>{
+  viewMode=b.dataset.v;document.querySelectorAll('[data-v]').forEach(x=>x.classList.toggle('on',x.dataset.v===viewMode));
+  reset();};});
+document.getElementById('bR').onclick=reset;
+document.getElementById('sA').oninput=e=>{thI=+e.target.value;document.getElementById('vA').textContent=thI+'°';initAll();};
+document.getElementById('sP').oninput=e=>{apexA=+e.target.value;document.getElementById('vP').textContent=apexA+'°';initAll();};
+document.getElementById('sAmp').oninput=e=>{amp=+e.target.value;document.getElementById('vAmp').textContent=amp;};
+
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

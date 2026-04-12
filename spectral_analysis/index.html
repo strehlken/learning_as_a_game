@@ -406,7 +406,7 @@ const WL_MAX = 730;
 const TELLURIC = [628.0, 687.0, 719.0];
 const QUICK_GASES = ['H', 'He', 'Na', 'Ne', 'Ca', 'Hg'];
 
-let selectedSymbol = 'H';
+let selectedSymbols = new Set(['H']);
 let labMode = 'emission';
 let showEarth = false;
 let currentStar = 'Sun';
@@ -483,6 +483,24 @@ function normalizeLines(lines) {
   if (!lines.length) return [];
   const max = Math.max(...lines.map(l => l.intensity || 1));
   return lines.map(l => ({ ...l, weight: (l.intensity || 1) / max }));
+}
+
+function getSelectedLines() {
+  const allLines = [];
+  selectedSymbols.forEach(sym => {
+    const meta = ELEMENTS[sym];
+    if (meta && meta.lines) {
+      meta.lines.forEach(l => allLines.push(l));
+    }
+  });
+  return allLines;
+}
+
+function getSelectedLabel() {
+  const syms = Array.from(selectedSymbols);
+  if (syms.length === 0) return 'none';
+  if (syms.length <= 3) return syms.map(s => ELEMENTS[s].name).join(' + ');
+  return syms.slice(0, 3).map(s => ELEMENTS[s].symbol).join('+') + ' +' + (syms.length - 3) + ' more';
 }
 
 function drawContinuousSpectrum(ctx, width, height, peakNm, absorptions = []) {
@@ -750,14 +768,15 @@ function renderExperimentFrame(timeMs) {
   const detectorTop = height * 0.14;
   const detectorH = height * 0.72;
   const detectorStripW = 20 * S;
-  const normalizedLines = normalizeLines(ELEMENTS[selectedSymbol].lines || []);
+  const normalizedLines = normalizeLines(getSelectedLines());
 
   ctx.fillStyle = '#e8ecf2';
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = '#232324';
   ctx.font = `bold ${15 * S}px ${font}`;
-  ctx.fillText(labMode === 'emission' ? `${ELEMENTS[selectedSymbol].symbol} excited in flame` : `White light through cool ${ELEMENTS[selectedSymbol].symbol} gas`, 16 * S, 26 * S);
+  const selLabel = getSelectedLabel();
+  ctx.fillText(labMode === 'emission' ? `${selLabel} excited in flame` : `White light through cool ${selLabel} gas`, 16 * S, 26 * S);
 
   ctx.fillStyle = '#f0f2f6';
   ctx.strokeStyle = '#d0d3da';
@@ -1160,13 +1179,13 @@ function starAbsorptions(key, includeEarth = false) {
 }
 
 function renderLab() {
-  const meta = ELEMENTS[selectedSymbol];
+  const selLabel = getSelectedLabel();
   prismStatus.textContent = labMode === 'emission'
-    ? `${meta.symbol} emission`
-    : `${meta.symbol} absorption`;
+    ? `${selLabel} emission`
+    : `${selLabel} absorption`;
   prismInstruction.textContent = labMode === 'emission'
-    ? `${meta.name} emits only specific wavelengths. The prism spreads them into bright lines on the detector.`
-    : `White light loses ${meta.name.toLowerCase()}'s wavelengths in the cool gas. Those positions go dark on the detector.`;
+    ? `${selLabel} emits only specific wavelengths. The prism spreads them into bright lines on the detector.`
+    : `White light loses wavelengths from ${selLabel.toLowerCase()} in the cool gas. Those positions go dark on the detector.`;
   dispersionValue.textContent = `${dispersionStrength.toFixed(2)}x`;
 
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
@@ -1182,11 +1201,12 @@ function renderExperimentGasRack() {
     const meta = ELEMENTS[sym];
     if (!meta) return;
     const chip = document.createElement('button');
-    chip.className = 'overlay-chip' + (selectedSymbol === sym ? ' active' : '');
+    chip.className = 'overlay-chip' + (selectedSymbols.has(sym) ? ' active' : '');
     chip.textContent = `${sym}`;
     chip.title = meta.name;
     chip.addEventListener('click', () => {
-      selectedSymbol = sym;
+      if (selectedSymbols.has(sym)) selectedSymbols.delete(sym);
+      else selectedSymbols.add(sym);
       explored.add(sym);
       renderPeriodicTable();
       renderLab();
@@ -1309,11 +1329,12 @@ function renderPeriodicTable() {
       }
       const meta = ELEMENTS[item.symbol];
       const el = document.createElement('button');
-      el.className = 'element-cell' + (meta.symbol === selectedSymbol ? ' selected' : '');
+      el.className = 'element-cell' + (selectedSymbols.has(meta.symbol) ? ' selected' : '');
       el.title = `${meta.name} (${meta.symbol})`;
       el.innerHTML = `<div class="element-num">${meta.atomicNumber}</div><div class="element-symbol">${meta.symbol}</div><div class="element-lines">${meta.lineCount ? meta.lineCount + ' lines' : 'no visible data'}</div>`;
       el.addEventListener('click', () => {
-        selectedSymbol = meta.symbol;
+        if (selectedSymbols.has(meta.symbol)) selectedSymbols.delete(meta.symbol);
+        else selectedSymbols.add(meta.symbol);
         explored.add(meta.symbol);
         renderPeriodicTable();
         renderLab();

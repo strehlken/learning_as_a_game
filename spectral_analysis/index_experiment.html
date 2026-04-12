@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prism Experiment — Exact Physics</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x2B50;</text></svg>">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Brandon Grotesque',system-ui,sans-serif;font-size:16px;line-height:1.6;background:#f7f8fa;color:#232324;padding:1.5rem 1.2rem 2.5rem;}
+.pg{max-width:1280px;margin:0 auto;}
+header{margin-bottom:1rem;}
+header h1{font-size:2rem;margin-bottom:.3rem;}
+header p{font-size:1rem;color:#6e7178;max-width:800px;}
+.ctrls{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;}
+.cr{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+.cl{font-size:.88rem;font-weight:600;color:#6e7178;margin-right:.1rem;}
+button.b{font-family:inherit;font-size:.93rem;font-weight:600;border:2px solid #d2d5db;border-radius:10px;background:#fff;color:#232324;padding:.45rem .75rem;cursor:pointer;transition:all .15s;}
+button.b:hover{border-color:#a0a6b2;}
+button.b.on{border-color:#2f5aaa;background:#dce7fc;}
+.cw{background:#fff;border:1px solid #d2d5db;border-radius:18px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.06);}
+canvas{display:block;width:100%;}
+.note{margin-top:.5rem;font-size:.9rem;color:#6e7178;}
+footer{margin-top:1.2rem;text-align:center;}
+footer a{color:#6e7178;text-decoration:none;font-size:.9rem;}
+footer a:hover{color:#232324;}
+</style>
+</head>
+<body>
+<div class="pg">
+  <header>
+    <h1>Prism Spectroscopy</h1>
+    <p>Physically exact: Sellmeier dispersion for SF11 glass, Snell's law at both faces, correct wavelength contraction and phase velocity inside the medium.</p>
+  </header>
+  <div class="ctrls">
+    <div class="cr"><span class="cl">Mode</span><button class="b on" id="bAbs">Absorption</button><button class="b" id="bEm">Emission</button></div>
+    <div class="cr"><span class="cl">Element</span><span id="elB"></span></div>
+  </div>
+  <div class="cw"><canvas id="cv"></canvas></div>
+  <div class="note" id="note"></div>
+  <footer><a href="index.html">&larr; back to main</a></footer>
+</div>
+<script>
+// ── Element data ──
+const EL={
+  H:{name:'Hydrogen',lines:[{nm:383.54,I:5},{nm:388.90,I:6},{nm:397.01,I:8},{nm:410.17,I:15},{nm:434.05,I:30},{nm:486.14,I:60},{nm:656.29,I:180}]},
+  He:{name:'Helium',lines:[{nm:388.86,I:300},{nm:402.62,I:50},{nm:447.15,I:200},{nm:501.57,I:100},{nm:587.56,I:500},{nm:667.82,I:200}]},
+  Na:{name:'Sodium',lines:[{nm:439.28,I:600},{nm:568.82,I:7},{nm:589.00,I:1000},{nm:589.59,I:500}]},
+  Ne:{name:'Neon',lines:[{nm:540.06,I:200},{nm:585.25,I:200},{nm:640.22,I:200},{nm:692.95,I:1000},{nm:703.24,I:800}]},
+  Ca:{name:'Calcium',lines:[{nm:393.37,I:1000},{nm:396.85,I:1000},{nm:422.67,I:1000},{nm:445.48,I:600},{nm:585.75,I:600},{nm:612.22,I:600},{nm:643.91,I:700}]},
+  Hg:{name:'Mercury',lines:[{nm:398.39,I:1000},{nm:404.66,I:400},{nm:435.83,I:1000},{nm:546.07,I:500},{nm:576.96,I:50},{nm:579.07,I:60}]},
+  Fe:{name:'Iron',lines:[{nm:382.04,I:500},{nm:385.99,I:500},{nm:388.63,I:300},{nm:404.58,I:300},{nm:406.36,I:150},{nm:432.58,I:150}]},
+  Li:{name:'Lithium',lines:[{nm:460.28,I:15},{nm:467.81,I:80},{nm:548.45,I:500},{nm:610.35,I:300},{nm:670.79,I:1000}]},
+};
+
+// ── Sellmeier glass data ──
+// SF11: high dispersion flint glass
+const GLASS = {name:'SF11',B:[1.73759695,0.313747346,1.89878101],C:[0.01318870700,0.0623068142,155.236290]};
+
+function nSellmeier(lambdaMicrons) {
+  const l2 = lambdaMicrons * lambdaMicrons;
+  let s = 1;
+  for (let i = 0; i < 3; i++) s += GLASS.B[i] * l2 / (l2 - GLASS.C[i]);
+  return Math.sqrt(s);
+}
+
+function wlRGB(wl) {
+  let r=0,g=0,b=0;
+  if(wl>=380&&wl<440){r=-(wl-440)/60;b=1;}else if(wl<490){g=(wl-440)/50;b=1;}
+  else if(wl<510){g=1;b=-(wl-510)/20;}else if(wl<580){r=(wl-510)/70;g=1;}
+  else if(wl<645){r=1;g=-(wl-645)/65;}else if(wl<=730)r=1;
+  let f=1;if(wl<420)f=.3+.7*(wl-380)/40;else if(wl>700)f=.3+.7*(730-wl)/30;
+  return [r*f,g*f,b*f];
+}
+
+function rgba(rgb, a) {
+  return `rgba(${rgb[0]*255|0},${rgb[1]*255|0},${rgb[2]*255|0},${a==null?1:a})`;
+}
+
+// ── Snell's law ray tracing through prism ──
+// Prism defined by apex angle A, oriented with apex up.
+// We rotate the whole prism by `rotation` radians so the beam can enter horizontally.
+// Entry face: left side. Exit face: right side.
+
+const APEX_DEG = 55;
+const INCIDENCE_DEG = 48;
+const PRISM_ROTATION = -0.62; // rotate CCW more to bring output up
+
+function traceRay(nm) {
+  const n = nSellmeier(nm / 1000);
+  const A = APEX_DEG * Math.PI / 180;
+  const thetaI = INCIDENCE_DEG * Math.PI / 180;
+
+  // Snell at entry face
+  const sinR1 = Math.sin(thetaI) / n;
+  if (Math.abs(sinR1) > 1) return null;
+  const r1 = Math.asin(sinR1);
+
+  // Angle at exit face
+  const r2 = A - r1;
+  if (r2 < 0) return null;
+
+  // Snell at exit face
+  const sinOut = n * Math.sin(r2);
+  if (Math.abs(sinOut) > 1) return null;
+  const thetaOut = Math.asin(sinOut);
+
+  // Total deviation
+  const deviation = thetaI + thetaOut - A;
+
+  return { n, r1, r2, thetaOut, deviation, insideNm: nm / n };
+}
+
+// ── State ──
+let mode = 'absorption', selEl = 'H', animTime = 0;
+const cv = document.getElementById('cv'), cx = cv.getContext('2d');
+let W, H, D;
+
+function resize() {
+  const r = cv.parentElement.getBoundingClientRect();
+  D = devicePixelRatio || 1;
+  W = r.width * D;
+  H = Math.round(Math.min(560, r.width * 0.42) * D);
+  cv.width = W; cv.height = H;
+  cv.style.height = (H / D) + 'px';
+}
+
+// ── Wave drawing with smooth curves ──
+function drawWave(x0, y0, x1, y1, wavePx, phase, rgb, alpha, lineW) {
+  const dx = x1 - x0, dy = y1 - y0, len = Math.hypot(dx, dy);
+  if (len < 2) return;
+  const nx = -dy / len, ny = dx / len;
+  const amp = 14 * D; // large amplitude
+  const steps = Math.max(80, (len / (1.0 * D)) | 0);
+
+  cx.save();
+  cx.strokeStyle = rgba(rgb, alpha);
+  cx.lineWidth = lineW;
+  cx.beginPath();
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const x = x0 + dx * t, y = y0 + dy * t;
+    const s = Math.sin(phase + (t * len / wavePx) * Math.PI * 2) * amp;
+    const px = x + nx * s, py = y + ny * s;
+    i ? cx.lineTo(px, py) : cx.moveTo(px, py);
+  }
+  cx.stroke();
+  cx.restore();
+}
+
+function render(ts) {
+  animTime = ts * 0.001;
+  resize();
+  cx.clearRect(0, 0, W, H);
+  cx.fillStyle = '#e8ecf2';
+  cx.fillRect(0, 0, W, H);
+
+  const el = EL[selEl];
+  const maxI = Math.max(...el.lines.map(l => l.I));
+  const font = "'Brandon Grotesque', system-ui, sans-serif";
+
+  // ── Prism geometry ──
+  // Prism sits at about 28% from left, centered vertically
+  const A_rad = APEX_DEG * Math.PI / 180;
+  const prismSize = Math.min(W, H) * 0.22;
+  const pCX = W * 0.26, pCY = H * 0.45;
+
+  const halfBase = prismSize * Math.sin(A_rad / 2);
+  const prismHeight = prismSize * Math.cos(A_rad / 2);
+
+  // Prism vertices before rotation (apex up)
+  const rot = PRISM_ROTATION;
+  function rotPt(x, y) {
+    const rx = x * Math.cos(rot) - y * Math.sin(rot);
+    const ry = x * Math.sin(rot) + y * Math.cos(rot);
+    return { x: pCX + rx, y: pCY + ry };
+  }
+  const pApex = rotPt(0, -prismHeight * 0.5);
+  const pBL = rotPt(-halfBase, prismHeight * 0.5);
+  const pBR = rotPt(halfBase, prismHeight * 0.5);
+
+  // Entry face: apex → bottom-left
+  const eFx = pBL.x - pApex.x, eFy = pBL.y - pApex.y, eLen = Math.hypot(eFx, eFy);
+  const eTx = eFx / eLen, eTy = eFy / eLen;
+  let eNx = -eTy, eNy = eTx;
+  if (eNx > 0) { eNx = -eNx; eNy = -eNy; } // outward left
+
+  // Exit face: apex → bottom-right
+  const xFx = pBR.x - pApex.x, xFy = pBR.y - pApex.y, xLen = Math.hypot(xFx, xFy);
+  const xTx = xFx / xLen, xTy = xFy / xLen;
+  let xNx = xTy, xNy = -xTx;
+  if (xNx < 0) { xNx = -xNx; xNy = -xNy; } // outward right
+
+  // Beam direction: inward along entry normal, rotated by incidence angle
+  const inNx = -eNx, inNy = -eNy; // inward normal
+  const enAng = Math.atan2(eNy, eNx);
+  const beamAng = enAng + Math.PI - INCIDENCE_DEG * Math.PI / 180;
+  const bDx = Math.cos(beamAng), bDy = Math.sin(beamAng);
+
+  // Entry point: midpoint of entry face
+  const entryPt = { x: pApex.x + eFx * 0.48, y: pApex.y + eFy * 0.48 };
+
+  // ── Full ray path for a given wavelength ──
+  function fullRay(nm) {
+    const r = traceRay(nm);
+    if (!r) return null;
+
+    // Inside direction after refraction at entry face
+    const ts = (bDx * eTx + bDy * eTy) > 0 ? 1 : -1;
+    const drx = Math.cos(r.r1) * inNx + Math.sin(r.r1) * eTx * ts;
+    const dry = Math.cos(r.r1) * inNy + Math.sin(r.r1) * eTy * ts;
+
+    // Intersect with exit face (apex → bottom-right)
+    const evx = pBR.x - pApex.x, evy = pBR.y - pApex.y;
+    const den = drx * evy - dry * evx;
+    if (Math.abs(den) < 1e-10) return null;
+    const tV = ((pApex.x - entryPt.x) * evy - (pApex.y - entryPt.y) * evx) / den;
+    const sV = ((pApex.x - entryPt.x) * dry - (pApex.y - entryPt.y) * drx) / den;
+    if (tV < 0 || sV < 0 || sV > 1) return null;
+    const exitPt = { x: entryPt.x + drx * tV, y: entryPt.y + dry * tV };
+
+    // Outgoing direction after exit face
+    const xts = (drx * xTx + dry * xTy) > 0 ? 1 : -1;
+    const dox = Math.cos(r.thetaOut) * xNx + Math.sin(r.thetaOut) * xTx * xts;
+    const doy = Math.cos(r.thetaOut) * xNy + Math.sin(r.thetaOut) * xTy * xts;
+
+    // Source point (compressed, close to prism)
+    const srcD = W * 0.16;
+    const srcPt = { x: entryPt.x - bDx * srcD, y: entryPt.y - bDy * srcD };
+
+    // Detector point (far right)
+    // Project onto x = screenX (right edge detector)
+    const screenX = W - 80 * D;
+    const tDet = (screenX - exitPt.x) / dox;
+    if (tDet < 0) return null;
+    const detPt = { x: screenX, y: exitPt.y + doy * tDet };
+
+    const insLen = Math.hypot(exitPt.x - entryPt.x, exitPt.y - entryPt.y);
+    return { srcPt, entryPt: { x: entryPt.x, y: entryPt.y }, exitPt, detPt, n: r.n, insideNm: r.insideNm, insLen };
+  }
+
+  // ── Compute all rays ──
+  const WL0 = 380, WL1 = 730;
+  const dense = [];
+  for (let i = 0; i < 300; i++) {
+    const wl = WL0 + (i / 299) * (WL1 - WL0);
+    const fp = fullRay(wl);
+    if (fp) dense.push({ wl, fp, blocked: el.lines.some(l => Math.abs(l.nm - wl) < 4) });
+  }
+
+  let animRays = [];
+  if (mode === 'emission') {
+    el.lines.filter(l => l.nm >= WL0 && l.nm <= WL1).forEach(l => {
+      const fp = fullRay(l.nm);
+      if (fp) animRays.push({ wl: l.nm, fp, w: l.I / maxI, blocked: false });
+    });
+  } else {
+    for (let i = 0; i < 50; i++) {
+      const wl = WL0 + (i / 49) * (WL1 - WL0);
+      const fp = fullRay(wl);
+      if (fp) animRays.push({ wl, fp, w: 1, blocked: el.lines.some(l => Math.abs(l.nm - wl) < 8) });
+    }
+  }
+
+  if (!dense.length) {
+    cx.fillStyle = '#6e7178'; cx.font = `600 ${16*D}px ${font}`; cx.textAlign = 'center';
+    cx.fillText('Total internal reflection at these settings', W/2, H/2);
+    requestAnimationFrame(render); return;
+  }
+
+  // ═══ DRAW ═══
+
+  // Source box
+  const srcPt0 = dense[Math.floor(dense.length/2)].fp.srcPt;
+  const sBW = 50 * D, sBH = 56 * D;
+  cx.fillStyle = '#edf0f5'; cx.strokeStyle = '#b8bcc6'; cx.lineWidth = 1.5 * D;
+  cx.fillRect(srcPt0.x - 6*D, srcPt0.y - sBH/2, sBW, sBH);
+  cx.strokeRect(srcPt0.x - 6*D, srcPt0.y - sBH/2, sBW, sBH);
+
+  if (mode === 'emission') {
+    const gw = cx.createRadialGradient(srcPt0.x + sBW/2 - 6*D, srcPt0.y, 3*D, srcPt0.x + sBW/2 - 6*D, srcPt0.y, 22*D);
+    gw.addColorStop(0, 'rgba(255,245,220,.85)'); gw.addColorStop(1, 'rgba(255,120,50,0)');
+    cx.fillStyle = gw; cx.beginPath(); cx.arc(srcPt0.x + sBW/2 - 6*D, srcPt0.y, 22*D, 0, Math.PI*2); cx.fill();
+  }
+
+  // Gas cell (absorption only)
+  if (mode === 'absorption') {
+    const gcx = srcPt0.x + sBW, gcw = 14*D, gch = 28*D;
+    cx.strokeStyle = '#9a6b2f'; cx.lineWidth = 1.5*D; cx.strokeRect(gcx, srcPt0.y - gch/2, gcw, gch);
+    cx.fillStyle = 'rgba(154,107,47,.07)'; cx.fillRect(gcx, srcPt0.y - gch/2, gcw, gch);
+  }
+
+  // Slit
+  const slOff = mode === 'absorption' ? 18 : 4;
+  const slX = srcPt0.x + sBW + slOff * D;
+  cx.fillStyle = '#232324'; cx.fillRect(slX - 2.5*D, srcPt0.y - 32*D, 5*D, 64*D);
+  cx.fillStyle = '#e8ecf2'; cx.fillRect(slX - 1.5*D, srcPt0.y - 11*D, 3*D, 22*D);
+
+  // Prism
+  cx.fillStyle = 'rgba(210,222,245,0.45)'; cx.strokeStyle = '#8a9cc0'; cx.lineWidth = 2*D;
+  cx.beginPath(); cx.moveTo(pApex.x, pApex.y); cx.lineTo(pBL.x, pBL.y); cx.lineTo(pBR.x, pBR.y); cx.closePath();
+  cx.fill(); cx.stroke();
+
+  // Detector strip
+  let dyMin = Infinity, dyMax = -Infinity;
+  dense.forEach(d => { if (d.fp.detPt.y < dyMin) dyMin = d.fp.detPt.y; if (d.fp.detPt.y > dyMax) dyMax = d.fp.detPt.y; });
+  const detMargin = 18 * D;
+  const detTop = Math.max(4*D, dyMin - detMargin);
+  const detBot = Math.min(H - 4*D, dyMax + detMargin);
+  const detX = dense[0].fp.detPt.x;
+  const detW = 18 * D;
+
+  cx.fillStyle = mode === 'emission' ? '#2a2e3a' : '#e6eaf0';
+  cx.fillRect(detX - detW/2, detTop, detW, detBot - detTop);
+
+  // Draw detector spectrum
+  for (const d of dense) {
+    const rgb = wlRGB(d.wl), y = d.fp.detPt.y;
+    if (mode === 'emission') {
+      const hit = el.lines.find(l => Math.abs(l.nm - d.wl) < 3);
+      if (hit) {
+        cx.fillStyle = rgba(rgb, .3 + (hit.I/maxI) * .6);
+        cx.fillRect(detX - detW/2, y - 1.5*D, detW, 3*D);
+        cx.fillStyle = rgba(rgb, .12);
+        cx.fillRect(detX - detW/2, y - 4*D, detW, 8*D);
+      }
+    } else {
+      cx.fillStyle = rgba(rgb, d.blocked ? .04 : .55);
+      cx.fillRect(detX - detW/2, y - .8, detW, 1.8);
+      if (d.blocked) {
+        cx.fillStyle = 'rgba(8,10,18,.5)';
+        cx.fillRect(detX - detW/2, y - .8, detW, 1.8);
+      }
+    }
+  }
+  cx.strokeStyle = '#a0a6b2'; cx.lineWidth = 1*D;
+  cx.strokeRect(detX - detW/2, detTop, detW, detBot - detTop);
+
+  // ── Draw traveling waves ──
+  const wScale = 0.05 * D; // wavelength → pixel scale
+  const speedBase = 300 * D;
+
+  for (const r of animRays) {
+    const rgb = wlRGB(r.wl);
+    const airWavePx = r.wl * wScale;
+    const insideWavePx = r.fp.insideNm * wScale;
+    const speed = speedBase / airWavePx; // same visual speed for all wavelengths
+    const phase = -animTime * speed;
+
+    let al = mode === 'emission' ? (.3 + r.w * .6) : (r.blocked ? .08 : .5);
+    const lw = (mode === 'emission' ? (1.8 + r.w * 1.8) : 2.2) * D;
+
+    // Source to entry
+    drawWave(r.fp.srcPt.x, r.fp.srcPt.y, r.fp.entryPt.x, r.fp.entryPt.y, airWavePx, phase, rgb, al, lw);
+
+    // Phase continuity: accumulate phase through entry segment
+    const entryLen = Math.hypot(r.fp.entryPt.x - r.fp.srcPt.x, r.fp.entryPt.y - r.fp.srcPt.y);
+    const phase1 = (entryLen / airWavePx) * Math.PI * 2;
+
+    // Inside prism
+    drawWave(r.fp.entryPt.x, r.fp.entryPt.y, r.fp.exitPt.x, r.fp.exitPt.y, insideWavePx, phase + phase1, rgb, al * .65, lw);
+
+    // Phase continuity through prism
+    const phase2 = phase1 + (r.fp.insLen / insideWavePx) * Math.PI * 2;
+
+    // Exit to detector
+    drawWave(r.fp.exitPt.x, r.fp.exitPt.y, r.fp.detPt.x, r.fp.detPt.y, airWavePx, phase + phase2, rgb, al, lw);
+  }
+
+  // ── Labels ──
+  cx.textAlign = 'center'; cx.fillStyle = '#505560'; cx.font = `600 ${13*D}px ${font}`;
+  cx.fillText(mode === 'emission' ? `hot ${selEl} gas` : 'white lamp', srcPt0.x + sBW/2 - 6*D, srcPt0.y - sBH/2 - 8*D);
+  cx.font = `500 ${12*D}px ${font}`;
+  cx.fillText('slit', slX, srcPt0.y - 38*D);
+  if (mode === 'absorption') {
+    cx.fillStyle = '#9a6b2f'; cx.font = `500 ${11*D}px ${font}`;
+    cx.fillText(`cool ${selEl}`, srcPt0.x + sBW + (slOff/2)*D, srcPt0.y - 18*D);
+  }
+  cx.fillStyle = '#505560'; cx.font = `600 ${13*D}px ${font}`;
+  cx.fillText(GLASS.name, pApex.x, pApex.y - 10*D);
+  cx.font = `400 ${11*D}px ${font}`;
+  cx.fillText('detector', detX, detTop - 8*D);
+
+  // Annotation at prism
+  cx.fillStyle = 'rgba(80,85,96,.5)'; cx.font = `italic ${11*D}px ${font}`;
+  cx.fillText('shorter wavelengths bend more', (pBL.x + pBR.x)/2, Math.max(pBL.y, pBR.y) + 16*D);
+
+  // Wavelength labels at detector
+  cx.textAlign = 'left'; cx.font = `500 ${11*D}px ${font}`;
+  const labels = [];
+  if (mode === 'emission') {
+    animRays.forEach(r => labels.push({ y: r.fp.detPt.y, wl: r.wl, rgb: wlRGB(r.wl) }));
+  } else {
+    dense.filter(d => d.blocked).forEach(d => labels.push({ y: d.fp.detPt.y, wl: d.wl, rgb: wlRGB(d.wl) }));
+  }
+  // Add range endpoints
+  if (dense.length > 1) {
+    labels.push({ y: dense[0].fp.detPt.y, wl: dense[0].wl, rgb: [.3,.2,.5] });
+    labels.push({ y: dense[dense.length-1].fp.detPt.y, wl: dense[dense.length-1].wl, rgb: [.5,.1,.08] });
+  }
+  labels.sort((a, b) => a.y - b.y);
+  // Collision avoidance — bidirectional
+  const labelYs = labels.map(l => l.y);
+  const minGap = 14 * D;
+  for (let iter = 0; iter < 10; iter++) {
+    for (let i = 1; i < labelYs.length; i++) {
+      const gap = labelYs[i] - labelYs[i-1];
+      if (gap < minGap) {
+        const push = (minGap - gap) / 2;
+        labelYs[i-1] -= push;
+        labelYs[i] += push;
+      }
+    }
+  }
+  labels.forEach((l, i) => {
+    // Connector line
+    cx.strokeStyle = rgba(l.rgb, .3); cx.lineWidth = 1*D;
+    cx.beginPath(); cx.moveTo(detX + detW/2 + 3*D, l.y); cx.lineTo(detX + detW/2 + 16*D, labelYs[i]); cx.stroke();
+    cx.fillStyle = rgba(l.rgb, .85);
+    cx.fillText(`${l.wl.toFixed(1)}`, detX + detW/2 + 18*D, labelYs[i] + 4*D);
+  });
+
+  // Title
+  cx.textAlign = 'left'; cx.fillStyle = '#232324'; cx.font = `bold ${14*D}px ${font}`;
+  cx.fillText(mode === 'emission' ? `${el.name} emission` : `White light through cool ${el.name}`, 10*D, 20*D);
+
+  // Info line
+  const nB = nSellmeier(dense[0].wl/1000).toFixed(4);
+  const nR = nSellmeier(dense[dense.length-1].wl/1000).toFixed(4);
+  document.getElementById('note').textContent = `${GLASS.name} glass  ·  n(${Math.round(dense[0].wl)}nm) = ${nB}  ·  n(${Math.round(dense[dense.length-1].wl)}nm) = ${nR}  ·  Dispersion: ${(nB - nR).toFixed(4)}`;
+
+  requestAnimationFrame(render);
+}
+
+// ── UI ──
+document.getElementById('bAbs').onclick = () => {
+  mode = 'absorption';
+  document.getElementById('bAbs').classList.add('on');
+  document.getElementById('bEm').classList.remove('on');
+};
+document.getElementById('bEm').onclick = () => {
+  mode = 'emission';
+  document.getElementById('bEm').classList.add('on');
+  document.getElementById('bAbs').classList.remove('on');
+};
+const elContainer = document.getElementById('elB');
+Object.keys(EL).forEach(k => {
+  const b = document.createElement('button');
+  b.className = 'b' + (k === selEl ? ' on' : '');
+  b.textContent = k;
+  b.dataset.el = k;
+  b.onclick = () => {
+    selEl = k;
+    document.querySelectorAll('[data-el]').forEach(x => x.classList.toggle('on', x.dataset.el === k));
+  };
+  elContainer.appendChild(b);
+});
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

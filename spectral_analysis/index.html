@@ -330,53 +330,16 @@
     <div class="experiment-stage">
       <canvas class="experiment-canvas" id="experimentCanvas"></canvas>
     </div>
-    <div class="instruction" id="prismInstruction" style="margin-top:0.5rem; color:var(--muted); font-size:0.95rem;">The prism turns wavelength into position. The detector strip on the right is the measurement.</div>
-  </section>
-
-  <section class="section">
-    <div class="section-head">
-      <div>
-        <div class="kicker">2. Build The Decoder Ring</div>
-        <div class="section-title">Use the periodic table as a lab bench.</div>
-      </div>
-      <div class="status-pill" id="labStatus">Choose an element</div>
-    </div>
-    <div class="lab-layout">
-      <div class="lab-top">
-        <div class="card">
-          <div class="selected-box">
-            <h3 id="selectedTitle">Hydrogen (H)</h3>
-            <p id="selectedMeta">Atomic number 1 · visible strong lines loaded</p>
-          </div>
-          <div class="lab-controls">
-            <button class="mode-btn active" id="emissionBtn">Hot glowing gas</button>
-            <button class="mode-btn" id="absorptionBtn">Cool gas in white light</button>
-          </div>
-          <div class="line-list" id="lineList"></div>
-          <div class="detector-note" id="bridgeNote">Same wavelengths. Different experiment. Bright lines in emission become dark gaps in absorption.</div>
-        </div>
-        <div class="card detector-card">
-          <div class="detector-meta">
-            <div>
-              <h4>Detector strip</h4>
-              <p id="detectorMeta">Visible wavelengths for the selected element</p>
-            </div>
-            <div class="status-pill" id="labStatus">Choose an element</div>
-          </div>
-          <canvas class="detector-spectrum" id="labSpectrum"></canvas>
-        </div>
-      </div>
-      <div class="card">
-        <div class="prompt">Pick any element. The detector strip keeps the same wavelength positions while the experiment flips from emission to absorption.</div>
-        <div class="periodic-grid" id="periodicGrid"></div>
-      </div>
+    <div class="instruction" id="prismInstruction" style="margin-top:0.5rem; color:var(--muted); font-size:0.95rem;">Pick any element below. The experiment shows its emission or absorption spectrum through the apparatus.</div>
+    <div style="margin-top:0.8rem;">
+      <div class="periodic-grid" id="periodicGrid"></div>
     </div>
   </section>
 
   <section class="section">
     <div class="section-head">
       <div>
-        <div class="kicker">3. Compare Causes</div>
+        <div class="kicker">2. Compare Causes</div>
         <div class="section-title">Ask whether Earth could be causing all the lines.</div>
       </div>
       <div class="status-pill">Model test</div>
@@ -407,7 +370,7 @@
   <section class="section">
     <div class="section-head">
       <div>
-        <div class="kicker">4. Read A Real Star</div>
+        <div class="kicker">3. Read A Real Star</div>
         <div class="section-title">Use the patterns you explored in the lab.</div>
       </div>
       <div class="status-pill" id="starStatus">Pick a star and test overlays</div>
@@ -461,14 +424,14 @@ const prismInstruction = document.getElementById('prismInstruction');
 const dispersionSlider = document.getElementById('dispersionSlider');
 const dispersionValue = document.getElementById('dispersionValue');
 
-const labSpectrum = document.getElementById('labSpectrum');
+// labSpectrum removed — experiment animation is the lab now
 const starSpectrum = document.getElementById('starSpectrum');
 const starMarkers = document.getElementById('starMarkers');
 const earthSpectrum = document.getElementById('earthSpectrum');
 const siriusSpectrum = document.getElementById('siriusSpectrum');
 const betelgeuseSpectrum = document.getElementById('betelgeuseSpectrum');
 
-let experimentCtx, labCtx, starCtx, markerCtx, earthCtx, siriusCtx, betelCtx;
+let experimentCtx, starCtx, markerCtx, earthCtx, siriusCtx, betelCtx;
 
 function sizeCanvas(canvas, height) {
   const rect = canvas.getBoundingClientRect();
@@ -480,7 +443,7 @@ function sizeCanvas(canvas, height) {
 
 function initCanvases() {
   experimentCtx = sizeCanvas(experimentCanvas, 420);
-  labCtx = sizeCanvas(labSpectrum, 360);
+  // labCtx removed — no separate lab canvas
   starCtx = sizeCanvas(starSpectrum, 160);
   markerCtx = sizeCanvas(starMarkers, 70);
   earthCtx = sizeCanvas(earthSpectrum, 92);
@@ -781,9 +744,9 @@ function renderExperimentFrame(timeMs) {
   const prismW = 128 * S;
   const prismH = 160 * S;
   const prismX = prismCenterX - prismW / 2;
-  const prismTopY = height * 0.15;
   const screenX = width - 96 * S;
   const midY = height * 0.48;
+  const prismTopY = midY - prismH * 0.45;
   const detectorTop = height * 0.14;
   const detectorH = height * 0.72;
   const detectorStripW = 20 * S;
@@ -1198,33 +1161,17 @@ function starAbsorptions(key, includeEarth = false) {
 
 function renderLab() {
   const meta = ELEMENTS[selectedSymbol];
-  document.getElementById('selectedTitle').textContent = `${meta.name} (${meta.symbol})`;
-  document.getElementById('selectedMeta').textContent = `Atomic number ${meta.atomicNumber} · ${meta.lineCount ? meta.lineCount + ' visible strong lines embedded' : 'no visible strong-line data embedded here'}`;
-  document.getElementById('labStatus').textContent = `${meta.symbol} selected`;
-  document.getElementById('detectorMeta').textContent = labMode === 'emission'
-    ? 'Bright positions from the excited gas'
-    : 'Dark gaps removed from white light';
-  prismStatus.textContent = labMode === 'emission' ? 'Emission experiment' : 'Absorption experiment';
+  prismStatus.textContent = labMode === 'emission'
+    ? `${meta.symbol} emission`
+    : `${meta.symbol} absorption`;
   prismInstruction.textContent = labMode === 'emission'
-    ? `${meta.name} emits only a few wavelengths. The prism spreads them into bright detector positions.`
-    : `White light loses ${meta.name.toLowerCase()}'s wavelengths before the prism, so those detector positions go dark.`;
+    ? `${meta.name} emits only specific wavelengths. The prism spreads them into bright lines on the detector.`
+    : `White light loses ${meta.name.toLowerCase()}'s wavelengths in the cool gas. Those positions go dark on the detector.`;
   dispersionValue.textContent = `${dispersionStrength.toFixed(2)}x`;
 
   document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-  document.getElementById(labMode === 'emission' ? 'emissionBtn' : 'absorptionBtn').classList.add('active');
   document.getElementById(labMode === 'emission' ? 'experimentEmissionBtn' : 'experimentAbsorptionBtn').classList.add('active');
 
-  drawVerticalDetector(labCtx, 0, 0, labSpectrum.width, labSpectrum.height, labMode, meta.lines || []);
-
-  const lineList = document.getElementById('lineList');
-  if (!meta.lineCount) {
-    lineList.innerHTML = `<div class="line-item"><strong>No strong visible lines</strong> were embedded for ${meta.name} in this source range.</div>`;
-  } else {
-    lineList.innerHTML = (meta.lines || []).slice(0, 8).map(line => `<div class="line-item"><strong>${line.nm.toFixed(1)} nm</strong> · ${line.spectrum}</div>`).join('');
-  }
-  document.getElementById('bridgeNote').textContent = labMode === 'emission'
-    ? 'Same wavelength positions as absorption, but lit up instead of removed.'
-    : 'Same wavelength positions as emission, but cut out of the white-light spectrum.';
   renderExperimentGasRack();
 }
 
@@ -1378,8 +1325,7 @@ function renderPeriodicTable() {
 }
 
 function initButtons() {
-  document.getElementById('emissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
-  document.getElementById('absorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
+  // emissionBtn/absorptionBtn removed — experiment buttons handle mode switching
   document.getElementById('experimentEmissionBtn').addEventListener('click', () => {
     labMode = 'emission';
     document.getElementById('beamModeWrap').style.display = 'none';

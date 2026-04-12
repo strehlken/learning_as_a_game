@@ -647,9 +647,15 @@ function drawVerticalDetector(ctx, x0, y0, width, height, mode, lines, options =
     ctx.moveTo(stripX - 8 * dpr, y);
     ctx.lineTo(stripX + stripW + 8 * dpr, y);
     ctx.stroke();
-    if (index < 8) {
-      ctx.fillStyle = '#232324';
-      ctx.fillText(`${line.nm.toFixed(1)}`, stripX + stripW + 14 * dpr, y - 5 * dpr);
+    // Only show individual line labels in standalone mode, not in experiment overlay
+    if (!options.overlayOnly && index < 6) {
+      // Avoid overlap with scale ticks (400,500,600,700)
+      const tooCloseToScale = [400,500,600,700].some(sw => Math.abs(wlToY(sw,height) - y) < 14 * dpr);
+      if (!tooCloseToScale) {
+        ctx.fillStyle = '#232324';
+        ctx.font = `${11 * dpr}px 'Brandon Grotesque', system-ui, sans-serif`;
+        ctx.fillText(`${line.nm.toFixed(1)}`, stripX + stripW + 14 * dpr, y - 5 * dpr);
+      }
     }
   });
 
@@ -722,7 +728,8 @@ function drawWavePath(ctx, points, color, wavelengthPx, amplitude, phase, alpha)
   ctx.lineWidth = 2 * dpr;
   ctx.globalAlpha = alpha;
   ctx.beginPath();
-  const steps = 80;
+  const totalLen = Math.hypot(points[1].x-points[0].x, points[1].y-points[0].y) + Math.hypot(points[2].x-points[1].x, points[2].y-points[1].y);
+  const steps = Math.max(100, Math.ceil(totalLen / (wavelengthPx * 0.12)));
   for (let i = 0; i <= steps; i++) {
     const t = i / steps;
     let p0, p1, localT;
@@ -817,17 +824,6 @@ function renderExperimentFrame(timeMs) {
     ctx.beginPath();
     ctx.arc(sourceX, midY, 34 * S, 0, Math.PI * 2);
     ctx.fill();
-    normalizedLines.slice(0, 6).forEach((line, idx) => {
-      const [r, g, b] = wlToColor(line.nm);
-      const a = idx / 5 * Math.PI * 2 + experimentTime * 0.25;
-      const len = 34 * S + idx * 5 * S;
-      ctx.strokeStyle = `rgba(${Math.round(r * 255)}, ${Math.round(g * 255)}, ${Math.round(b * 255)}, 0.45)`;
-      ctx.lineWidth = 2 * S;
-      ctx.beginPath();
-      ctx.moveTo(sourceX + Math.cos(a) * 12 * S, midY + Math.sin(a) * 12 * S);
-      ctx.lineTo(sourceX + Math.cos(a) * len, midY + Math.sin(a) * len);
-      ctx.stroke();
-    });
   }
 
   ctx.fillStyle = '#232324';
@@ -852,28 +848,51 @@ function renderExperimentFrame(timeMs) {
   ctx.font = `${12 * S}px ${font}`;
   ctx.fillText('prism', prismCenterX, prismTopY - 10 * S);
 
-  ctx.fillStyle = '#ecf1f7';
-  ctx.fillRect(screenX - detectorStripW / 2 - 6 * S, detectorTop, detectorStripW + 12 * S, detectorH);
+  // Detector strip background — dark for emission, light for absorption
+  const detStripX = screenX - detectorStripW / 2 - 2 * S;
+  const detStripFullW = detectorStripW + 4 * S;
+  if (labMode === 'emission') {
+    ctx.fillStyle = '#0c0e18';
+  } else {
+    ctx.fillStyle = '#ecf1f7';
+  }
+  ctx.fillRect(detStripX, detectorTop, detStripFullW, detectorH);
   ctx.strokeStyle = '#b0b4bc';
-  ctx.lineWidth = 2 * S;
-  ctx.strokeRect(screenX - detectorStripW / 2 - 6 * S, detectorTop, detectorStripW + 12 * S, detectorH);
+  ctx.lineWidth = 1.5 * S;
+  ctx.strokeRect(detStripX, detectorTop, detStripFullW, detectorH);
   ctx.fillStyle = '#6f7379';
   ctx.font = `${11 * S}px ${font}`;
   ctx.fillText('detector', screenX, height * 0.1);
 
   ctx.textAlign = 'left'; // reset
 
-  const rayCount = 11;
+  // In absorption mode: full spectrum of rays (white light source)
+  // In emission mode: only the element's actual emission lines
   const rays = [];
-  for (let i = 0; i < rayCount; i++) {
-    const t = i / (rayCount - 1);
-    const wl = 400 + t * 300;
-    const [r, g, b] = wlToColor(wl);
-    const color = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
-    const bendFactor = 1.0 - t;
-    const wavePx = (12 + t * 34) * S;
-    const insideSpeedFactor = 0.55 + t * 0.55;
-    rays.push({ wl, color, bendFactor, wavePx, insideSpeedFactor, t });
+  if (labMode === 'emission') {
+    const visibleLines = normalizedLines.filter(l => l.nm >= WL_MIN && l.nm <= WL_MAX);
+    visibleLines.forEach(line => {
+      const t = (line.nm - 400) / 300; // 0=violet, 1=red
+      const tClamped = Math.max(0, Math.min(1, t));
+      const [r, g, b] = wlToColor(line.nm);
+      const color = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+      const bendFactor = 1.0 - tClamped;
+      const wavePx = (12 + tClamped * 34) * S;
+      const insideSpeedFactor = 0.55 + tClamped * 0.55;
+      rays.push({ wl: line.nm, color, bendFactor, wavePx, insideSpeedFactor, t: tClamped, weight: line.weight });
+    });
+  } else {
+    const rayCount = 11;
+    for (let i = 0; i < rayCount; i++) {
+      const t = i / (rayCount - 1);
+      const wl = 400 + t * 300;
+      const [r, g, b] = wlToColor(wl);
+      const color = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+      const bendFactor = 1.0 - t;
+      const wavePx = (12 + t * 34) * S;
+      const insideSpeedFactor = 0.55 + t * 0.55;
+      rays.push({ wl, color, bendFactor, wavePx, insideSpeedFactor, t, weight: 1 });
+    }
   }
 
   const prismEntryX = prismX + 10 * S;
@@ -895,9 +914,7 @@ function renderExperimentFrame(timeMs) {
   }
 
   rays.forEach((ray) => {
-    const entryStart = labMode === 'emission'
-      ? { x: sourceStartX, y: midY + (ray.t - 0.5) * 12 * S }
-      : { x: sourceStartX, y: midY };
+    const entryStart = { x: sourceStartX, y: midY };
     const postCellStart = { x: slitX + 6 * S, y: midY };
     const prismEntry = { x: prismEntryX, y: midY };
     const bendOffset = (0.5 - ray.bendFactor) * fanSpread * 0.4;
@@ -905,10 +922,15 @@ function renderExperimentFrame(timeMs) {
     const screenOffset = (0.5 - ray.bendFactor) * fanSpread;
     const screenHit = { x: screenX, y: midY + screenOffset };
     const amp = 7 * S;
-    const phase = experimentTime * (7.5 - ray.t * 1.8);
+    // Visual crest speed = phaseRate × wavelengthPx.
+    // In air, all wavelengths travel at the same speed, so phaseRate ∝ 1/wavePx.
+    // In glass, frequency stays constant (same phaseRate) but wavelength shortens.
+    // The shorter wavelength inside glass automatically makes crests appear slower.
+    const phase = experimentTime * 280 * S / ray.wavePx;
 
     if (labMode === 'emission') {
-      drawWavePath(ctx, [entryStart, postCellStart, prismEntry], ray.color, ray.wavePx, amp, phase, 0.6);
+      const emAlpha = 0.3 + (ray.weight || 1) * 0.6;
+      drawWavePath(ctx, [entryStart, postCellStart, prismEntry], ray.color, ray.wavePx, amp, phase, emAlpha);
     } else {
       const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
       const alpha = blocked ? 0.18 : 0.68;
@@ -925,36 +947,43 @@ function renderExperimentFrame(timeMs) {
     }
 
     const insideWavePx = ray.wavePx * ray.insideSpeedFactor;
-    const insideSpeed = experimentTime * (8 / ray.insideSpeedFactor);
-    drawWavePath(ctx, [prismEntry, prismExit, prismExit], ray.color, insideWavePx, amp * 0.76, insideSpeed, 0.58);
-    drawWavePath(ctx, [prismExit, screenHit, screenHit], ray.color, ray.wavePx, amp, phase, 0.9);
+    const postAlpha = labMode === 'emission' ? (0.3 + (ray.weight || 1) * 0.6) : 0.9;
+    drawWavePath(ctx, [prismEntry, prismExit, prismExit], ray.color, insideWavePx, amp * 0.76, phase, postAlpha * 0.7);
+    drawWavePath(ctx, [prismExit, screenHit, screenHit], ray.color, ray.wavePx, amp, phase, postAlpha);
 
+    // Draw a bright line mark where the ray hits the detector
+    const markW = detectorStripW + 4 * S;
+    const markX = screenX - markW / 2;
+    if (labMode === 'emission') {
+      // Bright colored line on dark detector
+      const emA = 0.3 + (ray.weight || 1) * 0.65;
+      ctx.fillStyle = ray.color;
+      ctx.globalAlpha = emA;
+      ctx.fillRect(markX, screenHit.y - 1.5 * S, markW, 3 * S);
+      // Glow
+      ctx.globalAlpha = emA * 0.25;
+      ctx.fillRect(markX, screenHit.y - 4 * S, markW, 8 * S);
+      ctx.globalAlpha = 1;
+    } else {
+      // In absorption, blocked lines show as dark marks
+      const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
+      if (blocked) {
+        ctx.fillStyle = 'rgba(10,12,20,0.7)';
+        ctx.fillRect(markX, screenHit.y - 1.5 * S, markW, 3 * S);
+      } else {
+        ctx.fillStyle = ray.color;
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(markX, screenHit.y - 1 * S, markW, 2 * S);
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // Label at the hit point — just the wavelength, to the right of detector
     ctx.fillStyle = ray.color;
-    ctx.beginPath();
-    ctx.arc(screenHit.x, screenHit.y, 2.5 * S, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.font = `${9.5 * S}px ${font}`;
+    ctx.textAlign = 'left';
+    ctx.fillText(`${Math.round(ray.wl)}`, screenX + markW / 2 + 6 * S, screenHit.y + 3.5 * S);
   });
-
-  ctx.font = `${10 * S}px ${font}`;
-  const labelRays = [rays[0], rays[Math.floor(rayCount / 2)], rays[rayCount - 1]];
-  const labelTexts = ['~400 nm (violet)', '~550 nm (green)', '~700 nm (red)'];
-  labelRays.forEach((ray, i) => {
-    const screenOffset = (0.5 - ray.bendFactor) * fanSpread;
-    const sy = midY + screenOffset;
-    ctx.fillStyle = ray.color;
-    ctx.fillText(labelTexts[i], screenX + 10 * S, sy + 4 * S);
-  });
-
-  drawVerticalDetector(
-    ctx,
-    screenX - detectorStripW / 2 - 6 * S,
-    detectorTop,
-    detectorStripW + 120 * S,
-    detectorH,
-    labMode,
-    normalizedLines,
-    { overlayOnly: true }
-  );
 
   ctx.fillStyle = '#9a9ea6';
   ctx.font = `italic ${10 * S}px ${font}`;

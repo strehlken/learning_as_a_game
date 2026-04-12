@@ -315,7 +315,7 @@
       </div>
       <div class="slider-wrap">
         <label for="dispersionSlider">Prism dispersion</label>
-        <input type="range" id="dispersionSlider" min="0.6" max="1.6" step="0.05" value="1.0">
+        <input type="range" id="dispersionSlider" min="0.6" max="1.6" step="0.05" value="1.6">
         <span id="dispersionValue">1.00x</span>
       </div>
     </div>
@@ -445,7 +445,7 @@ let showEarth = false;
 let currentStar = 'Sun';
 let explored = new Set(['H','Na','Ca']);
 let activeOverlays = new Set(['H']);
-let dispersionStrength = 1.0;
+let dispersionStrength = 1.6;
 let experimentFrame = null;
 let experimentTime = 0;
 
@@ -787,8 +787,8 @@ function renderExperimentFrame(timeMs) {
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = '#232324';
-  ctx.font = `bold ${14 * S}px ${font}`;
-  ctx.fillText(labMode === 'emission' ? `${ELEMENTS[selectedSymbol].symbol} excited in flame` : `White light through cool ${ELEMENTS[selectedSymbol].symbol} gas`, 16 * S, 24 * S);
+  ctx.font = `bold ${15 * S}px ${font}`;
+  ctx.fillText(labMode === 'emission' ? `${ELEMENTS[selectedSymbol].symbol} excited in flame` : `White light through cool ${ELEMENTS[selectedSymbol].symbol} gas`, 16 * S, 26 * S);
 
   ctx.fillStyle = '#f0f2f6';
   ctx.strokeStyle = '#d0d3da';
@@ -798,10 +798,10 @@ function renderExperimentFrame(timeMs) {
   ctx.fillRect(sourceX - srcBoxW / 2, srcBoxY, srcBoxW, srcBoxH);
   ctx.strokeRect(sourceX - srcBoxW / 2, srcBoxY, srcBoxW, srcBoxH);
 
-  ctx.fillStyle = '#6f7379';
-  ctx.font = `${12 * S}px ${font}`;
+  ctx.fillStyle = '#505560';
+  ctx.font = `${14 * S}px ${font}`;
   ctx.textAlign = 'center';
-  ctx.fillText(labMode === 'emission' ? 'hot gas' : 'white lamp', sourceX, srcBoxY - 8 * S);
+  ctx.fillText(labMode === 'emission' ? 'hot gas' : 'white lamp', sourceX, srcBoxY - 10 * S);
 
   if (labMode === 'absorption') {
     const cellX = sourceX + srcBoxW / 2 + 16 * S;
@@ -812,8 +812,8 @@ function renderExperimentFrame(timeMs) {
     ctx.fillStyle = 'rgba(141,98,38,0.08)';
     ctx.fillRect(cellX, midY - cellH / 2, cellW, cellH);
     ctx.fillStyle = '#8d6226';
-    ctx.font = `${10 * S}px ${font}`;
-    ctx.fillText('cool gas', cellX + cellW / 2, midY - cellH / 2 - 6 * S);
+    ctx.font = `${12 * S}px ${font}`;
+    ctx.fillText('cool gas', cellX + cellW / 2, midY - cellH / 2 - 8 * S);
   } else {
     const glow = ctx.createRadialGradient(sourceX, midY, 4 * S, sourceX, midY, 34 * S);
     glow.addColorStop(0, 'rgba(255,250,236,0.95)');
@@ -830,9 +830,9 @@ function renderExperimentFrame(timeMs) {
   ctx.fillRect(slitX - 4 * S, midY - 60 * S, 8 * S, 120 * S);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(slitX - 2 * S, midY - 22 * S, 4 * S, 44 * S);
-  ctx.fillStyle = '#6f7379';
-  ctx.font = `${11 * S}px ${font}`;
-  ctx.fillText('slit', slitX, midY - 66 * S);
+  ctx.fillStyle = '#505560';
+  ctx.font = `${14 * S}px ${font}`;
+  ctx.fillText('slit', slitX, midY - 68 * S);
 
   ctx.fillStyle = 'rgba(220,230,248,0.92)';
   ctx.strokeStyle = '#96a8cc';
@@ -844,25 +844,21 @@ function renderExperimentFrame(timeMs) {
   ctx.closePath();
   ctx.fill();
   ctx.stroke();
-  ctx.fillStyle = '#6f7379';
-  ctx.font = `${12 * S}px ${font}`;
-  ctx.fillText('prism', prismCenterX, prismTopY - 10 * S);
+  ctx.fillStyle = '#505560';
+  ctx.font = `${14 * S}px ${font}`;
+  ctx.fillText('prism', prismCenterX, prismTopY - 12 * S);
 
   // Detector strip background — dark for emission, light for absorption
   const detStripX = screenX - detectorStripW / 2 - 2 * S;
   const detStripFullW = detectorStripW + 4 * S;
-  if (labMode === 'emission') {
-    ctx.fillStyle = '#0c0e18';
-  } else {
-    ctx.fillStyle = '#ecf1f7';
-  }
+  ctx.fillStyle = '#e8ecf2';
   ctx.fillRect(detStripX, detectorTop, detStripFullW, detectorH);
   ctx.strokeStyle = '#b0b4bc';
   ctx.lineWidth = 1.5 * S;
   ctx.strokeRect(detStripX, detectorTop, detStripFullW, detectorH);
-  ctx.fillStyle = '#6f7379';
-  ctx.font = `${11 * S}px ${font}`;
-  ctx.fillText('detector', screenX, height * 0.1);
+  ctx.fillStyle = '#505560';
+  ctx.font = `${14 * S}px ${font}`;
+  ctx.fillText('detector', screenX, height * 0.08);
 
   ctx.textAlign = 'left'; // reset
 
@@ -913,8 +909,15 @@ function renderExperimentFrame(timeMs) {
     ctx.stroke();
   }
 
-  rays.forEach((ray) => {
-    const entryStart = { x: sourceStartX, y: midY };
+  const rayLabelPositions = [];
+  rays.forEach((ray, rayIdx) => {
+    // Rays spread from source, converge through the slit, then travel as a narrow beam
+    const rayCount = rays.length;
+    const spreadFromSource = 40 * S; // how much rays fan out before the slit
+    const sourceSpread = rayCount > 1 ? (rayIdx / (rayCount - 1) - 0.5) * spreadFromSource : 0;
+    const entryStart = { x: sourceStartX, y: midY + sourceSpread };
+    // All rays converge to the slit center
+    const slitCenter = { x: slitX, y: midY };
     const postCellStart = { x: slitX + 6 * S, y: midY };
     const prismEntry = { x: prismEntryX, y: midY };
     const bendOffset = (0.5 - ray.bendFactor) * fanSpread * 0.4;
@@ -930,19 +933,24 @@ function renderExperimentFrame(timeMs) {
 
     if (labMode === 'emission') {
       const emAlpha = 0.3 + (ray.weight || 1) * 0.6;
-      drawWavePath(ctx, [entryStart, postCellStart, prismEntry], ray.color, ray.wavePx, amp, phase, emAlpha);
+      // Source to slit (fanning in)
+      drawWavePath(ctx, [entryStart, slitCenter, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, emAlpha * 0.7);
+      // Slit to prism (narrow beam)
+      drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp, phase, emAlpha);
     } else {
       const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
       const alpha = blocked ? 0.18 : 0.68;
-      drawWavePath(ctx, [entryStart, { x: cellRightX, y: midY }, postCellStart], ray.color, ray.wavePx, amp * 0.84, phase, alpha);
+      // Source through gas cell to slit (fanning in)
+      drawWavePath(ctx, [entryStart, { x: cellRightX, y: midY + sourceSpread * 0.6 }, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, alpha * 0.7);
       if (blocked) {
-        ctx.strokeStyle = 'rgba(35,35,36,0.18)';
-        ctx.lineWidth = 9 * S;
+        ctx.strokeStyle = 'rgba(35,35,36,0.25)';
+        ctx.lineWidth = 8 * S;
         ctx.beginPath();
-        ctx.moveTo(cellRightX - 16 * S, midY);
-        ctx.lineTo(cellRightX + 2 * S, midY);
+        ctx.moveTo(cellRightX - 14 * S, midY + sourceSpread * 0.6);
+        ctx.lineTo(cellRightX + 4 * S, midY + sourceSpread * 0.6);
         ctx.stroke();
       }
+      // Slit to prism (narrow beam)
       drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp * 0.8, phase, alpha);
     }
 
@@ -965,38 +973,121 @@ function renderExperimentFrame(timeMs) {
       ctx.fillRect(markX, screenHit.y - 4 * S, markW, 8 * S);
       ctx.globalAlpha = 1;
     } else {
-      // In absorption, blocked lines show as dark marks
-      const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
-      if (blocked) {
-        ctx.fillStyle = 'rgba(10,12,20,0.7)';
-        ctx.fillRect(markX, screenHit.y - 1.5 * S, markW, 3 * S);
-      } else {
-        ctx.fillStyle = ray.color;
-        ctx.globalAlpha = 0.5;
-        ctx.fillRect(markX, screenHit.y - 1 * S, markW, 2 * S);
-        ctx.globalAlpha = 1;
-      }
+      // In absorption mode, we draw the continuous spectrum + dark lines separately below
     }
 
-    // Label at the hit point — just the wavelength, to the right of detector
-    ctx.fillStyle = ray.color;
-    ctx.font = `${9.5 * S}px ${font}`;
-    ctx.textAlign = 'left';
-    ctx.fillText(`${Math.round(ray.wl)}`, screenX + markW / 2 + 6 * S, screenHit.y + 3.5 * S);
+    // Collect label positions for collision avoidance
+    // In emission: label every ray. In absorption: only label blocked wavelengths.
+    if (labMode === 'emission') {
+      rayLabelPositions.push({ y: screenHit.y, wl: ray.wl, color: ray.color });
+    }
   });
 
-  ctx.fillStyle = '#9a9ea6';
-  ctx.font = `italic ${10 * S}px ${font}`;
-  ctx.textAlign = 'right';
-  const annotX = screenX - detectorStripW / 2 - 14 * S;
-  ctx.fillText('shorter bends more', annotX, detectorTop + 16 * S);
-  ctx.fillText('longer bends less', annotX, detectorTop + detectorH - 8 * S);
-  ctx.textAlign = 'left';
+  // In absorption mode: draw continuous spectrum on detector with dark absorption lines
+  if (labMode === 'absorption') {
+    const stripTop = detectorTop + 2 * S;
+    const stripBot = detectorTop + detectorH - 2 * S;
+    const stripH = stripBot - stripTop;
+    const markX = screenX - detectorStripW / 2 - 2 * S;
+    const markW = detectorStripW + 4 * S;
 
-  ctx.fillStyle = 'rgba(110,118,138,0.6)';
-  ctx.font = `italic ${9.5 * S}px ${font}`;
+    // Map y position on detector to wavelength using the ray fan geometry
+    // Top of fan = violet (high bendFactor), bottom = red (low bendFactor)
+    for (let py = 0; py < stripH; py++) {
+      const y = stripTop + py;
+      // Invert the screen position to wavelength
+      const screenOffset = y - midY;
+      // screenOffset = (0.5 - bendFactor) * fanSpread
+      // bendFactor = 0.5 - screenOffset / fanSpread
+      const bendFactor = 0.5 - screenOffset / fanSpread;
+      const t = 1.0 - bendFactor; // t=0 is violet, t=1 is red
+      const wl = 400 + t * 300;
+      if (wl < WL_MIN || wl > WL_MAX) continue;
+
+      const [r, g, b] = wlToColor(wl);
+      let brightness = planckLike(wl, 560);
+
+      // Apply absorption from selected element
+      let absorption = 0;
+      normalizedLines.forEach(line => {
+        const d = Math.abs(wl - line.nm);
+        const depth = (line.weight || 0.6) * Math.exp(-(d * d) / (2 * 1.4 * 1.4));
+        absorption = Math.max(absorption, depth);
+      });
+      brightness *= (1 - absorption * 0.94);
+
+      const gamma = 0.64;
+      ctx.fillStyle = `rgb(${Math.round(Math.pow(r * brightness, gamma) * 255)},${Math.round(Math.pow(g * brightness, gamma) * 255)},${Math.round(Math.pow(b * brightness, gamma) * 255)})`;
+      ctx.fillRect(markX, y, markW, 1);
+    }
+
+    // Add absorption line labels
+    normalizedLines.forEach(line => {
+      if (line.nm < WL_MIN || line.nm > WL_MAX) return;
+      const t = (line.nm - 400) / 300;
+      const bendFactor = 1.0 - t;
+      const screenOffset = (0.5 - bendFactor) * fanSpread;
+      const hitY = midY + screenOffset;
+      rayLabelPositions.push({ y: hitY, wl: line.nm, color: '#232324' });
+    });
+  }
+
+  // Draw wavelength labels at detector with bidirectional collision avoidance
+  ctx.font = `${12 * S}px ${font}`;
+  ctx.textAlign = 'left';
+  const labelX = screenX + detectorStripW / 2 + 22 * S;
+  const connectorStartX = screenX + detectorStripW / 2 + 4 * S;
+  const minGap = 16 * S;
+
+  rayLabelPositions.sort((a, b) => a.y - b.y);
+
+  // First pass: spread labels so none overlap, centered around their natural positions
+  const n = rayLabelPositions.length;
+  const labelYs = rayLabelPositions.map(l => l.y);
+
+  // Push apart iteratively — spread both up and down from center of cluster
+  for (let iter = 0; iter < 10; iter++) {
+    for (let i = 1; i < n; i++) {
+      const gap = labelYs[i] - labelYs[i - 1];
+      if (gap < minGap) {
+        const push = (minGap - gap) / 2;
+        labelYs[i - 1] -= push;
+        labelYs[i] += push;
+      }
+    }
+  }
+
+  // Draw connector lines and labels
+  rayLabelPositions.forEach((label, i) => {
+    const adjustedY = labelYs[i];
+    const hitY = label.y;
+
+    // Thin connector line from the actual hit point to the label
+    ctx.strokeStyle = label.color;
+    ctx.globalAlpha = 0.4;
+    ctx.lineWidth = 1 * S;
+    ctx.beginPath();
+    ctx.moveTo(connectorStartX, hitY);
+    ctx.lineTo(labelX - 4 * S, adjustedY);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // Small dot at the hit point end
+    ctx.fillStyle = label.color;
+    ctx.beginPath();
+    ctx.arc(connectorStartX, hitY, 2 * S, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Label text
+    ctx.fillStyle = label.color;
+    ctx.fillText(`${Math.round(label.wl)} nm`, labelX, adjustedY + 4 * S);
+  });
+
+  // Single annotation at the prism — the key physics point
+  ctx.fillStyle = 'rgba(80,85,96,0.7)';
+  ctx.font = `italic ${12 * S}px ${font}`;
   ctx.textAlign = 'center';
-  ctx.fillText('shorter waves compress more in glass', prismCenterX, prismTopY + prismH - 10 * S);
+  ctx.fillText('shorter wavelengths bend more', prismCenterX, prismTopY + prismH + 18 * S);
   ctx.textAlign = 'left';
 
   experimentFrame = requestAnimationFrame(renderExperimentFrame);

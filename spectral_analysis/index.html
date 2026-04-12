@@ -316,7 +316,11 @@
       <div class="slider-wrap">
         <label for="dispersionSlider">Prism dispersion</label>
         <input type="range" id="dispersionSlider" min="0.6" max="1.6" step="0.05" value="1.6">
-        <span id="dispersionValue">1.00x</span>
+        <span id="dispersionValue">1.60x</span>
+      </div>
+      <div class="control-stack" id="beamModeWrap" style="display:none;">
+        <button class="mode-btn active" id="discreteBeamBtn">Discrete rays</button>
+        <button class="mode-btn" id="continuousBeamBtn">Continuous beam</button>
       </div>
     </div>
     <div class="quick-gas-wrap">
@@ -446,6 +450,7 @@ let currentStar = 'Sun';
 let explored = new Set(['H','Na','Ca']);
 let activeOverlays = new Set(['H']);
 let dispersionStrength = 1.6;
+let beamMode = 'discrete'; // 'discrete' or 'continuous'
 let experimentFrame = null;
 let experimentTime = 0;
 
@@ -784,7 +789,7 @@ function renderExperimentFrame(timeMs) {
   const detectorStripW = 20 * S;
   const normalizedLines = normalizeLines(ELEMENTS[selectedSymbol].lines || []);
 
-  ctx.fillStyle = '#fbfcfd';
+  ctx.fillStyle = '#e8ecf2';
   ctx.fillRect(0, 0, width, height);
 
   ctx.fillStyle = '#232324';
@@ -898,67 +903,149 @@ function renderExperimentFrame(timeMs) {
   const sourceStartX = sourceX + srcBoxW / 2;
   const cellRightX = (sourceX + srcBoxW / 2 + slitX) / 2 + 12 * S; // right edge of cool gas cell
 
-  if (labMode === 'absorption') {
-    const whiteBeam = ctx.createLinearGradient(sourceStartX, midY, slitX, midY);
-    whiteBeam.addColorStop(0, 'rgba(255,255,255,0.9)');
-    whiteBeam.addColorStop(1, 'rgba(255,244,220,0.42)');
-    ctx.strokeStyle = whiteBeam;
-    ctx.lineWidth = 16 * S;
+  const rayLabelPositions = [];
+  const amp = 7 * S;
+
+  if (labMode === 'absorption' && beamMode === 'continuous') {
+    // ── Continuous absorption mode ──
+
+    // (1) White beam from lamp to cool gas
+    ctx.strokeStyle = 'rgba(255,252,240,0.85)';
+    ctx.lineWidth = 14 * S;
     ctx.beginPath();
     ctx.moveTo(sourceStartX, midY);
-    ctx.lineTo(slitX - 8 * S, midY);
+    ctx.lineTo(cellRightX - 20 * S, midY);
     ctx.stroke();
-  }
+    // Label
+    ctx.fillStyle = '#9a9ea6';
+    ctx.font = `${10 * S}px ${font}`;
+    ctx.textAlign = 'center';
+    ctx.fillText('all wavelengths', (sourceStartX + cellRightX - 20 * S) / 2, midY - 14 * S);
 
-  const rayLabelPositions = [];
-  rays.forEach((ray, rayIdx) => {
-    // Rays spread from source, converge through the slit, then travel as a narrow beam
-    const rayCount = rays.length;
-    const spreadFromSource = 40 * S; // how much rays fan out before the slit
-    const sourceSpread = rayCount > 1 ? (rayIdx / (rayCount - 1) - 0.5) * spreadFromSource : 0;
-    const entryStart = { x: sourceStartX, y: midY + sourceSpread };
-    // All rays converge to the slit center
-    const slitCenter = { x: slitX, y: midY };
-    const postCellStart = { x: slitX + 6 * S, y: midY };
-    const prismEntry = { x: prismEntryX, y: midY };
-    const bendOffset = (0.5 - ray.bendFactor) * fanSpread * 0.4;
-    const prismExit = { x: prismExitX, y: midY + bendOffset };
-    const screenOffset = (0.5 - ray.bendFactor) * fanSpread;
-    const screenHit = { x: screenX, y: midY + screenOffset };
-    const amp = 7 * S;
-    // Visual crest speed = phaseRate × wavelengthPx.
-    // In air, all wavelengths travel at the same speed, so phaseRate ∝ 1/wavePx.
-    // In glass, frequency stays constant (same phaseRate) but wavelength shortens.
-    // The shorter wavelength inside glass automatically makes crests appear slower.
-    const phase = experimentTime * 280 * S / ray.wavePx;
+    // (2) Compute composite color after absorption
+    let rSum = 0, gSum = 0, bSum = 0, count = 0;
+    for (let wl = 400; wl <= 700; wl += 2) {
+      const [r, g, b] = wlToColor(wl);
+      let absorption = 0;
+      normalizedLines.forEach(line => {
+        const d = Math.abs(wl - line.nm);
+        absorption = Math.max(absorption, (line.weight || 0.6) * Math.exp(-(d * d) / (2 * 1.4 * 1.4)));
+      });
+      const survive = 1 - absorption * 0.94;
+      rSum += r * survive;
+      gSum += g * survive;
+      bSum += b * survive;
+      count++;
+    }
+    const compR = Math.round((rSum / count) * 255 * 1.8);
+    const compG = Math.round((gSum / count) * 255 * 1.8);
+    const compB = Math.round((bSum / count) * 255 * 1.8);
+    const compositeColor = `rgb(${Math.min(255, compR)},${Math.min(255, compG)},${Math.min(255, compB)})`;
 
-    if (labMode === 'emission') {
-      const emAlpha = 0.3 + (ray.weight || 1) * 0.6;
-      // Source to slit (fanning in)
-      drawWavePath(ctx, [entryStart, slitCenter, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, emAlpha * 0.7);
-      // Slit to prism (narrow beam)
-      drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp, phase, emAlpha);
-    } else {
-      const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
-      const alpha = blocked ? 0.18 : 0.68;
-      // Source through gas cell to slit (fanning in)
-      drawWavePath(ctx, [entryStart, { x: cellRightX, y: midY + sourceSpread * 0.6 }, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, alpha * 0.7);
-      if (blocked) {
-        ctx.strokeStyle = 'rgba(35,35,36,0.25)';
-        ctx.lineWidth = 8 * S;
-        ctx.beginPath();
-        ctx.moveTo(cellRightX - 14 * S, midY + sourceSpread * 0.6);
-        ctx.lineTo(cellRightX + 4 * S, midY + sourceSpread * 0.6);
-        ctx.stroke();
+    // Beam from cool gas through slit to prism — composite color
+    ctx.strokeStyle = compositeColor;
+    ctx.lineWidth = 10 * S;
+    ctx.globalAlpha = 0.7;
+    ctx.beginPath();
+    ctx.moveTo(cellRightX, midY);
+    ctx.lineTo(prismEntryX, midY);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    // (3) After prism: dense continuous fan, colored rays first, then absorbed dark rays on top
+    const continuousRayCount = 80;
+    const absorbedRays = []; // collect these to draw last (on top)
+
+    for (let i = 0; i < continuousRayCount; i++) {
+      const t = i / (continuousRayCount - 1);
+      const wl = 400 + t * 300;
+      const [r, g, b] = wlToColor(wl);
+      const color = `rgb(${Math.round(r * 255)},${Math.round(g * 255)},${Math.round(b * 255)})`;
+      const bendFactor = 1.0 - t;
+      const wavePx = (12 + t * 34) * S;
+      const insideSpeedFactor = 0.55 + t * 0.55;
+      const phase = experimentTime * 280 * S / wavePx;
+
+      // Check absorption against actual element line positions
+      let absorption = 0;
+      normalizedLines.forEach(line => {
+        if (line.nm < WL_MIN || line.nm > WL_MAX) return;
+        const d = Math.abs(wl - line.nm);
+        absorption = Math.max(absorption, (line.weight || 0.6) * Math.exp(-(d * d) / (2 * 2.5 * 2.5)));
+      });
+
+      const bendOffset = (0.5 - bendFactor) * fanSpread * 0.4;
+      const prismExit = { x: prismExitX, y: midY + bendOffset };
+      const screenOffset = (0.5 - bendFactor) * fanSpread;
+      const screenHit = { x: screenX, y: midY + screenOffset };
+      const insideWavePx = wavePx * insideSpeedFactor;
+
+      if (absorption > 0.25) {
+        // Save for drawing on top
+        absorbedRays.push({ prismEntry: {x: prismEntryX, y: midY}, prismExit, screenHit, insideWavePx, wavePx, phase, bendOffset, absorption });
+      } else {
+        // Draw colored ray
+        drawWavePath(ctx, [{x: prismEntryX, y: midY}, {x: prismExitX, y: midY + bendOffset}, {x: prismExitX, y: midY + bendOffset}], color, insideWavePx, amp * 0.6, phase, 0.45);
+        drawWavePath(ctx, [prismExit, screenHit, screenHit], color, wavePx, amp, phase, 0.75);
       }
-      // Slit to prism (narrow beam)
-      drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp * 0.8, phase, alpha);
     }
 
-    const insideWavePx = ray.wavePx * ray.insideSpeedFactor;
-    const postAlpha = labMode === 'emission' ? (0.3 + (ray.weight || 1) * 0.6) : 0.9;
-    drawWavePath(ctx, [prismEntry, prismExit, prismExit], ray.color, insideWavePx, amp * 0.76, phase, postAlpha * 0.7);
-    drawWavePath(ctx, [prismExit, screenHit, screenHit], ray.color, ray.wavePx, amp, phase, postAlpha);
+    // Draw absorbed rays on top — bold dark black
+    absorbedRays.forEach(ar => {
+      const darkAlpha = 0.5 + ar.absorption * 0.4;
+      drawWavePath(ctx, [ar.prismEntry, ar.prismExit, ar.prismExit], '#0a0a0e', ar.insideWavePx, amp * 0.7, ar.phase, darkAlpha * 0.7);
+      drawWavePath(ctx, [ar.prismExit, ar.screenHit, ar.screenHit], '#0a0a0e', ar.wavePx, amp * 0.8, ar.phase, darkAlpha);
+    });
+
+  } else {
+    // ── Discrete mode (emission or discrete absorption) ──
+
+    if (labMode === 'absorption') {
+      ctx.strokeStyle = 'rgba(255,252,240,0.85)';
+      ctx.lineWidth = 14 * S;
+      ctx.beginPath();
+      ctx.moveTo(sourceStartX, midY);
+      ctx.lineTo(slitX - 8 * S, midY);
+      ctx.stroke();
+    }
+
+    rays.forEach((ray, rayIdx) => {
+      const rayCount = rays.length;
+      const spreadFromSource = 40 * S;
+      const sourceSpread = rayCount > 1 ? (rayIdx / (rayCount - 1) - 0.5) * spreadFromSource : 0;
+      const entryStart = { x: sourceStartX, y: midY + sourceSpread };
+      const slitCenter = { x: slitX, y: midY };
+      const postCellStart = { x: slitX + 6 * S, y: midY };
+      const prismEntry = { x: prismEntryX, y: midY };
+      const bendOffset = (0.5 - ray.bendFactor) * fanSpread * 0.4;
+      const prismExit = { x: prismExitX, y: midY + bendOffset };
+      const screenOffset = (0.5 - ray.bendFactor) * fanSpread;
+      const screenHit = { x: screenX, y: midY + screenOffset };
+      const phase = experimentTime * 280 * S / ray.wavePx;
+
+      if (labMode === 'emission') {
+        const emAlpha = 0.3 + (ray.weight || 1) * 0.6;
+        drawWavePath(ctx, [entryStart, slitCenter, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, emAlpha * 0.7);
+        drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp, phase, emAlpha);
+      } else {
+        const blocked = normalizedLines.some(line => Math.abs(line.nm - ray.wl) < 10);
+        const alpha = blocked ? 0.18 : 0.68;
+        drawWavePath(ctx, [entryStart, { x: cellRightX, y: midY + sourceSpread * 0.6 }, slitCenter], ray.color, ray.wavePx, amp * 0.7, phase, alpha * 0.7);
+        if (blocked) {
+          ctx.strokeStyle = 'rgba(35,35,36,0.25)';
+          ctx.lineWidth = 8 * S;
+          ctx.beginPath();
+          ctx.moveTo(cellRightX - 14 * S, midY + sourceSpread * 0.6);
+          ctx.lineTo(cellRightX + 4 * S, midY + sourceSpread * 0.6);
+          ctx.stroke();
+        }
+        drawWavePath(ctx, [postCellStart, prismEntry, prismEntry], ray.color, ray.wavePx, amp * 0.8, phase, alpha);
+      }
+
+      const insideWavePx = ray.wavePx * ray.insideSpeedFactor;
+      const postAlpha = labMode === 'emission' ? (0.3 + (ray.weight || 1) * 0.6) : 0.9;
+      drawWavePath(ctx, [prismEntry, prismExit, prismExit], ray.color, insideWavePx, amp * 0.76, phase, postAlpha * 0.7);
+      drawWavePath(ctx, [prismExit, screenHit, screenHit], ray.color, ray.wavePx, amp, phase, postAlpha);
 
     // Draw a bright line mark where the ray hits the detector
     const markW = detectorStripW + 4 * S;
@@ -983,6 +1070,7 @@ function renderExperimentFrame(timeMs) {
       rayLabelPositions.push({ y: screenHit.y, wl: ray.wl, color: ray.color });
     }
   });
+  } // close discrete/continuous else block
 
   // In absorption mode: draw continuous spectrum on detector with dark absorption lines
   if (labMode === 'absorption') {
@@ -1292,8 +1380,26 @@ function renderPeriodicTable() {
 function initButtons() {
   document.getElementById('emissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
   document.getElementById('absorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
-  document.getElementById('experimentEmissionBtn').addEventListener('click', () => { labMode = 'emission'; renderLab(); });
-  document.getElementById('experimentAbsorptionBtn').addEventListener('click', () => { labMode = 'absorption'; renderLab(); });
+  document.getElementById('experimentEmissionBtn').addEventListener('click', () => {
+    labMode = 'emission';
+    document.getElementById('beamModeWrap').style.display = 'none';
+    renderLab();
+  });
+  document.getElementById('experimentAbsorptionBtn').addEventListener('click', () => {
+    labMode = 'absorption';
+    document.getElementById('beamModeWrap').style.display = '';
+    renderLab();
+  });
+  document.getElementById('discreteBeamBtn').addEventListener('click', () => {
+    beamMode = 'discrete';
+    document.getElementById('discreteBeamBtn').classList.add('active');
+    document.getElementById('continuousBeamBtn').classList.remove('active');
+  });
+  document.getElementById('continuousBeamBtn').addEventListener('click', () => {
+    beamMode = 'continuous';
+    document.getElementById('continuousBeamBtn').classList.add('active');
+    document.getElementById('discreteBeamBtn').classList.remove('active');
+  });
   document.getElementById('earthToggle').addEventListener('click', () => { showEarth = !showEarth; renderCompare(); });
   dispersionSlider.addEventListener('input', (e) => {
     dispersionStrength = parseFloat(e.target.value);

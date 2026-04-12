@@ -770,8 +770,9 @@ function renderExperimentFrame(timeMs) {
   const font = `'Brandon Grotesque', system-ui, sans-serif`;
 
   const sourceX = 74 * S;
-  const slitX = width * 0.2;
   const prismCenterX = width * 0.44;
+  const sourceRightEdge = sourceX + 40 * S; // half of srcBoxW (80*S)
+  const slitX = (sourceRightEdge + prismCenterX) / 2; // halfway between lamp edge and prism
   const prismW = 128 * S;
   const prismH = 160 * S;
   const prismX = prismCenterX - prismW / 2;
@@ -804,7 +805,7 @@ function renderExperimentFrame(timeMs) {
   ctx.fillText(labMode === 'emission' ? 'hot gas' : 'white lamp', sourceX, srcBoxY - 10 * S);
 
   if (labMode === 'absorption') {
-    const cellX = sourceX + srcBoxW / 2 + 16 * S;
+    const cellX = (sourceX + srcBoxW / 2 + slitX) / 2 - 12 * S; // centered between lamp and slit
     const cellW = 24 * S, cellH = 60 * S;
     ctx.strokeStyle = '#8d6226';
     ctx.lineWidth = 2 * S;
@@ -895,7 +896,7 @@ function renderExperimentFrame(timeMs) {
   const prismExitX = prismX + prismW - 12 * S;
   const fanSpread = height * 0.34 * dispersionStrength;
   const sourceStartX = sourceX + srcBoxW / 2;
-  const cellRightX = sourceX + srcBoxW / 2 + 40 * S;
+  const cellRightX = (sourceX + srcBoxW / 2 + slitX) / 2 + 12 * S; // right edge of cool gas cell
 
   if (labMode === 'absorption') {
     const whiteBeam = ctx.createLinearGradient(sourceStartX, midY, slitX, midY);

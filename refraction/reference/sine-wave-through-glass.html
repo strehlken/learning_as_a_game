@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sine Wave Through Glass</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:17px;background:#0a0b10;color:#c8cad4;padding:1.4rem;}
+  .pg{max-width:900px;margin:0 auto;}
+  h1{font-size:2rem;font-weight:700;color:#e8eaf0;margin-bottom:.2rem;}
+  .sub{font-size:1rem;color:#7a7e88;margin-bottom:.7rem;line-height:1.5;}
+  .ctrls{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;}
+  .sg{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:#7a7e88;}
+  .sg input[type=range]{width:120px;accent-color:#5a8fd4;}
+  .sg .v{font-family:'IBM Plex Mono',monospace;font-size:.84rem;color:#a0a4ae;min-width:2.5rem;}
+  button.b{font-family:inherit;font-size:.9rem;font-weight:600;border:1px solid #2e3140;border-radius:6px;background:#181a24;color:#a0a4b0;padding:.35rem .7rem;cursor:pointer;}
+  .cw{border-radius:12px;overflow:hidden;border:1px solid #22252e;}
+  canvas{display:block;width:100%;}
+</style>
+</head>
+<body>
+<div class="pg">
+  <h1>Sine Wave Through Glass</h1>
+  <p class="sub">One continuous zigzagging line. Every point on it moves in the same direction. The ones in glass go slower. The wave compresses and the crests tilt — nobody turned.</p>
+  <div class="ctrls">
+    <div class="sg"><label>Angle</label><input type=range id=sA min=15 max=70 step=1 value=40><span class=v id=vA>40°</span></div>
+    <div class="sg"><label>Slow speed</label><input type=range id=sN min=.25 max=.85 step=.01 value=.55><span class=v id=vN>0.55</span></div>
+    <div class="sg"><label>Amplitude</label><input type=range id=sAmp min=3 max=25 step=1 value=14><span class=v id=vAmp>14</span></div>
+    <button class="b" id=bR>Reset</button>
+  </div>
+  <div class="cw"><canvas id=cv></canvas></div>
+</div>
+<script>
+let angle=40, slowSpeed=0.55, amp=14;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W,H;
+function sz(){const r=cv.parentElement.getBoundingClientRect();W=Math.round(r.width);H=Math.round(Math.min(620,r.width*.7));cv.width=W;cv.height=H;cv.style.height=H+'px';}
+
+const bY=()=>H*0.45; // boundary
+
+// Points on the sine curve. Each has an (x,y) and that's it.
+// They all move in the beam direction at local speed.
+let pts=[];
+let emitPhase=0;
+
+function reset(){pts=[];emitPhase=0;}
+
+function render(){
+  sz();
+  const BY=bY();
+  const a=angle*Math.PI/180;
+  const dx=Math.cos(a),dy=Math.sin(a);   // beam direction (same for everyone)
+  const px=-dy,py=dx;                      // perpendicular (for sine displacement)
+  const baseSpeed=1.3;
+  const wl=50;                             // wavelength in pixels
+  const k=2*Math.PI/wl;
+
+  // Emit new points at the source end
+  // Each point is born at the source with a sine displacement
+  const srcX=-50,srcY=-30;
+  const emitStep=1.5; // spacing between points along the wave (in beam-direction pixels)
+  const emitsPerFrame=4;
+  for(let i=0;i<emitsPerFrame;i++){
+    const disp=amp*Math.sin(emitPhase*k);
+    pts.push({x:srcX+px*disp, y:srcY+py*disp});
+    emitPhase+=emitStep;
+  }
+
+  // Move every point: same direction, speed depends on y
+  for(const p of pts){
+    const spd=p.y>=BY?slowSpeed:1;
+    p.x+=dx*spd*baseSpeed;
+    p.y+=dy*spd*baseSpeed;
+  }
+
+  // Cull off-screen
+  pts=pts.filter(p=>p.x<W+80&&p.y<H+80);
+
+  // ── DRAW ──
+  ctx.fillStyle='#0e1018';ctx.fillRect(0,0,W,H);
+
+  // Slow zone
+  ctx.fillStyle='rgba(80,50,20,0.06)';ctx.fillRect(0,BY,W,H-BY);
+
+  // Boundary
+  ctx.strokeStyle='rgba(120,90,50,0.3)';ctx.lineWidth=1.5;
+  ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(0,BY);ctx.lineTo(W,BY);ctx.stroke();ctx.setLineDash([]);
+
+  // Labels
+  ctx.font="600 15px 'IBM Plex Sans'";ctx.textAlign='right';
+  ctx.fillStyle='rgba(140,180,255,0.18)';ctx.fillText('speed = 1',W-16,BY-12);
+  ctx.fillStyle='rgba(220,160,80,0.18)';ctx.fillText('speed = '+slowSpeed.toFixed(2),W-16,BY+26);
+
+  // Draw the curve — one continuous line, colored by region
+  if(pts.length>1){
+    // Glow
+    ctx.strokeStyle='rgba(160,190,240,0.08)';
+    ctx.lineWidth=6;
+    ctx.beginPath();
+    for(let i=0;i<pts.length;i++) i?ctx.lineTo(pts[i].x,pts[i].y):ctx.moveTo(pts[i].x,pts[i].y);
+    ctx.stroke();
+
+    // Draw segments colored by which side of boundary
+    for(let i=0;i<pts.length-1;i++){
+      const p0=pts[i],p1=pts[i+1];
+      const inGlass=((p0.y+p1.y)/2)>=BY;
+      ctx.strokeStyle=inGlass?'rgba(240,165,60,0.75)':'rgba(120,180,255,0.7)';
+      ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(p0.x,p0.y);ctx.lineTo(p1.x,p1.y);ctx.stroke();
+    }
+  }
+
+  requestAnimationFrame(render);
+}
+
+document.getElementById('sA').oninput=e=>{angle=+e.target.value;document.getElementById('vA').textContent=angle+'°';reset();};
+document.getElementById('sN').oninput=e=>{slowSpeed=+e.target.value;document.getElementById('vN').textContent=slowSpeed.toFixed(2);reset();};
+document.getElementById('sAmp').oninput=e=>{amp=+e.target.value;document.getElementById('vAmp').textContent=amp;reset();};
+document.getElementById('bR').onclick=reset;
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

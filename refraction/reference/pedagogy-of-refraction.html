@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Pedagogy of Refraction — An Empirical Study of Internet Physics Discourse</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;0,8..60,800;1,8..60,400;1,8..60,600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#f0ebe4;--bg2:#faf7f3;--bg3:#e6dfd6;
+  --stone:#c4b9ab;--stone-d:#8b7d6b;
+  --ink:#1e1a16;--ink2:#2a2520;--ink3:#4a4139;
+  --mute:#6b6056;--mute2:#8a7e72;
+  --green:#2d6b4f;--green-l:rgba(45,107,79,0.08);
+  --red:#b5513c;--red-l:rgba(181,81,60,0.06);
+  --blue:#3d6a96;--blue-l:rgba(61,106,150,0.06);
+  --gold:#967030;--gold-l:rgba(150,112,48,0.06);
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+
+body{font-family:var(--sans);font-size:18px;line-height:1.7;background:var(--bg);color:var(--ink2);}
+.wrap{max-width:820px;margin:0 auto;padding:0 1.6rem;}
+.wide{max-width:920px;margin:0 auto;padding:0 1.6rem;}
+section{padding:2.5rem 0;}
+section+section{border-top:3px solid var(--stone);}
+
+/* ── HERO ── */
+.hero{padding:4rem 0 2rem;text-align:left;}
+.hero .kicker{font-family:var(--mono);font-size:.9rem;font-weight:500;color:var(--mute2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem;}
+.hero h1{font-family:var(--serif);font-size:2.8rem;font-weight:800;color:var(--ink);line-height:1.12;letter-spacing:-.03em;margin-bottom:.6rem;}
+.hero .deck{font-size:1.15rem;font-weight:400;color:var(--mute);max-width:700px;line-height:1.6;margin-bottom:1rem;}
+.hero .byline{font-size:.95rem;font-weight:600;color:var(--mute2);}
+
+/* ── TYPE ── */
+h2{font-family:var(--serif);font-size:2rem;font-weight:700;color:var(--ink);margin-bottom:.6rem;letter-spacing:-.02em;}
+h3{font-family:var(--sans);font-size:1.25rem;font-weight:800;color:var(--ink);margin-bottom:.3rem;margin-top:1.5rem;}
+h3:first-child{margin-top:0;}
+p{margin-bottom:1rem;max-width:720px;}
+p.lead{font-size:1.1rem;color:var(--ink3);font-weight:500;}
+strong{font-weight:700;color:var(--ink);}
+
+/* ── BLOCKQUOTE ── */
+blockquote{border-left:4px solid var(--stone);margin:1.2rem 0;padding:.8rem 1.2rem;background:var(--bg2);border-radius:0 10px 10px 0;font-size:1rem;color:var(--ink3);max-width:700px;}
+blockquote .attr{display:block;margin-top:.4rem;font-size:.88rem;font-weight:600;color:var(--mute2);font-style:normal;}
+
+/* ── CYCLE ── */
+.cycle{background:var(--bg2);border:2px solid var(--stone);border-radius:12px;padding:1rem 1.2rem;margin:1.2rem 0;max-width:720px;font-size:1rem;color:var(--ink3);line-height:1.8;}
+.cycle .arrow{color:var(--stone-d);font-weight:700;margin:0 .2rem;}
+
+/* ── CARDS ── */
+.model-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1.2rem 0;}
+.model{border-radius:12px;padding:1rem 1.1rem;border:3px solid var(--stone);background:var(--bg2);}
+.model h4{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:.2rem;}
+.model .tag{font-family:var(--mono);font-size:.78rem;color:var(--mute2);font-weight:500;}
+.model p{font-size:.92rem;color:var(--ink3);margin:0;line-height:1.45;margin-top:.3rem;}
+
+.tier-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.8rem;margin:1.2rem 0;}
+.tier{border-radius:12px;padding:1rem 1.1rem;border:3px solid var(--stone);}
+.tier.t1{background:var(--bg3);border-color:#d4ccc2;}
+.tier.t2{background:var(--red-l);border-color:var(--red);}
+.tier.t3{background:var(--green-l);border-color:var(--green);}
+.tier h4{font-size:1rem;font-weight:800;margin-bottom:.25rem;}
+.tier.t1 h4{color:var(--mute);}
+.tier.t2 h4{color:var(--red);}
+.tier.t3 h4{color:var(--green);}
+.tier p{font-size:.92rem;color:var(--ink3);margin:0;line-height:1.45;}
+.tier .angle{font-family:var(--mono);font-size:1.3rem;font-weight:700;margin-top:.4rem;display:block;}
+.tier.t1 .angle{color:var(--mute);}
+.tier.t2 .angle{color:var(--red);}
+.tier.t3 .angle{color:var(--green);}
+
+/* ── PATTERN CARDS ── */
+.pattern{background:var(--bg2);border:2px solid var(--stone);border-radius:12px;padding:1rem 1.2rem;margin:.7rem 0;max-width:720px;}
+.pattern h4{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:.15rem;}
+.pattern h4 .letter{color:var(--mute2);font-family:var(--mono);margin-right:.3rem;}
+.pattern p{font-size:.95rem;margin-bottom:0;line-height:1.5;}
+
+/* ── DERIVATION CARDS ── */
+.deriv{background:var(--bg2);border:2px solid var(--stone);border-radius:12px;padding:1rem 1.2rem;margin:.7rem 0;max-width:720px;}
+.deriv h4{font-size:1.05rem;font-weight:800;color:var(--ink);margin-bottom:.2rem;}
+.deriv .year{font-family:var(--mono);font-size:.85rem;color:var(--mute2);font-weight:500;}
+.deriv p{font-size:.95rem;margin-bottom:0;line-height:1.5;}
+
+/* ── FORMULA ── */
+.formula{font-family:var(--mono);font-size:1rem;background:var(--bg2);border:2px solid var(--stone);border-radius:8px;padding:.6rem 1rem;margin:.8rem 0;display:inline-block;color:var(--ink);font-weight:500;}
+
+/* ── SPECTRUM ── */
+.spectrum{display:flex;align-items:stretch;gap:0;margin:1.2rem 0;border-radius:12px;overflow:hidden;border:3px solid var(--stone);max-width:720px;}
+.spec-item{flex:1;padding:.7rem .6rem;text-align:center;font-size:.82rem;font-weight:600;line-height:1.35;border-right:2px solid var(--stone);color:var(--ink3);}
+.spec-item:last-child{border-right:none;}
+.spec-item .lab{display:block;font-family:var(--mono);font-size:.72rem;font-weight:400;color:var(--mute2);margin-top:.25rem;}
+
+/* ── SIM ── */
+.sim-wrap{border-radius:16px;overflow:hidden;border:3px solid var(--stone);background:var(--bg2);box-shadow:0 8px 30px rgba(60,45,30,.08);margin:1rem 0;}
+.chart-wrap{margin:1rem 0;border-radius:16px;overflow:hidden;border:3px solid var(--stone);background:var(--bg2);box-shadow:0 8px 30px rgba(60,45,30,.08);}
+canvas{display:block;width:100%;}
+.sim-ctrls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;padding:.8rem 1rem;border-bottom:2px solid var(--stone);background:var(--bg);}
+.sg{display:flex;align-items:center;gap:.5rem;font-size:1rem;font-weight:600;color:var(--mute);}
+.sg input[type=range]{-webkit-appearance:none;appearance:none;width:140px;height:8px;border-radius:4px;background:#d4ccc2;outline:none;cursor:pointer;}
+.sg input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#5c4f42;border:3px solid var(--bg);cursor:pointer;}
+.sg .v{font-family:var(--mono);font-size:1rem;font-weight:500;color:var(--ink);min-width:3rem;}
+button.b{font-family:var(--sans);font-size:1rem;font-weight:700;border:3px solid var(--stone);border-radius:10px;background:var(--bg3);color:var(--ink3);padding:.4rem .8rem;cursor:pointer;transition:all .15s;}
+button.b:hover{border-color:var(--stone-d);background:#ddd4c8;}
+.sim-readout{padding:.6rem 1rem;font-family:var(--mono);font-size:1rem;color:var(--mute);font-weight:500;border-top:2px solid var(--stone);background:var(--bg);}
+.sim-readout .snell{color:var(--green);font-weight:700;}
+.sim-readout .sold{color:var(--red);font-weight:700;}
+.sim-readout .err{color:var(--gold);font-weight:700;}
+
+.foot{padding:2rem 0 3rem;font-size:.9rem;color:var(--mute2);line-height:1.6;}
+@media(max-width:700px){
+  .hero h1{font-size:2rem;}h2{font-size:1.5rem;}
+  .model-grid,.tier-grid{grid-template-columns:1fr;}
+  .spectrum{flex-direction:column;}
+  .spec-item{border-right:none;border-bottom:2px solid var(--stone);}.spec-item:last-child{border-bottom:none;}
+  body{font-size:17px;}.wrap,.wide{padding:0 1rem;}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<div class="wrap">
+<div class="hero">
+  <div class="kicker">An empirical study</div>
+  <h1>The Pedagogy of Refraction</h1>
+  <p class="deck">Across Physics Stack Exchange, Reddit, PhysicsForums, physics blogs, and YouTube comment sections, refraction is one of the most re-asked questions in all of internet physics. The same cycle plays out decade after decade. Here is what the armchair physicists have to say — and what they collectively reveal about the irreducible difficulty of explaining a wave phenomenon using particle intuitions.</p>
+  <span class="byline">A synthesis of forum ethnography, computation, and conversation</span>
+</div>
+</div>
+
+<!-- ═══════════════════ THE LANDSCAPE ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Landscape</h2>
+  <p class="lead">Someone encounters Snell's law in a class. Gets told the marching soldiers story. Feels a nagging dissatisfaction. Posts a question that boils down to "but <em>why</em> does it bend?" The community fractures into camps based on which framework they favor. Genuine confusion emerges about what level of explanation is even being sought.</p>
+  <p>This pattern repeats on every platform, every year, without resolution. The forums are collectively re-enacting the entire history of optics from Ibn Sahl to Feynman, one Reddit thread at a time.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ THREE MODELS ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Three Models People Reach For</h2>
+
+  <div class="model-grid">
+    <div class="model">
+      <h4>Marching Soldiers</h4>
+      <div class="tag">The dominant folk model</div>
+      <p>Soldiers march across concrete toward a swamp at an angle. The one who hits the swamp first slows down while others keep marching fast. The line pivots. Equivalently: a car hits mud with one wheel first. Overwhelmingly the first thing people encounter and the first thing they repeat.</p>
+    </div>
+    <div class="model">
+      <h4>Huygens' Principle</h4>
+      <div class="tag">The wave-sophisticate's model</div>
+      <p>Every point on a wavefront radiates secondary wavelets. The envelope of those wavelets gives the new wavefront. This naturally produces Snell's law geometrically. The standard textbook derivation for wave optics. The Galileo Unbound blog lists it as derivation #1 of five.</p>
+    </div>
+    <div class="model">
+      <h4>Fermat's Principle</h4>
+      <div class="tag">The variational elegant answer</div>
+      <p>Light takes the path of least time. Invoked especially by people with a mathematical bent, who like the connection to the principle of least action and Feynman's path integrals. A smaller but vocal contingent insists this is the "real" reason.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════ THE BESTIARY ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Forum Bestiary</h2>
+  <p class="lead">Recurring characters and their greatest hits, drawn from a decade of internet physics discourse.</p>
+
+  <h3>The Self-Aware Teacher</h3>
+  <blockquote>
+    "I am not a physicist, but rather a middle school science teacher. Please be gentle."
+    <span class="attr">— User AMG, PSE, Nov 2020. Prefacing a question about the marching soldiers analogy.</span>
+  </blockquote>
+  <p>After receiving answers, AMG came back and answered their own question:</p>
+  <blockquote>
+    "I've decided that marching soldiers is not an analog at all to WHY refraction occurs, but is a useful thought experiment to show that a changing of angle does occur when media (and therefore velocity) change."
+    <span class="attr">— AMG, self-answering. A beautiful example of forum discourse as a thinking tool.</span>
+  </blockquote>
+
+  <h3>The Pedantic Corrector</h3>
+  <blockquote>
+    "If you are thinking that the wavefront of a light beam is a bunch of photons lined up like marching soldiers, that is not a proper view."
+    <span class="attr">— PSE comment on "Would a Single Photon Refract?", Aug 2016. More upvotes than the actual answer.</span>
+  </blockquote>
+
+  <h3>The Exasperated Grad Student</h3>
+  <blockquote>
+    "Person B is wrong. This is why I hate the photon model — so many people misinterpret it. A good rule of thumb is that light travels as a wave but interacts [as particles]."
+    <span class="attr">— Reddit r/askscience, ~2012. Canonical enough to be preserved in the subreddit's wiki.</span>
+  </blockquote>
+
+  <h3>The Structural Critic</h3>
+  <blockquote>
+    "In the marching band model, the persons of a row are unaware of their neighbors in the row, so they cannot be required to keep a fixed distance."
+    <span class="attr">— PSE, "Problem in explanations about refracted light", Mar 2017. Qualitatively our point — but no formula.</span>
+  </blockquote>
+
+  <h3>The Existential Crisis</h3>
+  <p>An r/explainlikeimfive thread (~2013, <strong>470+ comments</strong>) asked where the energy comes from to speed light back up when it exits glass. A masterclass in how the naive "light literally slows down" picture — which the soldier analogy encourages — leads to thermodynamic confusion. If light truly lost kinetic energy entering glass, where does the energy go? The correct answer — phase velocity changes but no energy is lost in lossless propagation — is fundamentally alien to the soldier picture.</p>
+
+  <h3>The Misconception Crusader</h3>
+  <p>A Reddit r/Physics thread (~2012, 180+ comments) titled "Physicists of Reddit, we really need to fix this misconception" attacked the absorption-reemission myth head-on. Knowledgeable commenters explained that the phase velocity decreases due to interference between the incident wave and secondary waves from oscillating dipoles — that between atoms, photons still travel at c, and the effective index is emergent. This undermines the soldiers at their foundation: the soldiers do literally slow down. Light doesn't.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ THE PATTERNS ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Armchair Philosopher's Playbook</h2>
+  <p class="lead">Five recurring patterns in how forum participants engage with refraction, observed across every platform, decade after decade.</p>
+
+  <div class="pattern">
+    <h4><span class="letter">A</span> Analogy Worship → Analogy Collapse</h4>
+    <p>The most common trajectory. Learn the soldiers analogy, feel satisfied, think harder, feel unsatisfied, post a question, get told "the analogy is fine, you're overthinking it" or "the analogy was never meant to be more than a mnemonic." Satisfaction never returns.</p>
+  </div>
+
+  <div class="pattern">
+    <h4><span class="letter">B</span> Level Confusion</h4>
+    <p>Forum arguments are often about what level of explanation is being sought, without participants realizing it. Snell's law is geometry. Huygens explains how it emerges from wave behavior. Fermat reformulates it as optimization. Maxwell derives it from boundary conditions. QED explains it from path integrals. The Galileo Unbound blog catalogs five derivations and calls their convergence "deep physics." Forum participants talk past each other because they're on different rungs of this ladder.</p>
+  </div>
+
+  <div class="pattern">
+    <h4><span class="letter">C</span> "Light Doesn't Actually Slow Down"</h4>
+    <p>One of the most reliably inflammatory forum topics. Knowledgeable commenters push back against the idea that individual photons decelerate. The effective index is an emergent property of superposition. This undermines the marching soldiers at their foundation.</p>
+  </div>
+
+  <div class="pattern">
+    <h4><span class="letter">D</span> Self-Answering Questions</h4>
+    <p>Remarkably, several PSE threads feature the original questioner answering their own question after reflection. The act of formulating the question carefully enough to post it leads to the resolution. Forum discourse as thinking tool.</p>
+  </div>
+
+  <div class="pattern">
+    <h4><span class="letter">E</span> The Five-Fold Convergence as Reassurance</h4>
+    <p>When discussions get heated about which explanation is "really right," the most sophisticated participants point to the convergence: five independent derivations all yield the same law. This is deployed as evidence that arguing about which is fundamental misses the point.</p>
+  </div>
+
+  <h3>The Loop</h3>
+  <div class="cycle">
+    Learn the soldier analogy <span class="arrow">→</span> feel satisfied <span class="arrow">→</span> think harder <span class="arrow">→</span> feel unsatisfied <span class="arrow">→</span> post question <span class="arrow">→</span> get told it was just a mnemonic <span class="arrow">→</span> feel adrift <span class="arrow">→</span> encounter the five-fold convergence <span class="arrow">→</span> feel awed <span class="arrow">→</span> meet someone who thinks photons bounce off atoms <span class="arrow">→</span> start over
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════ SEVEN FRACTURES ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>Seven Fractures in the Soldier Model</h2>
+  <p class="lead">A taxonomy of every way the analogy breaks, drawn from a decade of forum discourse — plus one that the forums never found.</p>
+
+  <h3>1. How vs. Why — The Infinite Regress</h3>
+  <p>The soldiers show that <em>if</em> speed changes, direction changes. They don't show <em>why</em> speed changes. Push on "why does light slow down in glass?" and you leave all analogies behind, entering quantum electrodynamics — the EM field interacts with atomic electron oscillators, producing re-radiated fields that superpose to create an effective phase velocity reduction. The forums cycle through this regress endlessly.</p>
+
+  <h3>2. The Single-Photon Catastrophe</h3>
+  <p>The analogy requires spatial extent — a row of soldiers, a wide wavefront. A single marble rolling across the boundary would slow down but not change direction, as the Skulls in the Stars blog notes. Yet single photons refract. The QED answer (Feynman path integrals, where every path contributes a phase and stationary-phase paths dominate) is completely different from either the soldier story or Huygens.</p>
+
+  <h3>3. The Beam Width Paradox</h3>
+  <p>A PSE thread ("Can a light wave front narrow or widen in refraction?", 2020) confirmed that beam width changes upon refraction at non-normal incidence. The soldiers suggest the row stays the same width. It doesn't. This matters for prisms, where the beam enters at one angle and exits at another.</p>
+
+  <h3>4. The Descartes Speed Paradox</h3>
+  <p>Both Newton's corpuscular theory and the wave theory produce Snell's law, but predict opposite things about speed: particles speed up in the denser medium (wrong), waves slow down (correct). The soldier analogy, by assuming soldiers slow down, silently sides with the wave picture. Most teachers don't realize they're taking a side in a 300-year-old debate.</p>
+
+  <h3>5. Why Doesn't It Curve?</h3>
+  <p>Soldiers entering a swamp gradually should produce a gradual turn, not a sharp kink. Yet refraction at a sharp interface is instantaneous. In gradient-index media (like a mirage), light does curve continuously — one of the analogy's quiet strengths, and its only partial redemption.</p>
+
+  <h3>6. Missing Dispersion</h3>
+  <p>The soldiers all hit the same swamp. There's no way to make some soldiers slow more than others depending on their "color." You need the full electromagnetic picture — resonant interaction at different frequencies — to explain why prisms split white light. A Reddit r/AskPhysics thread on "why prisms cause light to split" noted that Snell's law already contains wavelength dependence through the index, but the deeper question of <em>why</em> n depends on λ requires going to the microscopic interaction.</p>
+
+  <h3>7. The Rigid Pole Problem</h3>
+  <p>For the soldiers to produce wavefront coherence, they need to be connected — usually a rigid pole held across the row. But what physical entity does the pole represent? In the wave picture, coherence is maintained by the phase relationship across the wave. The pole is a smuggled-in deus ex machina. The forums sense this ("the persons of a row are unaware of their neighbors") but never do the arithmetic to show what it costs.</p>
+  <p>We did the arithmetic. <a href="#rigid-pole">See below.</a></p>
+</div>
+</section>
+
+<!-- ═══════════════════ THE RIGID POLE — OUR FINDING ═══════════════════ -->
+<section id="rigid-pole">
+<div class="wrap">
+  <h2>The Rigid Pole Problem: Our Finding</h2>
+  <p class="lead">Fracture #7 is not just qualitative. The soldier model, computed carefully, predicts a <em>specific wrong angle</em>. The error is systematic, large, and grows with the parameters that matter most for refraction. As far as we can determine from extensive searching, nobody on any physics forum has made this quantitative point.</p>
+
+  <h3>Three tiers of coupling</h3>
+  <p>The key insight: there are three distinct models hiding inside "the marching soldiers analogy," and they give three different predictions.</p>
+
+  <div class="tier-grid">
+    <div class="tier t1">
+      <h4>Tier 1: No Coupling</h4>
+      <p>Each soldier independently enters the slow zone. No awareness of neighbors. No coherent wavefront forms.</p>
+      <span class="angle" id="t1a">θ₂ = θ₁ (no refraction)</span>
+    </div>
+    <div class="tier t2">
+      <h4>Tier 2: Rigid-Rod</h4>
+      <p>Soldiers maintain fixed spacing along their row. The row tilts at the boundary. Computable. Wrong.</p>
+      <span class="angle" id="t2a">θ₂ ≈ 9.5°</span>
+    </div>
+    <div class="tier t3">
+      <h4>Tier 3: Huygens</h4>
+      <p>Each point radiates circular wavelets. The common tangent is the new wavefront. This gives Snell's law.</p>
+      <span class="angle" id="t3a">θ₂ ≈ 15.1°</span>
+    </div>
+  </div>
+
+  <p>The analogy, as typically taught with a pole or linked arms, <strong>smuggles in Tier 3 while pretending to be Tier 2</strong>. The pole is presented as a rigid constraint, but the physics requires Huygens coupling. The two give different answers.</p>
+
+  <div class="formula">Snell (Huygens): &nbsp; θ₂ = arcsin(v · sin θ)</div><br>
+  <div class="formula">Rigid-rod soldiers: &nbsp; θ₂ = arctan(v·sin θ·cos θ / (1 − v·sin²θ))</div>
+  <p>Identical at small angles. Diverge as incidence angle and speed contrast increase.</p>
+
+  <h3>The sharpest version</h3>
+  <p><strong>Huygens coupling is the unique coupling mechanism that produces a unique, correct prediction.</strong> Rigid-rod coupling is underdetermined — maintain spacing along the row? Along the boundary? Perpendicular to the beam? Each choice gives a different wrong angle. The ambiguity itself is diagnostic. Huygens has no ambiguity. The circles are the circles. There is only one tangent.</p>
+</div>
+
+<div class="wide">
+  <div class="chart-wrap">
+    <div class="sim-ctrls">
+      <div class="sg"><label>Glass speed</label><input type=range id=cV min=.15 max=.9 step=.01 value=.42><span class=v id=cVv>0.42</span></div>
+    </div>
+    <canvas id="chartCv"></canvas>
+  </div>
+</div>
+
+<div class="wrap">
+  <p>At θ = 60° and v = 0.30, soldiers give <strong style="color:var(--red)">9.5°</strong>, Snell gives <strong style="color:var(--green)">15.1°</strong>. Under-bending by nearly 40%.</p>
+</div>
+
+<div class="wide">
+  <div class="sim-wrap">
+    <div class="sim-ctrls">
+      <div class="sg"><label>Angle</label><input type=range id=sA min=15 max=75 step=1 value=50><span class=v id=vA>50°</span></div>
+      <div class="sg"><label>Glass speed</label><input type=range id=sN min=.2 max=.9 step=.01 value=.42><span class=v id=vN>0.42</span></div>
+      <button class="b" id=bR>Reset</button>
+      <button class="b" id=bP>Pause</button>
+    </div>
+    <canvas id=simCv></canvas>
+    <div class="sim-readout" id="simReadout"></div>
+  </div>
+</div>
+<div class="wrap">
+  <p>The green semicircles are the thing the soldier model leaves out. Each point radiates laterally. Those wavelets constructively interfere only along the Snell tangent line. The soldier direction is where they destructively interfere. The beam goes where the constructive interference is, not where any individual point is heading.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ FIVE DERIVATIONS ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>Snell's Law: The Five-Fold Way</h2>
+  <p class="lead">Five independent derivations, from five branches of physics, all converge on the same equation. David Nolte of Purdue calls this "deep physics." When forum discussions get heated about which explanation is "really right," the most sophisticated participants point here.</p>
+
+  <div class="deriv">
+    <h4>1. Huygens' Principle</h4><span class="year">1687</span>
+    <p>Every point on a wavefront radiates secondary wavelets. The tangent to those wavelets gives the new wavefront. The geometry yields sin θ₁/v₁ = sin θ₂/v₂. Category: extremum principle.</p>
+  </div>
+  <div class="deriv">
+    <h4>2. Fermat's Principle of Least Time</h4><span class="year">1662</span>
+    <p>Light takes the path that minimizes travel time. Set dT/dx = 0. The path of least time = path of stationary phase = path of maximum constructive interference. Category: extremum principle.</p>
+  </div>
+  <div class="deriv">
+    <h4>3. Wavefront Continuity</h4><span class="year">geometric argument</span>
+    <p>Wavefronts cannot break at the boundary. The shared distance along the interface: d = λ₁/sin θ₁ = λ₂/sin θ₂. Since λ = λ₀/n, Snell's law follows. Category: continuity/conservation.</p>
+  </div>
+  <div class="deriv">
+    <h4>4. Maxwell's Boundary Conditions</h4><span class="year">electromagnetic</span>
+    <p>Phase-matching at the interface requires k₁ sin θ₁ = k₂ sin θ₂. Since k = nω/c, Snell follows. Bonus: also yields the law of reflection. Category: continuity/conservation.</p>
+  </div>
+  <div class="deriv">
+    <h4>5. Photon Momentum Conservation</h4><span class="year">quantum reinterpretation</span>
+    <p>Via de Broglie: p = ℏk. Transverse momentum conserved at the interface. Total momentum changes, but the transverse component stays fixed. Category: continuity/conservation.</p>
+  </div>
+
+  <p style="margin-top:1rem;">Source: David D. Nolte, "Snell's Law: The Five-Fold Way," <em>Galileo Unbound</em>, Jan 27, 2020.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ SIMULATION LANDSCAPE ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Fidelity Spectrum</h2>
+  <p class="lead">How different systems simulate refraction, from Maxwell's equations down to vibes. Nobody in any layer is simulating what the marching soldiers describe.</p>
+</div>
+<div class="wide">
+  <div class="spectrum">
+    <div class="spec-item" style="background:rgba(45,107,79,0.12);">FDTD Solvers<br>(MEEP, Lumerical)<span class="lab">Maxwell's equations on a grid</span></div>
+    <div class="spec-item" style="background:rgba(45,107,79,0.07);">PhET Wave View<span class="lab">Pedagogical 2D wave. Toggle ray vs wave.</span></div>
+    <div class="spec-item" style="background:rgba(150,112,48,0.07);">Path Tracers<br>(Pixar, Arnold)<span class="lab">Snell's law per ray. Fresnel coefficients.</span></div>
+    <div class="spec-item" style="background:rgba(181,81,60,0.07);">Game Engines<br>(pre-RTX)<span class="lab">Screen-space UV hack. No physics.</span></div>
+    <div class="spec-item" style="background:rgba(181,81,60,0.12);">Marching Soldiers<span class="lab">Vibes.</span></div>
+  </div>
+</div>
+<div class="wrap">
+  <p>Pixar's RenderMan implements the vector form of Snell's law at each ray-surface intersection — pure geometric optics, no waves. Dispersion is handled by tracing multiple wavelengths with different indices. No production renderer simulates Huygens wavelets. No game engine ever has.</p>
+  <p>FDTD solvers (MEEP, Lumerical, Tidy3D) literally solve Maxwell's equations in time. You watch wavefronts propagate, compress, and change direction. They are orders of magnitude too expensive for rendering. PhET's "Bending Light" — the gold standard for pedagogy, assigned in university labs from Evergreen State to Alabama — abstracts this into a toggleable ray/wave view that makes the Huygens picture viscerally obvious.</p>
+  <p>Pre-RTX game engines faked refraction with screen-space UV offsets — a warped texture lookup that has nothing to do with Snell's law. Post-RTX, games like Cyberpunk 2077 trace actual refracted rays, but still pure geometric optics at lower sample counts.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ THE PRISM ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>The Prism Problem</h2>
+  <p>Forum discussions about prisms add another layer. Dispersion — splitting white light into a spectrum — requires understanding that the refractive index depends on wavelength. The soldiers all hit the same swamp. There's no way to make some slow more than others depending on their "color."</p>
+  <p>You need either the electromagnetic picture (atomic resonance frequencies cause wavelength-dependent phase velocities) or at minimum the observation that n = n(λ). A Reddit r/AskPhysics thread on "why prisms cause light to split" noted that Snell's law already contains the wavelength dependence through the index, but the deeper question of why n depends on λ requires going to the microscopic interaction of light with matter — oscillating dipoles whose response varies with frequency.</p>
+  <p>This is perhaps the soldier model's most total failure: it cannot even gesture at dispersion. The swamp is the swamp. It doesn't care what color you are.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ SYNTHESIS ═══════════════════ -->
+<section>
+<div class="wrap">
+  <h2>What the Armchair Philosophers Reveal</h2>
+  <p class="lead">The internet's decade-plus discourse on refraction is, in aggregate, a remarkable document. It shows a community perpetually caught between wanting simple intuitive pictures and needing rigorous physics.</p>
+  <p>The marching soldiers model succeeds at one narrow task — making the geometry of Snell's law intuitively plausible — and fails at nearly everything else: it can't explain why light slows down, can't handle single photons, can't capture beam width changes, can't account for dispersion, predicts the wrong angle if you compute it honestly, and subtly misrepresents the mechanism by treating light like particles rather than a wave.</p>
+  <p>Huygens' principle is more rigorous but still leaves the fundamental "why does speed change?" question unanswered. And the deepest answer — QED path integrals, electromagnetic boundary conditions — is inaccessible at the level where the question is most often asked.</p>
+  <p>Refraction sits at a uniquely uncomfortable intersection of physics pedagogy: simple enough to describe (one equation), requiring the full wave theory to explain mechanistically, and the full quantum field theory to explain fundamentally. There is no comfortable middle ground. Every analogy occupies a rung on a ladder with no satisfying stopping point until Feynman's QED lectures — at which point the answer is so abstract (sum over all paths, weighted by e<sup>iS/ℏ</sup>) that it provides no intuitive satisfaction to anyone who originally asked "but why does the straw look bent?"</p>
+  <p>The forums sense this. They name every symptom. They cycle through the same questions year after year. What they do not do — what we did — is take the dominant analogy at face value, compute what it actually predicts, and show it is wrong by a specific, measurable amount. The discourse stays qualitative. The arithmetic was waiting.</p>
+</div>
+</section>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="wrap foot">
+  <p><strong>Sources:</strong> Physics Stack Exchange threads (2011–2020) including "Wavefronts, refraction, and the marching soldiers analogy" (AMG, Nov 2020), "Would a Single Photon Refract?" (Aug 2016), "Problem in explanations about refracted light" (Mar 2017), "Can a light wave front narrow or widen in refraction?" (Jun 2020), "Reconciling refraction with particle theory and wave theory" (Jan 2011). Reddit r/askscience, r/AskPhysics, r/Physics, r/explainlikeimfive (2012–2021). PhysicsForums. Skulls in the Stars blog (Greg Gbur, Jul 2012). Galileo Unbound blog (David D. Nolte, Purdue, Jan 2020). AIP "Wave refraction at an interface: Snell's law versus Chapman's law" (Am. J. Phys. 87(10), 2019). PhET Interactive Simulations (U. Colorado Boulder). Doc Schuster, YouTube (Feb 2013, 43K+ views). CalState ScholarWorks (Jul 2020).</p>
+</div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script>
+// ═══ CHART ═══
+(function(){
+  const cv=document.getElementById('chartCv'),ctx=cv.getContext('2d');
+  let W,H,vG=0.42;
+  function snellA(ti,v){const s=v*Math.sin(ti*Math.PI/180);return Math.abs(s)>1?null:Math.asin(s)*180/Math.PI;}
+  function soldA(ti,v){const t=ti*Math.PI/180,s=Math.sin(t),c=Math.cos(t);return Math.atan2(v*s*c,1-v*s*s)*180/Math.PI;}
+  function draw(){
+    const r=cv.parentElement.getBoundingClientRect();
+    W=Math.round(r.width);H=Math.round(Math.min(360,r.width*.38));
+    cv.width=W;cv.height=H;cv.style.height=H+'px';
+    const pad={l:70,r:30,t:30,b:50},pw=W-pad.l-pad.r,ph=H-pad.t-pad.b;
+    ctx.fillStyle='#faf7f3';ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='#e0d8ce';ctx.lineWidth=1;
+    for(let a=0;a<=90;a+=15){const x=pad.l+(a/90)*pw;ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,pad.t+ph);ctx.stroke();}
+    for(let d=0;d<=50;d+=10){const y=pad.t+ph-(d/50)*ph;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+pw,y);ctx.stroke();}
+    ctx.fillStyle='#6b6056';ctx.font="600 14px 'DM Sans'";ctx.textAlign='center';
+    ctx.fillText('Incidence angle θ',pad.l+pw/2,H-8);
+    ctx.save();ctx.translate(18,pad.t+ph/2);ctx.rotate(-Math.PI/2);ctx.fillText('Refracted angle θ₂',0,0);ctx.restore();
+    ctx.font="500 12px 'DM Mono'";ctx.textAlign='center';ctx.fillStyle='#8a7e72';
+    for(let a=0;a<=90;a+=15){ctx.fillText(a+'°',pad.l+(a/90)*pw,pad.t+ph+18);}
+    ctx.textAlign='right';
+    for(let d=0;d<=50;d+=10){ctx.fillText(d+'°',pad.l-8,pad.t+ph-(d/50)*ph+4);}
+    // Error fill
+    ctx.beginPath();
+    for(let a=1;a<=89;a++){const sn=snellA(a,vG);if(sn===null)continue;const x=pad.l+(a/90)*pw,y=pad.t+ph-(sn/50)*ph;a===1?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    for(let a=89;a>=1;a--){const so=soldA(a,vG);ctx.lineTo(pad.l+(a/90)*pw,pad.t+ph-(so/50)*ph);}
+    ctx.closePath();ctx.fillStyle='rgba(150,112,48,0.12)';ctx.fill();
+    // Snell
+    ctx.strokeStyle='#2d6b4f';ctx.lineWidth=3.5;ctx.beginPath();
+    for(let a=1;a<=89;a++){const sn=snellA(a,vG);if(sn===null)continue;const x=pad.l+(a/90)*pw,y=pad.t+ph-(sn/50)*ph;a===1?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();
+    // Soldier
+    ctx.strokeStyle='#b5513c';ctx.lineWidth=3.5;ctx.setLineDash([8,5]);ctx.beginPath();
+    for(let a=1;a<=89;a++){const so=soldA(a,vG);const x=pad.l+(a/90)*pw,y=pad.t+ph-(so/50)*ph;a===1?ctx.moveTo(x,y):ctx.lineTo(x,y);}
+    ctx.stroke();ctx.setLineDash([]);
+    // Labels
+    const labA=65,snL=snellA(labA,vG),soL=soldA(labA,vG);
+    if(snL!==null){ctx.font="800 14px 'DM Sans'";ctx.textAlign='left';ctx.fillStyle='#2d6b4f';ctx.fillText('Snell',pad.l+(labA/90)*pw+8,pad.t+ph-(snL/50)*ph-8);}
+    ctx.fillStyle='#b5513c';ctx.fillText('Soldiers',pad.l+(labA/90)*pw+8,pad.t+ph-(soL/50)*ph+18);
+    if(snL!==null){ctx.fillStyle='rgba(150,112,48,0.5)';ctx.font="700 12px 'DM Mono'";ctx.textAlign='right';
+    const my=(pad.t+ph-(snL/50)*ph+pad.t+ph-(soL/50)*ph)/2;ctx.fillText(`gap: ${(snL-soL).toFixed(1)}°`,pad.l+(labA/90)*pw-6,my+4);}
+    ctx.fillStyle='#6b6056';ctx.font="600 13px 'DM Sans'";ctx.textAlign='right';ctx.fillText('v = '+vG.toFixed(2),W-pad.r-4,pad.t+14);
+  }
+  draw();window.addEventListener('resize',draw);
+  document.getElementById('cV').oninput=e=>{vG=+e.target.value;document.getElementById('cVv').textContent=vG.toFixed(2);
+    const sn=snellA(50,vG),so=soldA(50,vG);
+    document.getElementById('t1a').textContent='θ₂ = θ₁ = 50° (no change)';
+    document.getElementById('t2a').textContent='θ₂ ≈ '+(so!==null?so.toFixed(1):'—')+'°';
+    document.getElementById('t3a').textContent='θ₂ ≈ '+(sn!==null?sn.toFixed(1):'—')+'°';
+    draw();};
+  document.getElementById('cV').dispatchEvent(new Event('input'));
+})();
+
+// ═══ HUYGENS SIM ═══
+(function(){
+  let theta=50,vG=0.42,paused=false,time=0;
+  const cv=document.getElementById('simCv'),ctx=cv.getContext('2d');
+  let W,H,BY;
+  function sz(){const r=cv.parentElement.getBoundingClientRect();W=Math.round(r.width);H=Math.round(Math.min(500,r.width*.52));cv.width=W;cv.height=H;cv.style.height=H+'px';BY=H*0.36;}
+  const N=12,gap=42;
+  function entryPts(){const x0=90,out=[];for(let i=0;i<N;i++)out.push({x:x0+i*gap,tE:i*gap*Math.sin(theta*Math.PI/180)});return out;}
+  function snellA(ti,v){const s=v*Math.sin(ti*Math.PI/180);return Math.abs(s)>1?null:Math.asin(s)*180/Math.PI;}
+  function soldA(ti,v){const t=ti*Math.PI/180,s=Math.sin(t),c=Math.cos(t);return Math.atan2(v*s*c,1-v*s*s)*180/Math.PI;}
+  function reset(){time=0;}
+  function render(){
+    if(!paused)time+=0.75;sz();
+    const pts=entryPts(),th=theta*Math.PI/180,st=Math.sin(th),ct=Math.cos(th);
+    ctx.fillStyle='#faf7f3';ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#f0e8db';ctx.fillRect(0,BY,W,H-BY);
+    ctx.strokeStyle='#b5a890';ctx.lineWidth=3.5;ctx.beginPath();ctx.moveTo(0,BY);ctx.lineTo(W,BY);ctx.stroke();
+    ctx.font="700 15px 'DM Sans'";ctx.textAlign='right';ctx.fillStyle='#b5a890';ctx.fillText('air',W-20,BY-14);ctx.fillText('glass',W-20,BY+28);
+    // Incoming
+    const aL=130;ctx.strokeStyle='rgba(100,130,170,0.3)';ctx.lineWidth=3;ctx.setLineDash([8,6]);
+    ctx.beginPath();ctx.moveTo(pts[0].x-st*aL,BY-ct*aL);ctx.lineTo(pts[0].x,BY);ctx.stroke();ctx.setLineDash([]);
+    const aa=Math.atan2(ct,st);ctx.fillStyle='rgba(100,130,170,0.35)';ctx.beginPath();ctx.moveTo(pts[0].x,BY);
+    ctx.lineTo(pts[0].x-14*Math.cos(aa-.3),BY-14*Math.sin(aa-.3));ctx.lineTo(pts[0].x-14*Math.cos(aa+.3),BY-14*Math.sin(aa+.3));ctx.closePath();ctx.fill();
+    for(let w=-2;w<=0;w++){const d=pts[0].tE-(time+w*48);if(d<-20||d>200)continue;const cx=pts[0].x-st*d,cy=BY-ct*d,half=H*.7;
+      ctx.save();ctx.beginPath();ctx.rect(0,0,W,BY);ctx.clip();ctx.strokeStyle=w===0?'rgba(100,130,170,0.45)':'rgba(100,130,170,0.14)';ctx.lineWidth=w===0?3.5:2.5;
+      ctx.beginPath();ctx.moveTo(cx-ct*half,cy+st*half);ctx.lineTo(cx+ct*half,cy-st*half);ctx.stroke();ctx.restore();}
+    const ent=[];for(const p of pts){const dt=time-p.tE;if(dt>0)ent.push({x:p.x,r:vG*dt,dt});}
+    // Circles
+    for(const e of ent){if(e.r<1)continue;ctx.strokeStyle='rgba(45,107,79,0.22)';ctx.lineWidth=2.8;ctx.beginPath();ctx.arc(e.x,BY,e.r,0,Math.PI);ctx.stroke();
+      ctx.fillStyle='rgba(45,107,79,0.03)';ctx.beginPath();ctx.arc(e.x,BY,e.r,0,Math.PI);ctx.fill();}
+    // Snell wavefront
+    if(ent.length>=2){const sn=snellA(theta,vG);if(sn!==null){const sr=sn*Math.PI/180,f=ent[0],l=ent[ent.length-1];
+      const tx0=f.x+f.r*Math.sin(sr),ty0=BY+f.r*Math.cos(sr),tx1=l.x+l.r*Math.sin(sr),ty1=BY+l.r*Math.cos(sr);
+      const dx=tx1-tx0,dy=ty1-ty0,len=Math.hypot(dx,dy);if(len>3){const ext=70;ctx.strokeStyle='#2d6b4f';ctx.lineWidth=4;ctx.beginPath();
+        ctx.moveTo(tx0-dx/len*ext,ty0-dy/len*ext);ctx.lineTo(tx1+dx/len*ext,ty1+dy/len*ext);ctx.stroke();
+        for(const e of ent){if(e.r<2)continue;ctx.fillStyle='rgba(45,107,79,0.35)';ctx.beginPath();ctx.arc(e.x+e.r*Math.sin(sr),BY+e.r*Math.cos(sr),4.5,0,Math.PI*2);ctx.fill();}
+        const mx=(tx0+tx1)/2,my=(ty0+ty1)/2;let nx=-dy/len,ny=dx/len;if(ny<0){nx=-nx;ny=-ny;}const rl=55;
+        ctx.strokeStyle='rgba(45,107,79,0.45)';ctx.lineWidth=3;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx+nx*rl,my+ny*rl);ctx.stroke();ctx.setLineDash([]);
+        const ra=Math.atan2(ny,nx);ctx.fillStyle='rgba(45,107,79,0.45)';ctx.beginPath();ctx.moveTo(mx+nx*rl,my+ny*rl);
+        ctx.lineTo(mx+nx*rl-12*Math.cos(ra-.3),my+ny*rl-12*Math.sin(ra-.3));ctx.lineTo(mx+nx*rl-12*Math.cos(ra+.3),my+ny*rl-12*Math.sin(ra+.3));ctx.closePath();ctx.fill();
+        ctx.font="800 15px 'DM Sans'";ctx.textAlign='left';ctx.fillStyle='#2d6b4f';ctx.fillText('Snell',tx1+dx/len*ext+10,ty1+dy/len*ext+5);}}}
+    // Soldiers
+    if(ent.length>=2){const sP=ent.map(e=>({x:e.x+st*vG*e.dt,y:BY+ct*vG*e.dt}));
+      for(const s of sP){ctx.fillStyle='#b5513c';ctx.beginPath();ctx.arc(s.x,s.y,6,0,Math.PI*2);ctx.fill();}
+      for(let i=0;i<sP.length;i+=2){const s=sP[i],vl=vG*20;ctx.strokeStyle='rgba(181,81,60,0.3)';ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(s.x,s.y);ctx.lineTo(s.x+st*vl,s.y+ct*vl);ctx.stroke();
+        const va=Math.atan2(ct,st);ctx.fillStyle='rgba(181,81,60,0.3)';ctx.beginPath();ctx.moveTo(s.x+st*vl,s.y+ct*vl);
+        ctx.lineTo(s.x+st*vl-7*Math.cos(va-.4),s.y+ct*vl-7*Math.sin(va-.4));ctx.lineTo(s.x+st*vl-7*Math.cos(va+.4),s.y+ct*vl-7*Math.sin(va+.4));ctx.closePath();ctx.fill();}
+      const sf=sP[0],sl=sP[sP.length-1],dx=sl.x-sf.x,dy=sl.y-sf.y,len=Math.hypot(dx,dy);
+      if(len>3){const ext=70;ctx.strokeStyle='#b5513c';ctx.lineWidth=3.5;ctx.setLineDash([10,7]);ctx.beginPath();
+        ctx.moveTo(sf.x-dx/len*ext,sf.y-dy/len*ext);ctx.lineTo(sl.x+dx/len*ext,sl.y+dy/len*ext);ctx.stroke();ctx.setLineDash([]);
+        const mx=(sf.x+sl.x)/2,my=(sf.y+sl.y)/2;let nx=-dy/len,ny=dx/len;if(ny<0){nx=-nx;ny=-ny;}const rl=55;
+        ctx.strokeStyle='rgba(181,81,60,0.35)';ctx.lineWidth=3;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(mx,my);ctx.lineTo(mx+nx*rl,my+ny*rl);ctx.stroke();ctx.setLineDash([]);
+        const sa=Math.atan2(ny,nx);ctx.fillStyle='rgba(181,81,60,0.35)';ctx.beginPath();ctx.moveTo(mx+nx*rl,my+ny*rl);
+        ctx.lineTo(mx+nx*rl-12*Math.cos(sa-.3),my+ny*rl-12*Math.sin(sa-.3));ctx.lineTo(mx+nx*rl-12*Math.cos(sa+.3),my+ny*rl-12*Math.sin(sa+.3));ctx.closePath();ctx.fill();
+        ctx.font="800 15px 'DM Sans'";ctx.textAlign='left';ctx.fillStyle='#b5513c';ctx.fillText('Soldiers',sl.x+dx/len*ext+10,sl.y+dy/len*ext+5);}}
+    // Entry dots
+    for(const p of pts){const dt=time-p.tE;if(dt<-40)continue;ctx.fillStyle=dt>0?'#5c4f42':'rgba(100,130,170,0.35)';ctx.beginPath();ctx.arc(p.x,BY,dt>0?5:4,0,Math.PI*2);ctx.fill();}
+    // Normal
+    ctx.strokeStyle='rgba(90,80,70,0.15)';ctx.lineWidth=2;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(pts[0].x,BY-70);ctx.lineTo(pts[0].x,BY+100);ctx.stroke();ctx.setLineDash([]);
+    // Arcs
+    const aR=44;ctx.strokeStyle='rgba(100,130,170,0.4)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(pts[0].x,BY,aR,-Math.PI/2,Math.atan2(-ct,-st),true);ctx.stroke();
+    ctx.font="700 13px 'DM Mono'";ctx.textAlign='left';ctx.fillStyle='rgba(100,130,170,0.55)';ctx.fillText(`${theta}°`,pts[0].x+aR+8,BY-aR+12);
+    if(ent.length>=2){const sn=snellA(theta,vG);if(sn!==null){ctx.strokeStyle='rgba(45,107,79,0.5)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(pts[0].x,BY,aR*.8,Math.PI/2,Math.PI/2-sn*Math.PI/180,true);ctx.stroke();
+      ctx.fillStyle='#2d6b4f';ctx.font="700 13px 'DM Mono'";ctx.fillText(`${sn.toFixed(1)}°`,pts[0].x+aR*.8+8,BY+14);}
+      const so=soldA(theta,vG);ctx.strokeStyle='rgba(181,81,60,0.4)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(pts[0].x,BY,aR*.6,Math.PI/2,Math.PI/2-so*Math.PI/180,true);ctx.stroke();
+      ctx.fillStyle='#b5513c';ctx.font="700 13px 'DM Mono'";ctx.fillText(`${so.toFixed(1)}°`,pts[0].x+aR*.6+8,BY+32);}
+    // Readout
+    const sn=snellA(theta,vG),so=soldA(theta,vG);
+    if(sn!==null){const err=Math.abs(sn-so);document.getElementById('simReadout').innerHTML=
+      `<span class="snell">Snell: ${sn.toFixed(1)}°</span> · <span class="sold">Soldiers: ${so.toFixed(1)}°</span> · <span class="err">error ${err.toFixed(1)}° (${(err/sn*100).toFixed(0)}%)</span>`;}
+    requestAnimationFrame(render);}
+  document.getElementById('sA').oninput=e=>{theta=+e.target.value;document.getElementById('vA').textContent=theta+'°';reset();};
+  document.getElementById('sN').oninput=e=>{vG=+e.target.value;document.getElementById('vN').textContent=vG.toFixed(2);reset();};
+  document.getElementById('bR').onclick=reset;
+  document.getElementById('bP').onclick=()=>{paused=!paused;document.getElementById('bP').textContent=paused?'Play':'Pause';};
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>

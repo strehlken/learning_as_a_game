@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marching Soldiers</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:17px;background:#0a0b10;color:#c8cad4;padding:1.4rem;}
+  .pg{max-width:900px;margin:0 auto;}
+  h1{font-size:2rem;font-weight:700;color:#e8eaf0;margin-bottom:.2rem;}
+  .sub{font-size:1rem;color:#7a7e88;margin-bottom:.7rem;line-height:1.5;}
+  .ctrls{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center;margin-bottom:.6rem;}
+  .sg{display:flex;align-items:center;gap:.35rem;font-size:.9rem;color:#7a7e88;}
+  .sg input[type=range]{width:120px;accent-color:#5a8fd4;}
+  .sg .v{font-family:'IBM Plex Mono',monospace;font-size:.84rem;color:#a0a4ae;min-width:2.5rem;}
+  button.b{font-family:inherit;font-size:.9rem;font-weight:600;border:1px solid #2e3140;border-radius:6px;background:#181a24;color:#a0a4b0;padding:.35rem .7rem;cursor:pointer;}
+  .cw{border-radius:12px;overflow:hidden;border:1px solid #22252e;}
+  canvas{display:block;width:100%;}
+</style>
+</head>
+<body>
+<div class="pg">
+  <h1>Marching Soldiers</h1>
+  <p class="sub">Every soldier marches in the same direction. Nobody turns. The ones in mud just go slower. Watch what happens to the line connecting them.</p>
+  <div class="ctrls">
+    <div class="sg"><label>Angle</label><input type=range id=sA min=15 max=75 step=1 value=40><span class=v id=vA>40°</span></div>
+    <div class="sg"><label>Slow zone speed</label><input type=range id=sN min=.2 max=.9 step=.01 value=.55><span class=v id=vN>0.55</span></div>
+    <button class="b" id=bR>Reset</button>
+  </div>
+  <div class="cw"><canvas id=cv></canvas></div>
+</div>
+<script>
+let angle=40, slowSpeed=0.55;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+let W,H;
+function sz(){const r=cv.parentElement.getBoundingClientRect();W=Math.round(r.width);H=Math.round(Math.min(620,r.width*.7));cv.width=W;cv.height=H;cv.style.height=H+'px';}
+
+const bY=()=>H*0.45;
+let rows=[];
+let clock=0;
+const spacing=36;
+const nSoldiers=24;
+const baseSpeed=1.2;
+
+function spawnRow(){
+  const a=angle*Math.PI/180;
+  const dx=Math.cos(a),dy=Math.sin(a);
+  const px=-dy,py=dx;
+  const originX=-60, originY=-20;
+  const width=H*0.9;
+  const soldiers=[];
+  for(let i=0;i<nSoldiers;i++){
+    const t=(i/(nSoldiers-1)-.5)*width;
+    soldiers.push({x:originX+px*t, y:originY+py*t});
+  }
+  rows.push(soldiers);
+}
+
+function reset(){rows=[];clock=0;}
+
+function render(){
+  sz();
+  const a=angle*Math.PI/180;
+  const dx=Math.cos(a),dy=Math.sin(a);
+  const BY=bY();
+
+  const need=Math.floor(clock/spacing*baseSpeed)+6;
+  while(rows.length<need) spawnRow();
+
+  for(const row of rows){
+    for(const s of row){
+      const spd=(s.y>=BY)?slowSpeed:1;
+      s.x+=dx*spd*baseSpeed;
+      s.y+=dy*spd*baseSpeed;
+    }
+  }
+
+  rows=rows.filter(row=>row.some(s=>s.x<W+60&&s.y<H+60));
+  clock++;
+
+  ctx.fillStyle='#0e1018';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='rgba(80,50,20,0.08)';ctx.fillRect(0,BY,W,H-BY);
+  ctx.strokeStyle='rgba(120,90,50,0.35)';ctx.lineWidth=2;
+  ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(0,BY);ctx.lineTo(W,BY);ctx.stroke();ctx.setLineDash([]);
+
+  ctx.font="600 15px 'IBM Plex Sans'";ctx.textAlign='right';
+  ctx.fillStyle='rgba(140,180,255,0.2)';ctx.fillText('speed = 1',W-16,BY-12);
+  ctx.fillStyle='rgba(220,160,80,0.2)';ctx.fillText('speed = '+slowSpeed.toFixed(2),W-16,BY+28);
+
+  for(const row of rows){
+    ctx.strokeStyle='rgba(160,180,210,0.25)';ctx.lineWidth=1;
+    ctx.beginPath();
+    for(let i=0;i<row.length;i++) i?ctx.lineTo(row[i].x,row[i].y):ctx.moveTo(row[i].x,row[i].y);
+    ctx.stroke();
+    for(const s of row){
+      const inSlow=s.y>=BY;
+      ctx.fillStyle=inSlow?'rgba(240,160,60,0.85)':'rgba(120,180,255,0.8)';
+      ctx.beginPath();ctx.arc(s.x,s.y,inSlow?3:3.5,0,Math.PI*2);ctx.fill();
+    }
+  }
+
+  requestAnimationFrame(render);
+}
+
+document.getElementById('sA').oninput=e=>{angle=+e.target.value;document.getElementById('vA').textContent=angle+'°';reset();};
+document.getElementById('sN').oninput=e=>{slowSpeed=+e.target.value;document.getElementById('vN').textContent=slowSpeed.toFixed(2);reset();};
+document.getElementById('bR').onclick=reset;
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

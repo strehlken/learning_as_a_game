@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huygens Wavelet Engine</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌊</text></svg>">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;0,8..60,800;1,8..60,400;1,8..60,600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box;}
+
+:root{
+  --bg:#f0ebe4;--bg2:#faf7f3;--bg3:#e6dfd6;
+  --stone:#c4b9ab;--stone-d:#8b7d6b;
+  --ink:#1e1a16;--ink2:#2a2520;--ink3:#4a4139;
+  --mute:#6b6056;--mute2:#8a7e72;
+  --green:#2d6b4f;--green-l:rgba(45,107,79,0.08);
+  --red:#b5513c;--red-l:rgba(181,81,60,0.06);
+  --blue:#3d6a96;--blue-l:rgba(61,106,150,0.06);
+  --gold:#967030;--gold-l:rgba(150,112,48,0.06);
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --mono:'DM Mono',monospace;
+}
+
+body{font-family:var(--sans);font-size:18px;line-height:1.7;background:var(--bg);color:var(--ink2);}
+.wrap{max-width:920px;margin:0 auto;padding:0 1.6rem;}
+
+.sim-wrap{border-radius:16px;overflow:hidden;border:3px solid var(--stone);background:var(--bg2);box-shadow:0 8px 30px rgba(60,45,30,.08);margin:2rem 0;}
+canvas{display:block;width:100%;cursor:crosshair;}
+
+.sim-ctrls{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;padding:.8rem 1rem;border-bottom:2px solid var(--stone);background:var(--bg);}
+.sg{display:flex;align-items:center;gap:.5rem;font-size:.95rem;font-weight:600;color:var(--mute);}
+.sg label{font-size:.85rem;font-weight:600;color:var(--mute2);}
+.sg input[type=range]{-webkit-appearance:none;appearance:none;width:120px;height:8px;border-radius:4px;background:#d4ccc2;outline:none;cursor:pointer;}
+.sg input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#5c4f42;border:3px solid var(--bg);cursor:pointer;}
+.sg .v{font-family:var(--mono);font-size:.95rem;font-weight:500;color:var(--ink);min-width:3rem;}
+button.b{font-family:var(--sans);font-size:.95rem;font-weight:700;border:3px solid var(--stone);border-radius:10px;background:var(--bg3);color:var(--ink3);padding:.35rem .7rem;cursor:pointer;transition:all .15s;}
+button.b:hover{border-color:var(--stone-d);background:#ddd4c8;}
+
+.sim-readout{padding:.6rem 1rem;font-family:var(--mono);font-size:.9rem;color:var(--mute);font-weight:500;border-top:2px solid var(--stone);background:var(--bg);}
+.sim-readout .snell{color:var(--green);font-weight:700;}
+.sim-readout .angle{color:var(--blue);font-weight:700;}
+.sim-readout .verify{color:var(--mute2);font-weight:500;}
+
+@media(max-width:700px){
+  body{font-size:17px;}.wrap{padding:0 1rem;}
+  .sg input[type=range]{width:90px;}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="sim-wrap">
+    <div class="sim-ctrls">
+      <div class="sg"><label>Angle</label><input type=range id=rAngle min=10 max=80 step=1 value=45><span class=v id=vAngle>45°</span></div>
+      <div class="sg"><label>n₂</label><input type=range id=rIndex min=1.1 max=2.8 step=.01 value=1.50><span class=v id=vIndex>1.50</span></div>
+      <div class="sg"><label>Width</label><input type=range id=rWidth min=4 max=20 step=1 value=12><span class=v id=vWidth>12</span></div>
+      <div class="sg"><label>Speed</label><input type=range id=rSpeed min=0.2 max=2.5 step=.1 value=1.0><span class=v id=vSpeed>1.0x</span></div>
+      <button class=b id=bPause>Pause</button>
+      <button class=b id=bReset>Reset</button>
+    </div>
+    <canvas id=cv></canvas>
+    <div class="sim-readout" id=readout></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+
+  // ─── State ───
+  var W, H, BY;
+  var theta = 45;       // incidence angle (degrees)
+  var nRatio = 1.50;    // refractive index ratio n2/n1
+  var beamN = 12;       // source points along beam width
+  var speedMul = 1.0;
+  var paused = false;
+  var time = 0;
+
+  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var GAP = 28;          // spacing between source points (pixels)
+  var WF_SPACING = 32;   // wavefront spacing = wavelength in air (pixels)
+
+  // ─── Palette ───
+  var C = {
+    canvasBg: '#faf7f3',
+    glassBg:  '#f0e8db',
+    boundary: '#b5a890',
+    label:    '#8a7e72',
+    beam:     function(a) { return 'rgba(61,106,150,' + a + ')'; },
+    ref:      function(a) { return 'rgba(45,107,79,' + a + ')'; },
+    hi:       function(a) { return 'rgba(180,130,40,' + a + ')'; }, // gold highlight
+    dot:      '#5c4f42',
+    dotPend:  function(a) { return 'rgba(61,106,150,' + a + ')'; },
+  };
+
+  // ─── Physics ───
+  // Speed in glass relative to air (v_glass = 1/n)
+  function vGlass() { return 1.0 / nRatio; }
+
+  // Snell's law — used ONLY for readout verification, never for drawing
+  function snellDeg(thetaI, n) {
+    var s = Math.sin(thetaI * Math.PI / 180) / n;
+    return Math.abs(s) > 1 ? null : Math.asin(s) * 180 / Math.PI;
+  }
+
+  // ─── Geometric tangent from actual wavelet circles ───
+  // Given active circles on the boundary, compute the common tangent.
+  // Returns { sinPhi, cosPhi } or null if fewer than 2 circles.
+  //
+  // Each circle i sits at (x_i, BY) with radius r_i = vG * dt_i.
+  // The external tangent below the boundary satisfies:
+  //   sin(phi) = (r_first - r_last) / (x_last - x_first)
+  // This IS Snell's law, but we derive it from geometry, not from the formula.
+  function tangentFromCircles(circles) {
+    if (circles.length < 2) return null;
+    var first = circles[0];
+    var last = circles[circles.length - 1];
+    var dx = last.x - first.x;
+    if (Math.abs(dx) < 0.01) return null;
+    var sinPhi = (first.r - last.r) / dx;
+    if (Math.abs(sinPhi) > 1) return null; // total internal reflection
+    var cosPhi = Math.sqrt(1 - sinPhi * sinPhi);
+    return { sinPhi: sinPhi, cosPhi: cosPhi };
+  }
+
+  // ─── Layout ───
+  function resize() {
+    var rect = cv.parentElement.getBoundingClientRect();
+    W = Math.round(rect.width);
+    H = Math.round(Math.min(520, rect.width * 0.55));
+    cv.width = W * DPR;
+    cv.height = H * DPR;
+    cv.style.height = H + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    BY = Math.round(H * 0.38);
+  }
+
+  // ─── Source points on boundary ───
+  function sourcePoints() {
+    var thR = theta * Math.PI / 180;
+    var st = Math.sin(thR);
+    var totalW = (beamN - 1) * GAP;
+    var x0 = (W - totalW) / 2;
+    var pts = [];
+    for (var i = 0; i < beamN; i++) {
+      pts.push({ x: x0 + i * GAP, tEntry: i * GAP * st });
+    }
+    return pts;
+  }
+
+  // ─── Active circles at a given reference time ───
+  function activeCircles(pts, tRef) {
+    var vG = vGlass();
+    var out = [];
+    for (var i = 0; i < pts.length; i++) {
+      var dt = tRef - pts[i].tEntry;
+      if (dt > 0) out.push({ x: pts[i].x, r: vG * dt, dt: dt });
+    }
+    return out;
+  }
+
+  // Auto-loop
+  function autoLoop(pts) {
+    if (pts.length === 0) return;
+    var last = pts[pts.length - 1];
+    var vG = vGlass();
+    var maxTravel = (H - BY) * 1.3;
+    if ((time - last.tEntry) * vG > maxTravel) time = -60;
+  }
+
+  // ─── Draw: background ─���─
+  function drawBackground() {
+    ctx.fillStyle = C.canvasBg;
+    ctx.fillRect(0, 0, W, BY);
+    ctx.fillStyle = C.glassBg;
+    ctx.fillRect(0, BY, W, H - BY);
+    ctx.strokeStyle = C.boundary;
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(0, BY);
+    ctx.lineTo(W, BY);
+    ctx.stroke();
+    ctx.font = "700 15px 'DM Sans', system-ui, sans-serif";
+    ctx.textAlign = 'right';
+    ctx.fillStyle = C.label;
+    ctx.fillText('air', W - 20, BY - 14);
+    ctx.fillText('glass', W - 20, BY + 28);
+  }
+
+  // ─── Draw: beam envelope ───
+  // Incident beam: direction from theta. Refracted beam: direction from geometric tangent.
+  function drawBeamEnvelope(pts, leadingTangent) {
+    if (pts.length < 2) return;
+    var thR = theta * Math.PI / 180;
+    var st = Math.sin(thR), ct = Math.cos(thR);
+    var first = pts[0], last = pts[pts.length - 1];
+    var beamLen = 350;
+
+    // ── Incident beam ──
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, BY + 1);
+    ctx.clip();
+
+    var grad1 = ctx.createLinearGradient(
+      first.x - st * beamLen, BY - ct * beamLen, first.x, BY
+    );
+    grad1.addColorStop(0, C.beam(0));
+    grad1.addColorStop(0.4, C.beam(0.03));
+    grad1.addColorStop(1, C.beam(0.08));
+
+    ctx.fillStyle = grad1;
+    ctx.beginPath();
+    ctx.moveTo(first.x - st * beamLen, BY - ct * beamLen);
+    ctx.lineTo(first.x, BY);
+    ctx.lineTo(last.x, BY);
+    ctx.lineTo(last.x - st * beamLen, BY - ct * beamLen);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = C.beam(0.18);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(first.x - st * beamLen, BY - ct * beamLen);
+    ctx.lineTo(first.x, BY);
+    ctx.moveTo(last.x - st * beamLen, BY - ct * beamLen);
+    ctx.lineTo(last.x, BY);
+    ctx.stroke();
+    ctx.restore();
+
+    // ── Refracted beam (direction from geometric tangent, not Snell) ──
+    if (!leadingTangent) return;
+    var sR = leadingTangent.sinPhi;
+    var cR = leadingTangent.cosPhi;
+
+    var vG = vGlass();
+    var dt0 = time - first.tEntry;
+    var dtLast = time - last.tEntry;
+    if (dt0 <= 0) return;
+
+    var reach0 = vG * Math.max(0, dt0);
+    var reachLast = vG * Math.max(0, dtLast);
+    var maxReach = Math.max(reach0, reachLast);
+    if (maxReach < 2) return;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, BY - 1, W, H - BY + 1);
+    ctx.clip();
+
+    var ext0 = Math.min(reach0, 400);
+    var extL = Math.min(Math.max(reachLast, 0), 400);
+    var fadeLen = Math.min(Math.max(ext0, extL) * 1.1, 350);
+
+    // Solid fill — visible tube of light
+    var grad2 = ctx.createLinearGradient(
+      first.x, BY, first.x + sR * fadeLen, BY + cR * fadeLen
+    );
+    grad2.addColorStop(0, C.ref(0.18));
+    grad2.addColorStop(0.5, C.ref(0.12));
+    grad2.addColorStop(1, C.ref(0.02));
+
+    ctx.fillStyle = grad2;
+    ctx.beginPath();
+    ctx.moveTo(first.x, BY);
+    ctx.lineTo(first.x + sR * ext0, BY + cR * ext0);
+    ctx.lineTo(last.x + sR * extL, BY + cR * extL);
+    ctx.lineTo(last.x, BY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Edges
+    ctx.strokeStyle = C.ref(0.30);
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(first.x, BY);
+    ctx.lineTo(first.x + sR * ext0, BY + cR * ext0);
+    ctx.moveTo(last.x, BY);
+    ctx.lineTo(last.x + sR * extL, BY + cR * extL);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // ─── Draw: incident wavefronts (perpendicular to beam direction) ───
+  // The gold wavefront is w=0 — the FIRST wavefront, the leading edge.
+  // You follow it the whole time: air → boundary → glass.
+  function drawIncidentWavefronts(pts) {
+    if (pts.length < 2) return;
+    var thR = theta * Math.PI / 180;
+    var st = Math.sin(thR), ct = Math.cos(thR);
+    var first = pts[0], last = pts[pts.length - 1];
+    var beamLen = 350;
+
+    // Clip to beam envelope in air
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(first.x - st * beamLen, BY - ct * beamLen);
+    ctx.lineTo(first.x, BY);
+    ctx.lineTo(last.x, BY);
+    ctx.lineTo(last.x - st * beamLen, BY - ct * beamLen);
+    ctx.closePath();
+    ctx.clip();
+    ctx.beginPath();
+    ctx.rect(0, 0, W, BY);
+    ctx.clip();
+
+    var halfExt = W; // full width, clipping trims
+
+    // Total sweep distance: how far d goes negative before the last point is crossed
+    var totalSweep = last.tEntry - first.tEntry;
+
+    for (var w = -12; w <= 4; w++) {
+      var d = first.tEntry - (time + w * WF_SPACING);
+      var isGold = (w === 0);
+
+      // Only skip if truly off canvas
+      if (d < -(totalSweep + 500) || d > 500) continue;
+
+      var mx = first.x - st * d;
+      var my = BY - ct * d;
+
+      if (isGold) {
+        // Gold is always full strength — clipping handles visibility
+        ctx.strokeStyle = C.hi(0.7);
+        ctx.lineWidth = 3;
+      } else {
+        // Fade only with distance from boundary into the sky, not past it
+        var dist = ct * d; // positive = far from boundary in air
+        var alpha = 0.18;
+        if (dist > 0) alpha = Math.max(0.04, 0.18 - dist * 0.0008);
+        // No fade when past boundary — clipping handles it
+        ctx.strokeStyle = C.beam(alpha.toFixed(3));
+        ctx.lineWidth = 1.5;
+      }
+      ctx.beginPath();
+      ctx.moveTo(mx - ct * halfExt, my + st * halfExt);
+      ctx.lineTo(mx + ct * halfExt, my - st * halfExt);
+      ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // ─── Draw: wavelets (geometry drives everything) ───
+  function drawWavelets(pts) {
+    var vG = vGlass();
+    var lambdaGlass = WF_SPACING * vG;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, BY, W, H - BY);
+    ctx.clip();
+
+    // ── Semicircular wavelets — leading circle + 1 faint trail ──
+    for (var pi = 0; pi < pts.length; pi++) {
+      var dt = time - pts[pi].tEntry;
+      if (dt <= 0) continue;
+      var r = vG * dt;
+      var x = pts[pi].x;
+
+      // Leading circle (outermost = the gold wavefront's contribution)
+      // This IS the gold wavefront's wavelet — it's always the outermost
+      if (r > 1) {
+        ctx.strokeStyle = C.hi(Math.max(0.08, 0.30 - r * 0.0005).toFixed(3));
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, BY, r, 0, Math.PI);
+        ctx.stroke();
+      }
+
+      // One faint trailing ring
+      var r1 = r - lambdaGlass;
+      if (r1 > 2) {
+        ctx.strokeStyle = C.ref(0.06);
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(x, BY, r1, 0, Math.PI);
+        ctx.stroke();
+      }
+    }
+
+    // ── Tangent wavefronts ──
+    var allActive = activeCircles(pts, time);
+    if (allActive.length >= 2) {
+      for (var w = 0; w <= 8; w++) {
+        var circles = activeCircles(pts, time - w * WF_SPACING);
+        if (circles.length < 2) continue;
+
+        var tan = tangentFromCircles(circles);
+        if (!tan) continue;
+
+        var f = circles[0], l = circles[circles.length - 1];
+        var tx0 = f.x + f.r * tan.sinPhi;
+        var ty0 = BY + f.r * tan.cosPhi;
+        var tx1 = l.x + l.r * tan.sinPhi;
+        var ty1 = BY + l.r * tan.cosPhi;
+
+        if (ty0 < BY && ty1 < BY) continue;
+
+        if (w === 0) {
+          // Gold tangent — this IS the gold wavefront continuing into glass
+          // Glow
+          ctx.strokeStyle = C.hi(0.12);
+          ctx.lineWidth = 12;
+          ctx.beginPath();
+          ctx.moveTo(tx0, ty0);
+          ctx.lineTo(tx1, ty1);
+          ctx.stroke();
+          // Solid
+          ctx.strokeStyle = C.hi(0.60);
+          ctx.lineWidth = 3.5;
+          ctx.beginPath();
+          ctx.moveTo(tx0, ty0);
+          ctx.lineTo(tx1, ty1);
+          ctx.stroke();
+        } else {
+          var talpha = Math.max(0, 0.20 - w * 0.03);
+          if (talpha <= 0) continue;
+          ctx.strokeStyle = C.ref(talpha.toFixed(3));
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(tx0, ty0);
+          ctx.lineTo(tx1, ty1);
+          ctx.stroke();
+        }
+      }
+
+      // ── Tangent dots on leading (gold) wavefront ──
+      var leadTan = tangentFromCircles(allActive);
+      if (leadTan) {
+        for (var di = 0; di < allActive.length; di++) {
+          var da = allActive[di];
+          if (da.r < 4) continue;
+          var tx = da.x + da.r * leadTan.sinPhi;
+          var ty = BY + da.r * leadTan.cosPhi;
+          if (ty < BY) continue;
+          ctx.fillStyle = C.hi(0.50);
+          ctx.beginPath();
+          ctx.arc(tx, ty, 3.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    ctx.restore();
+  }
+
+  // ─── Draw: entry dots ───
+  // Gold flash is tied to dt = time - tEntry: the leading wavefront hitting this dot.
+  function drawEntryDots(pts) {
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      var dt = time - p.tEntry;
+
+      if (dt > 0) {
+        var flash = Math.max(0, 1 - dt / (WF_SPACING * 0.6));
+        if (flash > 0.05) {
+          // Gold flash ring
+          ctx.strokeStyle = C.hi((flash * 0.6).toFixed(2));
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(p.x, BY, 4 + flash * 4, 0, Math.PI * 2);
+          ctx.stroke();
+          // Gold center
+          ctx.fillStyle = C.hi((flash * 0.8).toFixed(2));
+          ctx.beginPath();
+          ctx.arc(p.x, BY, 3 + flash * 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Settled dot
+          ctx.fillStyle = C.dot;
+          ctx.globalAlpha = 0.30;
+          ctx.beginPath();
+          ctx.arc(p.x, BY, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalAlpha = 1;
+        }
+      } else if (dt > -40) {
+        var approach = 1 + dt / 40;
+        ctx.fillStyle = C.dotPend((approach * 0.3).toFixed(2));
+        ctx.beginPath();
+        ctx.arc(p.x, BY, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  }
+
+
+  // ─── Readout ───
+  // Shows the geometrically-derived angle, then verifies against Snell
+  function updateReadout(leadingTangent) {
+    var el = document.getElementById('readout');
+    if (!leadingTangent) {
+      el.innerHTML = '';
+      return;
+    }
+    var phiDeg = Math.asin(leadingTangent.sinPhi) * 180 / Math.PI;
+    var snellCheck = snellDeg(theta, nRatio);
+
+    if (snellCheck !== null) {
+      var sinRatio = (Math.sin(theta * Math.PI / 180) / leadingTangent.sinPhi);
+      el.innerHTML =
+        '<span class="angle">\u03B8\u2081 = ' + theta + '\u00B0</span>' +
+        ' \u2192 ' +
+        '<span class="snell">\u03B8\u2082 = ' + phiDeg.toFixed(1) + '\u00B0</span>' +
+        ' (from tangent)' +
+        ' \u00B7 ' +
+        '<span class="verify">sin \u03B8\u2081 / sin \u03B8\u2082 = ' +
+        sinRatio.toFixed(3) +
+        ' \u2248 n\u2082 = ' + nRatio.toFixed(2) +
+        '</span>';
+    } else {
+      el.innerHTML = '<span style="color:var(--red)">Total internal reflection</span>';
+    }
+  }
+
+  // ─── Render ───
+  function render() {
+    if (!paused) time += 0.55 * speedMul;
+    resize();
+    var pts = sourcePoints();
+
+    // Compute leading tangent once — this drives beam direction, angles, readout
+    var leading = activeCircles(pts, time);
+    var leadingTangent = tangentFromCircles(leading);
+
+    drawBackground();
+    drawBeamEnvelope(pts, leadingTangent);
+    drawIncidentWavefronts(pts);
+    drawWavelets(pts);
+    drawEntryDots(pts);
+    updateReadout(leadingTangent);
+    autoLoop(pts);
+
+    requestAnimationFrame(render);
+  }
+
+  // ─── Controls ───
+  var bindings = [
+    ['rAngle', function(v) { theta = v; document.getElementById('vAngle').textContent = v + '\u00B0'; }],
+    ['rIndex', function(v) { nRatio = v; document.getElementById('vIndex').textContent = v.toFixed(2); }],
+    ['rWidth', function(v) { beamN = v; document.getElementById('vWidth').textContent = v; }],
+    ['rSpeed', function(v) { speedMul = v; document.getElementById('vSpeed').textContent = v.toFixed(1) + 'x'; }],
+  ];
+
+  for (var i = 0; i < bindings.length; i++) {
+    (function(id, fn) {
+      document.getElementById(id).addEventListener('input', function() {
+        fn(+this.value);
+        time = 0;
+      });
+    })(bindings[i][0], bindings[i][1]);
+  }
+
+  document.getElementById('bPause').addEventListener('click', function() {
+    paused = !paused;
+    this.textContent = paused ? 'Play' : 'Pause';
+  });
+
+  document.getElementById('bReset').addEventListener('click', function() { time = 0; });
+
+  resize();
+  requestAnimationFrame(render);
+})();
+</script>
+</body>
+</html>
